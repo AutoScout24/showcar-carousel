@@ -1,9 +1,12 @@
+$item-width-xs: calc(100vw - 20px);
 $item-width-s: calc(100vw - 40px);
 $item-width-m: 310px;
 
 as24-carousel {
   display: block;
   position: relative;
+  white-space: nowrap;
+  overflow: hidden;
 
   // CAROUSEL PAGINATION
   .as24-pagination {
@@ -48,7 +51,7 @@ as24-carousel {
   as24-carousel-item {
     border: 1px solid #dcdcdc;
     display: inline-block;
-    width: $item-width-s;
+    width: $item-width-xs;
     margin: 0 10px;
     background-color: white;
     text-align: center;
@@ -59,7 +62,7 @@ as24-carousel {
     // Lazy image aspect ratio load hack for fixing the flickering bug on webkit
     // Currently the style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
 
-    .carousel-image-container {
+    .as24-carousel-image-container {
       position: relative;
       display: block;
       overflow: hidden;
@@ -80,12 +83,12 @@ as24-carousel {
       }
     }
 
-    .description {
+    .as24-carousel-description {
 
       padding: 20px 20px 28px;
       vertical-align: top;
 
-      h5 {
+      h2, h3, h4, h5 {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -93,9 +96,15 @@ as24-carousel {
         display: block;
       }
 
+      p {
+        color: #333;
+      }
+
     }
 
     @media screen and (min-width: 320px) {
+
+      width: $item-width-s;
 
       &:first-child {
         margin-left: 20px;
