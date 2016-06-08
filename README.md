@@ -4,13 +4,21 @@ This module provides a easy to use carousel.
 
 ## Usage
 
-For an example usage of the carousel, have a look inside the
-examples directory.
+For an example usage of the carousel, have a look inside the examples directory.
+Just run the following command in root of the carousel library
+
+```
+$> npm start
+```
+
+This will open a small express server on your local machine where you can see the running example
+[http://localhost:8080](http://localhost:8080)
+
 
 ### HTML Code
 
-The whole carousel is defined by an `as24-carousel` element. Each
-item needs to be wrapped inside a `as24-carousel-item` element.
+The whole carousel is defined by an `as24-carousel` element. 
+Each item needs to be wrapped inside a `as24-carousel-item` element.
 See the following example below:
 
 ```html
@@ -18,12 +26,12 @@ See the following example below:
 
     <as24-carousel-item>
       <a href="javascript:void(0);">
-        <div class="carousel-image-container">
+        <div class="as24-carousel-image-container">
             <img data-src="http://placehold.it/320x240?text=1,320x240"
                  src=""
                  alt="">
         </div>
-        <div class="carousel-description">
+        <div class="as24-carousel-description">
             <h5>Headline</h5>
             <p>Content</p>
         </div>
@@ -38,7 +46,7 @@ See the following example below:
  For better performance it is possible to lazy load images. Therefor just replace
  the `src` attribute of your `img` with an `data-src` attribute.
 
-### CSS Styling ( Changing the image aspect ratio)
+#### CSS Styling ( Changing the image aspect ratio)
 
 Currently the default style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
 In order to change the aspect ratio of the images in the carousel add the following to you implementation.
@@ -54,6 +62,7 @@ In order to change the aspect ratio of the images in the carousel add the follow
 ### JS Interface
 
 If you need to change the width of the carousel dynamically, you can call the ``redraw()`` method, to force the carousel to recalculate its sizings and positionings.
+Note: Window resizing is included out of the box
 
 ```
 document.getElementById('carousel-example').redraw()
@@ -65,7 +74,9 @@ document.getElementById('carousel-example').redraw()
 
   To install showcar-carousel within your project use npm.
 
-  `npm install --save git@github.com:AutoScout24/showcar-carousel.git`
+  ```
+  npm install --save git@github.com:AutoScout24/showcar-carousel.git
+  ```
 
   Afterwards you need to add the css and js to your page.
 
@@ -77,7 +88,9 @@ document.getElementById('carousel-example').redraw()
   <script src="../dist/showcar-carousel.js"></script>
   ```
 
-  showcar-carousel has no dependencies.
+  showcar-carousel has no further dependencies.
+
+***
 
 ## Contributing
 
@@ -94,3 +107,6 @@ document.getElementById('carousel-example').redraw()
 ## License
 
 MIT License
+
+***
+
