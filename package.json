@@ -1,6 +1,6 @@
 {
   "name": "showcar-carousel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An simple carousel elemen of the showcar ui library",
   "main": "dist/showcar-carousel.min.js",
   "scripts": {
@@ -21,10 +21,10 @@
     "watch:server": "nodemon --ignore dist --ignore src ./example/server.js",
     "watch:sass": "node-sass -w ./src/ -o ./dist/",
     "watch:babel": "babel $npm_package_config_src.js -w -o $npm_package_config_dist.js -s",
-    "watch:browser":"livereload",
+    "watch:browser": "livereload",
     "prewatch": "echo 'Starting watchers'",
     "watch": "npm run watch:sass & npm run watch:babel & npm run watch:server & npm run watch:browser",
-    "dev":"npm run watch",
+    "dev": "npm run watch",
     "version:major": "npm version major",
     "version:minor": "npm version minor",
     "version:patch": "npm version patch",
