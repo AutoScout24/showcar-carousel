@@ -1,7 +1,7 @@
 {
   "name": "showcar-carousel",
   "version": "1.0.1",
-  "description": "An simple carousel elemen of the showcar ui library",
+  "description": "A simple carousel component without dependencies.",
   "main": "dist/showcar-carousel.min.js",
   "scripts": {
     "prestart": "npm install",
