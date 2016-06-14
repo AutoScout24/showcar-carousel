@@ -57,9 +57,9 @@ Currently the default style is set to support 4:3 images if the carousel uses an
 In order to change the aspect ratio of the images in the carousel add the following to you implementation.
 
 ```css
-  // CAROUSEL ITEM
+  /* CAROUSEL ITEM */
   as24-carousel-item > .carousel-image-container {
-    // Aspect ratio of the image ( 100% width / 75% height = 1.333 )
+    /* Aspect ratio of the image ( 100% width / 75% height = 1.333 ) */
     padding-bottom: 75%;
   }
 ```
