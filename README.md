@@ -4,18 +4,23 @@ This module provides a easy to use carousel.
 
 ## Usage
 
-For an example usage of the carousel, have a look inside the examples directory.
-Just run the following command in root of the carousel library
+#####Live example:
+Visit the [example](https://autoscout24.github.io/showcar-carousel/) on github pages.
+
+
+#####Local example:
+Just run the following command in the root of the carousel library.
 
 ```
 $> npm start
 ```
+This will open a small express server on your local machine where you can see the running example.
 
-This will open a small express server on your local machine where you can see the running example
-[http://localhost:8080](http://localhost:8080)
+Visit: [http://localhost:8080](http://localhost:8080)
 
 
-### HTML Code
+
+#### HTML Code
 
 The whole carousel is defined by an `as24-carousel` element. 
 Each item needs to be wrapped inside a `as24-carousel-item` element.
@@ -43,8 +48,8 @@ See the following example below:
 ```
 
 #### lazy loading
- For better performance it is possible to lazy load images. Therefor just replace
- the `src` attribute of your `img` with an `data-src` attribute.
+ For better performance it is possible to lazy load images.
+ Therefor just replace the `src` attribute of your `img` with an `data-src` attribute.
 
 #### CSS Styling ( Changing the image aspect ratio)
 
@@ -59,10 +64,10 @@ In order to change the aspect ratio of the images in the carousel add the follow
   }
 ```
 
-### JS Interface
+#### JS Interface
 
 If you need to change the width of the carousel dynamically, you can call the ``redraw()`` method, to force the carousel to recalculate its sizings and positionings.
-Note: Window resizing is included out of the box
+*Note: Window resizing is included out of the box.*
 
 ```
 document.getElementById('carousel-example').redraw()
@@ -70,12 +75,12 @@ document.getElementById('carousel-example').redraw()
 
 ## Installation
 
-### How to install:
+#### How to install:
 
   To install showcar-carousel within your project use npm.
 
   ```
-  npm install showcar-carousel --save
+  $> npm install showcar-carousel --save
   ```
 
   Afterwards you need to add the css and js to your page.
@@ -94,19 +99,21 @@ document.getElementById('carousel-example').redraw()
 
 ## Contributing
 
-### How to contribute:
+#### How to contribute:
 
-  Fork this repository and `git clone` your fork. Then `npm install` the required dependencies.
+  * Fork this repository and `$> git clone` your fork. 
+  * Then `$> npm install` the required dependencies.
+  * Start the dev server `$> npm run dev`.
+  * Visit [http://localhost:8080](http://localhost:8080)
 
-#### Contribute
+*Note: ( changes will automatically build and refresh the browser )*
 
-  Save your changes and run `npm build`.
+##### Contribute
+
+  Save your changes and run `$> npm prod`.
 
   Commit your code _and_ the compiled libraries in _./dist_. Then create a pull-request.
 
 ## License
 
 MIT License
-
-***
-
