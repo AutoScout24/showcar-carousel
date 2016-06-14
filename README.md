@@ -93,7 +93,7 @@ document.getElementById('carousel-example').redraw()
   <script src="../dist/showcar-carousel.js"></script>
   ```
 
-  showcar-carousel has no further dependencies.
+  *Note: showcar-carousel has no further dependencies.*
 
 ***
 
