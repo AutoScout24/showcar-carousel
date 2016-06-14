@@ -106,7 +106,7 @@ document.getElementById('carousel-example').redraw()
   * Start the dev server `$> npm run dev`.
   * Visit [http://localhost:8080](http://localhost:8080)
 
-*Note: ( changes will automatically build and refresh the browser )*
+*Note: changes will automatically build and refresh the browser.*
 
 ##### Contribute
 
