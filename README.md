@@ -75,7 +75,7 @@ document.getElementById('carousel-example').redraw()
   To install showcar-carousel within your project use npm.
 
   ```
-  npm install --save git@github.com:AutoScout24/showcar-carousel.git
+  npm install showcar-carousel --save
   ```
 
   Afterwards you need to add the css and js to your page.
