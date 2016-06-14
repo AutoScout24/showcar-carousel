@@ -2,6 +2,8 @@
 
 This module provides a easy to use carousel.
 
+***
+
 ## Usage
 
 #####Live example:
