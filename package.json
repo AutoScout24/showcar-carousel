@@ -18,7 +18,7 @@
     "build:clean": "rimraf dist",
     "postbuild": "echo 'Build succeeded!'",
     "prod": "npm run build",
-    "watch:server": "nodemon --ignore dist --ignore src ./example/server.js",
+    "watch:server": "nodemon --ignore dist --ignore src --ignore node_modules ./example/server.js",
     "watch:sass": "node-sass -w ./src/ -o ./dist/",
     "watch:babel": "babel $npm_package_config_src.js -w -o $npm_package_config_dist.js -s",
     "watch:browser": "livereload",
