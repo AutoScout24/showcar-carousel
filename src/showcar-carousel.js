@@ -20,6 +20,8 @@
  * @returns {HTMLElement}
  */
 function addClass(className, domEl) {
+  if (!domEl.getAttribute) return domEl;
+
   let classList = [], classesString = domEl.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
@@ -40,6 +42,8 @@ function addClass(className, domEl) {
  * @returns {HTMLElement}
  */
 function removeClass(className, domEl) {
+  if (!domEl.getAttribute) return domEl;
+
   let classList = [], classesString = domEl.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
@@ -58,6 +62,8 @@ function removeClass(className, domEl) {
  * @returns {boolean}
  */
 function containsClass(className, domEl) {
+  if (!domEl.getAttribute) return false;
+
   let classList = [], classesString = domEl.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
@@ -253,6 +259,9 @@ class Carousel {
    * Wraps all the carousel items in a wrapper plus a container
    */
   addContainer() {
+
+    if (containsClass('as24-carousel-wrapper', this.element.firstChild)) return;
+
     let wrapper = document.createElement('div');
     addClass('as24-carousel-wrapper', wrapper);
 
