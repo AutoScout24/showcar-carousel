@@ -1,4 +1,19 @@
 /**
+ * Polyfill for CustomEvent
+ */
+(function () {
+  if ( typeof window.CustomEvent === "function" ) return false;
+  function CustomEvent ( event, params ) {
+    params = params || { bubbles: false, cancelable: false, detail: undefined };
+    var evt = document.createEvent( 'CustomEvent' );
+    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    return evt;
+  }
+  CustomEvent.prototype = window.Event.prototype;
+  window.CustomEvent = CustomEvent;
+})();
+
+/**
  * Add a class to the given DOM element
  * @param {string} className
  * @param {HTMLElement} domEl
@@ -53,8 +68,9 @@ function containsClass(className, domEl) {
 
 class Carousel {
 
-  constructor(element) {
+  constructor(element, config = {}) {
 
+    this.gap = config.gap || 20;
     this.element = element;
     this.container = null;
 
@@ -115,12 +131,12 @@ class Carousel {
    * Resizes the carousel items
    */
   resizeItems(){
-    this.orgWidth = this.items[0].getBoundingClientRect().width + 20;
+    this.orgWidth = this.items[0].getBoundingClientRect().width + this.gap;
     if(this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth){
-      this.itemWidth = this.element.offsetWidth - 20;
-      [].forEach.call(this.items, element => element.style.width = `${this.itemWidth-20}px`);
+      this.itemWidth = this.element.offsetWidth - this.gap;
+      [].forEach.call(this.items, element => element.style.width = `${this.itemWidth-this.gap}px`);
     } else {
-      this.itemWidth = this.items[0].getBoundingClientRect().width + 20;
+      this.itemWidth = this.items[0].getBoundingClientRect().width + this.gap;
     }
   }
 
@@ -285,20 +301,40 @@ class Carousel {
   }
 
   /**
+   * Move the carousel to an specified image
+   * @param {Number} index
+   */
+  goTo(index){
+    this.index = index;
+    this.triggerEvent('slide',{
+      index: this.index
+    });
+    this.update();
+  }
+
+  /**
    * The handler for the pagination event
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
    */
   paginate(direction){
     this.getNewIndex(direction);
+    this.triggerEvent('slide',{
+      direction: direction,
+      index: this.index
+    });
+    this.update();
+  }
+
+  /**
+   * Updates the position of the carousel
+   */
+  update(){
     let distance = this.calculateDistance();
     this.setPaginationButtonsVisibility();
     this.loadImages();
     this.moveContainer(distance);
   }
 
-  /**
-   * Calculates the moving distance
-   */
   calculateDistance(){
     let distance =  this.index * this.stepWidth;
     distance = distance > this.totalReach ? this.totalReach : distance;
@@ -350,6 +386,18 @@ class Carousel {
       });
     }
   }
+
+  /**
+   * Triggers event
+   * @param {String} event
+   * @param {Object} payload
+   */
+  triggerEvent(type,payload){
+    let event = new CustomEvent(type, {detail: payload});
+    this.element.dispatchEvent(event);
+  }
+
+
 }
 
 
@@ -437,9 +485,9 @@ try {
         createdCallback: { value: elementCreatedHandler },
         attachedCallback: { value: elementAttachedHandler }
       }), {
-        redraw: function () {
-          this.carousel.redraw();
-        }
+        redraw: function ()     { this.carousel.redraw(); },
+        goTo: function (index)  { this.carousel.goTo(index); },
+        getIndex: function()    { return this.carousel.index; }
       }
     )
   });

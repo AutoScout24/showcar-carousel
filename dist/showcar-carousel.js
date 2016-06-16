@@ -5,6 +5,21 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
+ * Polyfill for CustomEvent
+ */
+(function () {
+  if (typeof window.CustomEvent === "function") return false;
+  function CustomEvent(event, params) {
+    params = params || { bubbles: false, cancelable: false, detail: undefined };
+    var evt = document.createEvent('CustomEvent');
+    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+    return evt;
+  }
+  CustomEvent.prototype = window.Event.prototype;
+  window.CustomEvent = CustomEvent;
+})();
+
+/**
  * Add a class to the given DOM element
  * @param {string} className
  * @param {HTMLElement} domEl
@@ -61,8 +76,11 @@ function containsClass(className, domEl) {
 
 var Carousel = function () {
   function Carousel(element) {
+    var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
     _classCallCheck(this, Carousel);
 
+    this.gap = config.gap || 20;
     this.element = element;
     this.container = null;
 
@@ -133,14 +151,14 @@ var Carousel = function () {
     value: function resizeItems() {
       var _this = this;
 
-      this.orgWidth = this.items[0].getBoundingClientRect().width + 20;
+      this.orgWidth = this.items[0].getBoundingClientRect().width + this.gap;
       if (this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth) {
-        this.itemWidth = this.element.offsetWidth - 20;
+        this.itemWidth = this.element.offsetWidth - this.gap;
         [].forEach.call(this.items, function (element) {
-          return element.style.width = _this.itemWidth - 20 + 'px';
+          return element.style.width = _this.itemWidth - _this.gap + 'px';
         });
       } else {
-        this.itemWidth = this.items[0].getBoundingClientRect().width + 20;
+        this.itemWidth = this.items[0].getBoundingClientRect().width + this.gap;
       }
     }
 
@@ -344,6 +362,21 @@ var Carousel = function () {
     }
 
     /**
+     * Move the carousel to an specified image
+     * @param {Number} index
+     */
+
+  }, {
+    key: 'goTo',
+    value: function goTo(index) {
+      this.index = index;
+      this.triggerEvent('slide', {
+        index: this.index
+      });
+      this.update();
+    }
+
+    /**
      * The handler for the pagination event
      * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
      */
@@ -352,16 +385,25 @@ var Carousel = function () {
     key: 'paginate',
     value: function paginate(direction) {
       this.getNewIndex(direction);
+      this.triggerEvent('slide', {
+        direction: direction,
+        index: this.index
+      });
+      this.update();
+    }
+
+    /**
+     * Updates the position of the carousel
+     */
+
+  }, {
+    key: 'update',
+    value: function update() {
       var distance = this.calculateDistance();
       this.setPaginationButtonsVisibility();
       this.loadImages();
       this.moveContainer(distance);
     }
-
-    /**
-     * Calculates the moving distance
-     */
-
   }, {
     key: 'calculateDistance',
     value: function calculateDistance() {
@@ -423,6 +465,19 @@ var Carousel = function () {
           }
         });
       }
+    }
+
+    /**
+     * Triggers event
+     * @param {String} event
+     * @param {Object} payload
+     */
+
+  }, {
+    key: 'triggerEvent',
+    value: function triggerEvent(type, payload) {
+      var event = new CustomEvent(type, { detail: payload });
+      this.element.dispatchEvent(event);
     }
   }, {
     key: 'items',
@@ -523,6 +578,12 @@ try {
     }), {
       redraw: function redraw() {
         this.carousel.redraw();
+      },
+      goTo: function goTo(index) {
+        this.carousel.goTo(index);
+      },
+      getIndex: function getIndex() {
+        return this.carousel.index;
       }
     })
   });
