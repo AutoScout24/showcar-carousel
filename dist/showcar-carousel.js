@@ -570,7 +570,7 @@ var Carousel = function () {
   }, {
     key: 'resizeHandler',
     value: function resizeHandler() {
-      var currentWindowWidth = getWindowWidth();
+      var currentWindowWidth = this.getWindowWidth();
       if (this.windowWidth !== currentWindowWidth) {
         this.windowWidth = currentWindowWidth;
         this.redraw();

@@ -470,7 +470,7 @@ class Carousel {
    * Checks if the window width has changed and starts the redraw process.
    */
   resizeHandler() {
-    let currentWindowWidth = getWindowWidth();
+    let currentWindowWidth = this.getWindowWidth();
     if (this.windowWidth !== currentWindowWidth) {
       this.windowWidth = currentWindowWidth;
       this.redraw();
