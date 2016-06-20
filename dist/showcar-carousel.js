@@ -5,7 +5,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
- * Polyfill for CustomEvent
+ * Poly-fill for CustomEvent.
  */
 (function () {
   if (typeof window.CustomEvent === "function") return false;
@@ -20,12 +20,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 })();
 
 /**
- * Add a class to the given DOM element
+ * Add a class to the given DOM element.
  * @param {string} className
  * @param {HTMLElement} domEl
  * @returns {HTMLElement}
  */
 function addClass(className, domEl) {
+  if (!domEl.getAttribute) return domEl;
+
   var classList = [],
       classesString = domEl.getAttribute('class');
   if (classesString) {
@@ -41,12 +43,14 @@ function addClass(className, domEl) {
 }
 
 /**
- * Remove a class from the given DOM element
+ * Remove a class from the given DOM element.
  * @param {string} className
  * @param {HTMLElement} domEl
  * @returns {HTMLElement}
  */
 function removeClass(className, domEl) {
+  if (!domEl.getAttribute) return domEl;
+
   var classList = [],
       classesString = domEl.getAttribute('class');
   if (classesString) {
@@ -60,12 +64,14 @@ function removeClass(className, domEl) {
 }
 
 /**
- * Check if the given DOM element has a class
+ * Check if the given DOM element has a class.
  * @param {string} className
  * @param {HTMLElement} domEl
  * @returns {boolean}
  */
 function containsClass(className, domEl) {
+  if (!domEl.getAttribute) return false;
+
   var classList = [],
       classesString = domEl.getAttribute('class');
   if (classesString) {
@@ -74,15 +80,30 @@ function containsClass(className, domEl) {
   return classList.indexOf(className) > -1;
 }
 
+/**
+ * Main Class for the Carousel component.
+ */
+
 var Carousel = function () {
+
+  /** @constructor */
+
   function Carousel(element) {
-    var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var config = arguments.length <= 1 || arguments[1] === undefined ? {
+      gap: 20
+    } : arguments[1];
 
     _classCallCheck(this, Carousel);
 
-    this.gap = config.gap || 20;
+    this.config = config;
     this.element = element;
     this.container = null;
+
+    this.resizeTimeout = null;
+    this.resizeListener = null;
+    this.touchStartListener = null;
+    this.touchMoveListener = null;
+    this.touchEndListener = null;
 
     this.pagination = {
       left: null,
@@ -93,7 +114,6 @@ var Carousel = function () {
     this.refWidth = 330;
     this.itemWidth = 330;
     this.touchStart = {};
-    this.touchPrev = {};
 
     this.speed = Carousel.Speed.SLOW;
 
@@ -101,25 +121,37 @@ var Carousel = function () {
     addClass('as24-pagination', this.pager);
     addClass('hide', this.pager);
     this.pager.href = '#';
-
-    this.element.addEventListener('touchstart', this.touchStartEventHandler.bind(this));
-    this.element.addEventListener('touchmove', this.touchMoveEventHandler.bind(this));
-    this.element.addEventListener('touchend', this.touchEndEventHandler.bind(this));
   }
 
   /**
-   * Gets all carousel items
+   * Gets all carousel items.
    */
 
 
   _createClass(Carousel, [{
-    key: 'init',
+    key: 'attached',
 
 
     /**
-     * Initializes the carousel by adding all necessary bits and bolts
+     * Initializes the carousel by adding all necessary bits and bolts.
      */
-    value: function init() {
+    value: function attached() {
+      // Get the initial window with
+      this.windowWidth = this.getWindowWidth();
+
+      // Create Listeners
+      this.resizeListener = this.resizeTimeoutHandler.bind(this);
+      this.touchStartListener = this.touchStartEventHandler.bind(this);
+      this.touchMoveListener = this.touchMoveEventHandler.bind(this);
+      this.touchEndListener = this.touchEndEventHandler.bind(this);
+
+      // Add Listeners
+      window.addEventListener('resize', this.resizeListener, true);
+      this.element.addEventListener('touchstart', this.touchStartListener, true);
+      this.element.addEventListener('touchmove', this.touchMoveListener, true);
+      this.element.addEventListener('touchend', this.touchEndListener, true);
+
+      // Add all necessary items and do the math
       this.addContainer();
       this.resizeItems();
       this.addPagination();
@@ -128,7 +160,26 @@ var Carousel = function () {
     }
 
     /**
-     * Redraw the whole carousel (can be triggered from outside)
+     * Initializes the carousel by adding all necessary bits and bolts.
+     */
+
+  }, {
+    key: 'detached',
+    value: function detached() {
+      // Remove Listeners
+      window.removeEventListener('resize', this.resizeListener, true);
+      this.element.removeEventListener('touchstart', this.touchStartListener, true);
+      this.element.removeEventListener('touchmove', this.touchMoveListener, true);
+      this.element.removeEventListener('touchend', this.touchEndListener, true);
+
+      // Remove dynamically created Elements
+      this.removeContainer();
+      this.removePagination();
+    }
+
+    /**
+     * Redraw the whole carousel.
+     * @public
      */
 
   }, {
@@ -143,7 +194,7 @@ var Carousel = function () {
     }
 
     /**
-     * Resizes the carousel items
+     * Resizes the carousel items.
      */
 
   }, {
@@ -151,20 +202,20 @@ var Carousel = function () {
     value: function resizeItems() {
       var _this = this;
 
-      this.orgWidth = this.items[0].getBoundingClientRect().width + this.gap;
+      this.orgWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
       if (this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth) {
-        this.itemWidth = this.element.offsetWidth - this.gap;
+        this.itemWidth = this.element.offsetWidth - this.config.gap;
         [].forEach.call(this.items, function (element) {
-          return element.style.width = _this.itemWidth - _this.gap + 'px';
+          return element.style.width = _this.itemWidth - _this.config.gap + 'px';
         });
       } else {
-        this.itemWidth = this.items[0].getBoundingClientRect().width + this.gap;
+        this.itemWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
       }
     }
 
     /**
-     * Handles the touch start event
-     * @param {TouchEvent|Event} event - the event object
+     * Handles the touch start event.
+     * @param {Event} event - the event object
      */
 
   }, {
@@ -174,13 +225,12 @@ var Carousel = function () {
       this.resetTouch();
       if (!containsClass('as24-pagination', target)) {
         this.touchStart = this.getTouchCoords(event);
-        this.touchPrev = this.touchStart;
       }
     }
 
     /**
-     * Handles the touch move event
-     * @param {TouchEvent|Event} event - the event object
+     * Handles the touch move event.
+     * @param {Event} event - the event object
      */
 
   }, {
@@ -198,13 +248,12 @@ var Carousel = function () {
         this.resetTouch();
       } else {
         event.preventDefault();
-        this.touchPrev = touchCoords;
       }
     }
 
     /**
-     * Handles the touch end event
-     * @param {TouchEvent|Event} event - the event object
+     * Handles the touch end event.
+     * @param {Event} event - the event object
      */
 
   }, {
@@ -229,8 +278,8 @@ var Carousel = function () {
     }
 
     /**
-     * Gets the touch coordinates by its touch event
-     * @param {TouchEvent|Event} event - the event object
+     * Gets the touch coordinates by its touch event.
+     * @param {Event} event - the event object
      * @returns {Coordinate} coordinate - object containing some x and y coordinates
      */
 
@@ -242,18 +291,17 @@ var Carousel = function () {
     }
 
     /**
-     * Resets the touch coordinates
+     * Resets the touch coordinates.
      */
 
   }, {
     key: 'resetTouch',
     value: function resetTouch() {
       this.touchStart = {};
-      this.touchPrev = {};
     }
 
     /**
-     * Checks if the carousel is in swiping mode
+     * Checks if the carousel is in swiping mode.
      * @returns {boolean}
      */
 
@@ -264,7 +312,7 @@ var Carousel = function () {
     }
 
     /**
-     * Gets all the necessary dimensions and values for calculating distances and the index
+     * Gets all the necessary dimensions and values for calculating distances and the index.
      */
 
   }, {
@@ -278,7 +326,7 @@ var Carousel = function () {
     }
 
     /**
-     * Get the new index for paginating depending on the direction
+     * Get the new index for paginating depending on the direction.
      * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
      */
 
@@ -293,7 +341,7 @@ var Carousel = function () {
     }
 
     /**
-     * Wraps all the carousel items in a wrapper plus a container
+     * Wraps all the carousel items in a wrapper plus a container.
      */
 
   }, {
@@ -301,11 +349,16 @@ var Carousel = function () {
     value: function addContainer() {
       var _this2 = this;
 
-      var wrapper = document.createElement('div');
-      addClass('as24-carousel-wrapper', wrapper);
+      if (containsClass('as24-carousel-wrapper', this.element.firstChild)) {
+        this.wrapper = this.element.querySelector('.as24-carousel-wrapper');
+        this.container = this.element.querySelector('.as24-carousel-container');
+        return;
+      }
+
+      this.wrapper = document.createElement('div');
+      addClass('as24-carousel-wrapper', this.wrapper);
 
       this.container = document.createElement('div');
-
       addClass('as24-carousel-container', this.container);
 
       [].forEach.call(this.element.children, function (element) {
@@ -313,21 +366,36 @@ var Carousel = function () {
         _this2.container.appendChild(item);
       });
 
-      wrapper.appendChild(this.container);
-
+      this.wrapper.appendChild(this.container);
       this.element.innerHTML = '';
-      this.element.appendChild(wrapper);
+      this.element.appendChild(this.wrapper);
     }
 
     /**
-     * Adds the 'left' and 'right 'pagination buttons
+     * Removes the container.
+     */
+
+  }, {
+    key: 'removeContainer',
+    value: function removeContainer() {
+      var _this3 = this;
+
+      [].forEach.call(this.container.children, function (element) {
+        _this3.container.removeChild(element);
+      });
+      this.wrapper.removeChild(this.container);
+      this.element.removeChild(this.wrapper);
+    }
+
+    /**
+     * Adds the 'left' and 'right 'pagination buttons.
      */
 
   }, {
     key: 'addPagination',
     value: function addPagination() {
+      this.removePagination();
       var _arr = [Carousel.Direction.LEFT, Carousel.Direction.RIGHT];
-
       for (var _i = 0; _i < _arr.length; _i++) {
         var direction = _arr[_i];
         this.createPaginationButton(direction);
@@ -336,14 +404,27 @@ var Carousel = function () {
     }
 
     /**
-     * Creates the pagination buttons and event listeners
+     * Removes the 'left' and 'right 'pagination buttons.
+     */
+
+  }, {
+    key: 'removePagination',
+    value: function removePagination() {
+      var buttons = this.element.querySelectorAll('[data-direction]');
+      [].forEach.call(buttons, function (element) {
+        element.parentNode.removeChild(element);
+      });
+    }
+
+    /**
+     * Creates the pagination buttons and event listeners.
      * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
      */
 
   }, {
     key: 'createPaginationButton',
     value: function createPaginationButton(direction) {
-      var _this3 = this;
+      var _this4 = this;
 
       var button = this.pagination[direction] = this.pager.cloneNode(true);
       button.setAttribute('data-direction', direction);
@@ -351,7 +432,7 @@ var Carousel = function () {
       button.addEventListener('mouseup', function (e) {
         e.stopPropagation();
         e.preventDefault();
-        _this3.paginate(direction);
+        _this4.paginate(direction);
       });
 
       button.addEventListener('click', function (e) {
@@ -362,7 +443,8 @@ var Carousel = function () {
     }
 
     /**
-     * Move the carousel to an specified image
+     * Move the carousel to an specified image.
+     * @public
      * @param {Number} index
      */
 
@@ -377,7 +459,7 @@ var Carousel = function () {
     }
 
     /**
-     * The handler for the pagination event
+     * The handler for the pagination event.
      * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
      */
 
@@ -393,7 +475,7 @@ var Carousel = function () {
     }
 
     /**
-     * Updates the position of the carousel
+     * Updates the position of the carousel.
      */
 
   }, {
@@ -413,20 +495,21 @@ var Carousel = function () {
     }
 
     /**
-     * Moves the container by the given distance
+     * Moves the container by the given distance.
      * @param {Number} distance - the moving distance
      */
 
   }, {
     key: 'moveContainer',
-    value: function moveContainer(distance) {
-      distance = distance | 0;
+    value: function moveContainer() {
+      var distance = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+
       this.container.style.transform = 'translate3d(' + distance + 'px, 0, 0)';
       this.container.style.webkitTransform = 'translate3d(' + distance + 'px, 0, 0)';
     }
 
     /**
-     * Sets the visibility of the pagination buttons
+     * Sets the visibility of the pagination buttons.
      */
 
   }, {
@@ -445,7 +528,7 @@ var Carousel = function () {
     }
 
     /**
-     * Only loads the images of the carousel items that are currently visible
+     * Only loads the images of the carousel items that are currently visible.
      */
 
   }, {
@@ -468,9 +551,9 @@ var Carousel = function () {
     }
 
     /**
-     * Triggers event
-     * @param {String} event
-     * @param {Object} payload
+     * Triggers an custom event with the given name and payload.
+     * @param {String} type - name of the event
+     * @param {Object} payload - payload of the event
      */
 
   }, {
@@ -478,6 +561,42 @@ var Carousel = function () {
     value: function triggerEvent(type, payload) {
       var event = new CustomEvent(type, { detail: payload });
       this.element.dispatchEvent(event);
+    }
+
+    /**
+     * Checks if the window width has changed and starts the redraw process.
+     */
+
+  }, {
+    key: 'resizeHandler',
+    value: function resizeHandler() {
+      var currentWindowWidth = getWindowWidth();
+      if (this.windowWidth !== currentWindowWidth) {
+        this.windowWidth = currentWindowWidth;
+        this.redraw();
+      }
+    }
+
+    /**
+     * Resize timeout call blocker.
+     */
+
+  }, {
+    key: 'resizeTimeoutHandler',
+    value: function resizeTimeoutHandler() {
+      clearTimeout(this.resizeTimeout);
+      this.resizeTimeout = setTimeout(this.resizeHandler.bind(this), 300);
+    }
+
+    /**
+     * gets the current client height.
+     * @returns {number}
+     */
+
+  }, {
+    key: 'getWindowWidth',
+    value: function getWindowWidth() {
+      return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     }
   }, {
     key: 'items',
@@ -528,53 +647,59 @@ Carousel.Coordinate = function () {
 };
 
 /**
- * gets the current client height.
- * @returns {number}
- */
-function getWindowWidth() {
-  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-}
-
-/**
- * Handler for resizing
- */
-function resizeHandler() {
-  var currentWindowWidth = getWindowWidth();
-  if (this.windowWidth !== currentWindowWidth) {
-    this.windowWidth = currentWindowWidth;
-    this.carousel.redraw();
-  }
-}
-
-/**
- * Gets called after the element is created
+ * Handler for creating the element.
  */
 function elementCreatedHandler() {
-  this.carousel = new Carousel(this);
-}
-
-/**
- * Gets called when the element is attached to the dom
- */
-function elementAttachedHandler() {
-  var _this4 = this;
-
-  this.carousel.init();
-  this.windowWidth = getWindowWidth();
-  window.addEventListener('resize', function () {
-    clearTimeout(resizeHandler);
-    setTimeout(resizeHandler.bind(_this4), 300);
+  var gap = parseInt(checkValue(this.getAttribute('gap'), 20));
+  this.carousel = new Carousel(this, {
+    gap: gap
   });
 }
 
 /**
- * Registering the carousel component
+ * Handler for the attachment of the element to the dom.
+ */
+function elementAttachedHandler() {
+  this.carousel.attached();
+}
+
+/**
+ * Handler for detachment of the element from the dom.
+ */
+function elementDetachedCallback() {
+  this.carousel.detached();
+  delete this.carousel;
+}
+
+/**
+ * Handler for the element attribute changes.
+ * @property {String} attributeName
+ */
+function elementAttributeChangedHandler(attributeName) {
+  if (attributeName === 'gap') {
+    this.carousel.config.gap = parseInt(checkValue(this.getAttribute('gap'), 20));
+  }
+}
+
+/**
+ * Method for assigning an default value if the given value is undefined or null.
+ * @property {Object} value - value to check
+ * @property {Object} defaultValue - the default value to be set if the given value is undefined
+ */
+function checkValue(value, defaultValue) {
+  return typeof value !== 'undefined' && value !== null ? value : defaultValue;
+}
+
+/**
+ * Try to register the carousel component.
  */
 try {
   document.registerElement('as24-carousel', {
     prototype: Object.assign(Object.create(HTMLElement.prototype, {
       createdCallback: { value: elementCreatedHandler },
-      attachedCallback: { value: elementAttachedHandler }
+      attachedCallback: { value: elementAttachedHandler },
+      detachedCallback: { value: elementDetachedCallback },
+      attributeChangedCallback: { value: elementAttributeChangedHandler }
     }), {
       redraw: function redraw() {
         this.carousel.redraw();

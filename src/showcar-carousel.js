@@ -1,5 +1,5 @@
 /**
- * Polyfill for CustomEvent
+ * Poly-fill for CustomEvent.
  */
 (function () {
   if ( typeof window.CustomEvent === "function" ) return false;
@@ -14,7 +14,7 @@
 })();
 
 /**
- * Add a class to the given DOM element
+ * Add a class to the given DOM element.
  * @param {string} className
  * @param {HTMLElement} domEl
  * @returns {HTMLElement}
@@ -36,7 +36,7 @@ function addClass(className, domEl) {
 }
 
 /**
- * Remove a class from the given DOM element
+ * Remove a class from the given DOM element.
  * @param {string} className
  * @param {HTMLElement} domEl
  * @returns {HTMLElement}
@@ -56,7 +56,7 @@ function removeClass(className, domEl) {
 }
 
 /**
- * Check if the given DOM element has a class
+ * Check if the given DOM element has a class.
  * @param {string} className
  * @param {HTMLElement} domEl
  * @returns {boolean}
@@ -72,13 +72,26 @@ function containsClass(className, domEl) {
 }
 
 
+/**
+ * Main Class for the Carousel component.
+ */
 class Carousel {
 
-  constructor(element, config = {}) {
+  /** @constructor */
+  constructor(element,
+              config = {
+                gap: 20
+              }) {
 
-    this.gap = config.gap || 20;
+    this.config = config;
     this.element = element;
     this.container = null;
+
+    this.resizeTimeout = null;
+    this.resizeListener = null;
+    this.touchStartListener = null;
+    this.touchMoveListener = null;
+    this.touchEndListener = null;
 
     this.pagination = {
       left: null,
@@ -89,7 +102,6 @@ class Carousel {
     this.refWidth = 330;
     this.itemWidth = 330;
     this.touchStart = {};
-    this.touchPrev  = {};
 
     this.speed = Carousel.Speed.SLOW;
 
@@ -97,23 +109,35 @@ class Carousel {
     addClass('as24-pagination', this.pager);
     addClass('hide', this.pager);
     this.pager.href = '#';
-
-    this.element.addEventListener('touchstart', this.touchStartEventHandler.bind(this));
-    this.element.addEventListener('touchmove',  this.touchMoveEventHandler.bind(this));
-    this.element.addEventListener('touchend',   this.touchEndEventHandler.bind(this));
   }
 
   /**
-   * Gets all carousel items
+   * Gets all carousel items.
    */
   get items() {
     return this.element.querySelectorAll('as24-carousel-item');
   }
 
   /**
-   * Initializes the carousel by adding all necessary bits and bolts
+   * Initializes the carousel by adding all necessary bits and bolts.
    */
-  init() {
+  attached() {
+    // Get the initial window with
+    this.windowWidth = this.getWindowWidth();
+
+    // Create Listeners
+    this.resizeListener     = this.resizeTimeoutHandler.bind(this);
+    this.touchStartListener = this.touchStartEventHandler.bind(this);
+    this.touchMoveListener  = this.touchMoveEventHandler.bind(this);
+    this.touchEndListener   = this.touchEndEventHandler.bind(this);
+
+    // Add Listeners
+    window.addEventListener(      'resize',     this.resizeListener,      true);
+    this.element.addEventListener('touchstart', this.touchStartListener,  true);
+    this.element.addEventListener('touchmove',  this.touchMoveListener,   true);
+    this.element.addEventListener('touchend',   this.touchEndListener,    true);
+
+    // Add all necessary items and do the math
     this.addContainer();
     this.resizeItems();
     this.addPagination();
@@ -122,7 +146,23 @@ class Carousel {
   }
 
   /**
-   * Redraw the whole carousel (can be triggered from outside)
+   * Initializes the carousel by adding all necessary bits and bolts.
+   */
+  detached() {
+    // Remove Listeners
+    window.removeEventListener(      'resize',     this.resizeListener,     true);
+    this.element.removeEventListener('touchstart', this.touchStartListener, true);
+    this.element.removeEventListener('touchmove',  this.touchMoveListener,  true);
+    this.element.removeEventListener('touchend',   this.touchEndListener,   true);
+
+    // Remove dynamically created Elements
+    this.removeContainer();
+    this.removePagination();
+  }
+
+  /**
+   * Redraw the whole carousel.
+   * @public
    */
   redraw() {
     this.index = 0;
@@ -134,34 +174,33 @@ class Carousel {
   }
 
   /**
-   * Resizes the carousel items
+   * Resizes the carousel items.
    */
   resizeItems(){
-    this.orgWidth = this.items[0].getBoundingClientRect().width + this.gap;
+    this.orgWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
     if(this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth){
-      this.itemWidth = this.element.offsetWidth - this.gap;
-      [].forEach.call(this.items, element => element.style.width = `${this.itemWidth-this.gap}px`);
+      this.itemWidth = this.element.offsetWidth - this.config.gap;
+      [].forEach.call(this.items, element => element.style.width = `${this.itemWidth-this.config.gap}px`);
     } else {
-      this.itemWidth = this.items[0].getBoundingClientRect().width + this.gap;
+      this.itemWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
     }
   }
 
   /**
-   * Handles the touch start event
-   * @param {TouchEvent|Event} event - the event object
+   * Handles the touch start event.
+   * @param {Event} event - the event object
    */
   touchStartEventHandler(event) {
     const target = event.target;
     this.resetTouch();
     if (!containsClass('as24-pagination', target)) {
       this.touchStart = this.getTouchCoords(event);
-      this.touchPrev  = this.touchStart;
     }
   }
 
   /**
-   * Handles the touch move event
-   * @param {TouchEvent|Event} event - the event object
+   * Handles the touch move event.
+   * @param {Event} event - the event object
    */
   touchMoveEventHandler(event) {
     if (!this.isSwiping()) {
@@ -176,13 +215,12 @@ class Carousel {
       this.resetTouch();
     } else {
       event.preventDefault();
-      this.touchPrev = touchCoords;
     }
   }
 
   /**
-   * Handles the touch end event
-   * @param {TouchEvent|Event} event - the event object
+   * Handles the touch end event.
+   * @param {Event} event - the event object
    */
   touchEndEventHandler(event) {
     if (!this.isSwiping()) {
@@ -204,8 +242,8 @@ class Carousel {
   }
 
   /**
-   * Gets the touch coordinates by its touch event
-   * @param {TouchEvent|Event} event - the event object
+   * Gets the touch coordinates by its touch event.
+   * @param {Event} event - the event object
    * @returns {Coordinate} coordinate - object containing some x and y coordinates
    */
   getTouchCoords(event) {
@@ -217,15 +255,14 @@ class Carousel {
   }
 
   /**
-   * Resets the touch coordinates
+   * Resets the touch coordinates.
    */
   resetTouch() {
     this.touchStart = {};
-    this.touchPrev  = {};
   }
 
   /**
-   * Checks if the carousel is in swiping mode
+   * Checks if the carousel is in swiping mode.
    * @returns {boolean}
    */
   isSwiping() {
@@ -233,18 +270,18 @@ class Carousel {
   }
 
   /**
-   * Gets all the necessary dimensions and values for calculating distances and the index
+   * Gets all the necessary dimensions and values for calculating distances and the index.
    */
   calculateEnvironment(){
-    this.itemsLength    = this.container.children.length;
-    this.itemsVisible   = Math.floor(this.element.offsetWidth / this.itemWidth);
-    this.totalReach     = this.container.offsetWidth - this.element.offsetWidth;
-    this.stepLength     = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
-    this.stepWidth      = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
+    this.itemsLength  = this.container.children.length;
+    this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
+    this.totalReach   = this.container.offsetWidth - this.element.offsetWidth;
+    this.stepLength   = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
+    this.stepWidth    = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
   }
 
   /**
-   * Get the new index for paginating depending on the direction
+   * Get the new index for paginating depending on the direction.
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
    */
   getNewIndex(direction){
@@ -256,17 +293,19 @@ class Carousel {
   }
 
   /**
-   * Wraps all the carousel items in a wrapper plus a container
+   * Wraps all the carousel items in a wrapper plus a container.
    */
   addContainer() {
+    if (containsClass('as24-carousel-wrapper', this.element.firstChild)){
+      this.wrapper = this.element.querySelector('.as24-carousel-wrapper');
+      this.container = this.element.querySelector('.as24-carousel-container');
+      return;
+    }
 
-    if (containsClass('as24-carousel-wrapper', this.element.firstChild)) return;
-
-    let wrapper = document.createElement('div');
-    addClass('as24-carousel-wrapper', wrapper);
+    this.wrapper = document.createElement('div');
+    addClass('as24-carousel-wrapper', this.wrapper);
 
     this.container = document.createElement('div');
-
     addClass('as24-carousel-container', this.container);
 
     [].forEach.call(this.element.children, element => {
@@ -274,16 +313,27 @@ class Carousel {
       this.container.appendChild(item);
     });
 
-    wrapper.appendChild(this.container);
-
+    this.wrapper.appendChild(this.container);
     this.element.innerHTML = '';
-    this.element.appendChild(wrapper);
+    this.element.appendChild(this.wrapper);
   }
 
   /**
-   * Adds the 'left' and 'right 'pagination buttons
+   * Removes the container.
+   */
+  removeContainer() {
+    [].forEach.call(this.container.children, element => {
+      this.container.removeChild(element);
+    });
+    this.wrapper.removeChild(this.container);
+    this.element.removeChild(this.wrapper);
+  }
+
+  /**
+   * Adds the 'left' and 'right 'pagination buttons.
    */
   addPagination() {
+    this.removePagination();
     for (let direction of [Carousel.Direction.LEFT, Carousel.Direction.RIGHT]){
       this.createPaginationButton(direction);
     }
@@ -291,7 +341,17 @@ class Carousel {
   }
 
   /**
-   * Creates the pagination buttons and event listeners
+   * Removes the 'left' and 'right 'pagination buttons.
+   */
+  removePagination() {
+    let buttons = this.element.querySelectorAll('[data-direction]');
+    [].forEach.call(buttons, element => {
+      element.parentNode.removeChild(element);
+    });
+  }
+
+  /**
+   * Creates the pagination buttons and event listeners.
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
    */
   createPaginationButton(direction) {
@@ -310,7 +370,8 @@ class Carousel {
   }
 
   /**
-   * Move the carousel to an specified image
+   * Move the carousel to an specified image.
+   * @public
    * @param {Number} index
    */
   goTo(index){
@@ -322,7 +383,7 @@ class Carousel {
   }
 
   /**
-   * The handler for the pagination event
+   * The handler for the pagination event.
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
    */
   paginate(direction){
@@ -335,7 +396,7 @@ class Carousel {
   }
 
   /**
-   * Updates the position of the carousel
+   * Updates the position of the carousel.
    */
   update(){
     let distance = this.calculateDistance();
@@ -351,17 +412,16 @@ class Carousel {
   }
 
   /**
-   * Moves the container by the given distance
+   * Moves the container by the given distance.
    * @param {Number} distance - the moving distance
    */
-  moveContainer(distance){
-    distance = distance | 0;
+  moveContainer(distance = 0){
     this.container.style.transform = 'translate3d(' + distance + 'px, 0, 0)';
     this.container.style.webkitTransform = 'translate3d(' + distance + 'px, 0, 0)';
   }
 
   /**
-   * Sets the visibility of the pagination buttons
+   * Sets the visibility of the pagination buttons.
    */
   setPaginationButtonsVisibility(){
     if(this.index === 0){
@@ -377,7 +437,7 @@ class Carousel {
   }
 
   /**
-   * Only loads the images of the carousel items that are currently visible
+   * Only loads the images of the carousel items that are currently visible.
    */
   loadImages(){
     let start = this.index;
@@ -397,18 +457,42 @@ class Carousel {
   }
 
   /**
-   * Triggers event
-   * @param {String} event
-   * @param {Object} payload
+   * Triggers an custom event with the given name and payload.
+   * @param {String} type - name of the event
+   * @param {Object} payload - payload of the event
    */
   triggerEvent(type,payload){
     let event = new CustomEvent(type, {detail: payload});
     this.element.dispatchEvent(event);
   }
 
+  /**
+   * Checks if the window width has changed and starts the redraw process.
+   */
+  resizeHandler() {
+    let currentWindowWidth = getWindowWidth();
+    if (this.windowWidth !== currentWindowWidth) {
+      this.windowWidth = currentWindowWidth;
+      this.redraw();
+    }
+  }
 
+  /**
+   * Resize timeout call blocker.
+   */
+  resizeTimeoutHandler(){
+    clearTimeout(this.resizeTimeout);
+    this.resizeTimeout = setTimeout(this.resizeHandler.bind(this), 300);
+  }
+
+  /**
+   * gets the current client height.
+   * @returns {number}
+   */
+  getWindowWidth() {
+    return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  }
 }
-
 
 
 /**
@@ -421,7 +505,6 @@ Carousel.Direction = {
   RIGHT: 'right'
 };
 
-
 /**
  * Speed Enum string values.
  * @enum {string}
@@ -431,7 +514,6 @@ Carousel.Speed = {
   SLOW: 'slow',
   FAST: 'fast'
 };
-
 
 /**
  * @typedef Coordinate
@@ -447,56 +529,64 @@ Carousel.Coordinate = function(x = 0, y = 0){
 };
 
 /**
- * gets the current client height.
- * @returns {number}
- */
-function getWindowWidth() {
-  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-}
-
-/**
- * Handler for resizing
- */
-function resizeHandler() {
-  let currentWindowWidth = getWindowWidth();
-  if(this.windowWidth !== currentWindowWidth){
-    this.windowWidth = currentWindowWidth;
-    this.carousel.redraw();
-  }
-}
-
-/**
- * Gets called after the element is created
+ * Handler for creating the element.
  */
 function elementCreatedHandler() {
-  this.carousel = new Carousel(this);
-}
-
-/**
- * Gets called when the element is attached to the dom
- */
-function elementAttachedHandler() {
-  this.carousel.init();
-  this.windowWidth = getWindowWidth();
-  window.addEventListener('resize', () =>{
-    clearTimeout(resizeHandler);
-    setTimeout(resizeHandler.bind(this),300);
+  let gap = parseInt(checkValue(this.getAttribute('gap'), 20));
+  this.carousel = new Carousel(this, {
+    gap: gap
   });
 }
 
 /**
- * Registering the carousel component
+ * Handler for the attachment of the element to the dom.
+ */
+function elementAttachedHandler() {
+  this.carousel.attached();
+}
+
+/**
+ * Handler for detachment of the element from the dom.
+ */
+function elementDetachedCallback() {
+  this.carousel.detached();
+  delete this.carousel;
+}
+
+/**
+ * Handler for the element attribute changes.
+ * @property {String} attributeName
+ */
+function elementAttributeChangedHandler(attributeName) {
+  if(attributeName === 'gap'){
+    this.carousel.config.gap = parseInt(checkValue(this.getAttribute('gap'), 20));
+  }
+}
+
+/**
+ * Method for assigning an default value if the given value is undefined or null.
+ * @property {Object} value - value to check
+ * @property {Object} defaultValue - the default value to be set if the given value is undefined
+ */
+function checkValue(value, defaultValue) {
+  return typeof value !== 'undefined' && value !== null ? value : defaultValue;
+}
+
+/**
+ * Try to register the carousel component.
  */
 try {
   document.registerElement('as24-carousel', {
     prototype: Object.assign(
       Object.create( HTMLElement.prototype, {
-        createdCallback: { value: elementCreatedHandler },
-        attachedCallback: { value: elementAttachedHandler }
+        createdCallback:          { value: elementCreatedHandler },
+        attachedCallback:         { value: elementAttachedHandler },
+        detachedCallback:         { value: elementDetachedCallback },
+        attributeChangedCallback: { value: elementAttributeChangedHandler }
       }), {
-        redraw: function ()     { this.carousel.redraw(); },
-        goTo: function (index)  { this.carousel.goTo(index); },
-        getIndex: function()    { return this.carousel.index; }
+        redraw:   function (){ this.carousel.redraw(); },
+        goTo:     function (index){ this.carousel.goTo(index); },
+        getIndex: function (){ return this.carousel.index; }
       }
     )
   });
