@@ -1,5 +1,6 @@
 /**
  * Poly-fill for CustomEvent.
+ * ToDo: Move to ui utils library
  */
 (function () {
   if ( typeof window.CustomEvent === "function" ) return false;
@@ -16,13 +17,14 @@
 /**
  * Add a class to the given DOM element.
  * @param {string} className
- * @param {HTMLElement} domEl
+ * @param {HTMLElement} element
  * @returns {HTMLElement}
+ * ToDo: Move to ui utils library
  */
-function addClass(className, domEl) {
-  if (!domEl.getAttribute) return domEl;
+function addClass(className, element) {
+  if (!element.getAttribute) return element;
 
-  let classList = [], classesString = domEl.getAttribute('class');
+  let classList = [], classesString = element.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
     if (classList.indexOf(className) === -1) {
@@ -31,40 +33,42 @@ function addClass(className, domEl) {
   } else {
     classesString = className
   }
-  domEl.setAttribute('class', classesString);
-  return domEl;
+  element.setAttribute('class', classesString);
+  return element;
 }
 
 /**
  * Remove a class from the given DOM element.
  * @param {string} className
- * @param {HTMLElement} domEl
+ * @param {HTMLElement} element
  * @returns {HTMLElement}
+ * ToDo: Move to ui utils library
  */
-function removeClass(className, domEl) {
-  if (!domEl.getAttribute) return domEl;
+function removeClass(className, element) {
+  if (!element.getAttribute) return element;
 
-  let classList = [], classesString = domEl.getAttribute('class');
+  let classList = [], classesString = element.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
     if(classList.indexOf(className) !== -1){
       classList.splice(classList.indexOf(className), 1);
     }
-    domEl.setAttribute('class', classList.join(' '));
+    element.setAttribute('class', classList.join(' '));
   }
-  return domEl;
+  return element;
 }
 
 /**
  * Check if the given DOM element has a class.
  * @param {string} className
- * @param {HTMLElement} domEl
+ * @param {HTMLElement} element
  * @returns {boolean}
+ * ToDo: Move to ui utils library
  */
-function containsClass(className, domEl) {
-  if (!domEl.getAttribute) return false;
+function containsClass(className, element) {
+  if (!element.getAttribute) return false;
 
-  let classList = [], classesString = domEl.getAttribute('class');
+  let classList = [], classesString = element.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
   }
@@ -78,10 +82,7 @@ function containsClass(className, domEl) {
 class Carousel {
 
   /** @constructor */
-  constructor(element,
-              config = {
-                gap: 20
-              }) {
+  constructor(element, config) {
 
     this.config = config;
     this.element = element;
@@ -165,12 +166,17 @@ class Carousel {
    * @public
    */
   redraw() {
-    this.index = 0;
+
     this.resizeItems();
     this.calculateEnvironment();
-    this.setPaginationButtonsVisibility();
+
+    if(this.config.mode === Carousel.Mode.DEFAULT){
+      this.index = 0;
+      this.move(0, this.container);
+      this.setPaginationButtonsVisibility();
+    }
+
     this.loadImages();
-    this.moveContainer(0);
   }
 
   /**
@@ -270,29 +276,6 @@ class Carousel {
   }
 
   /**
-   * Gets all the necessary dimensions and values for calculating distances and the index.
-   */
-  calculateEnvironment(){
-    this.itemsLength  = this.container.children.length;
-    this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
-    this.totalReach   = this.container.offsetWidth - this.element.offsetWidth;
-    this.stepLength   = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
-    this.stepWidth    = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
-  }
-
-  /**
-   * Get the new index for paginating depending on the direction.
-   * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
-   */
-  getNewIndex(direction){
-    if(direction === Carousel.Direction.LEFT && this.index > 0){
-      this.index -= 1;
-    } else if(direction === Carousel.Direction.RIGHT && this.index < this.stepLength) {
-      this.index += 1;
-    }
-  }
-
-  /**
    * Wraps all the carousel items in a wrapper plus a container.
    */
   addContainer() {
@@ -337,7 +320,12 @@ class Carousel {
     for (let direction of [Carousel.Direction.LEFT, Carousel.Direction.RIGHT]){
       this.createPaginationButton(direction);
     }
+
     removeClass('hide', this.pagination.right);
+
+    if(this.config.mode === Carousel.Mode.SLIDER){
+      removeClass('hide', this.pagination.left);
+    }
   }
 
   /**
@@ -379,7 +367,7 @@ class Carousel {
     this.triggerEvent('slide',{
       index: this.index
     });
-    this.update();
+    this.update(Carousel.Direction.RIGHT);
   }
 
   /**
@@ -387,37 +375,99 @@ class Carousel {
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
    */
   paginate(direction){
-    this.getNewIndex(direction);
+    this.index = this.getIndexOf(this.index, direction);
     this.triggerEvent('slide',{
       direction: direction,
       index: this.index
     });
-    this.update();
+    this.update(direction);
+  }
+
+  /**
+   * Gets all the necessary dimensions and values for calculating distances and the index.
+   */
+  calculateEnvironment(){
+    this.itemsLength  = this.container.children.length;
+    this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
+    this.totalReach   = this.container.offsetWidth - this.element.offsetWidth;
+    this.stepLength   = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
+    this.stepWidth    = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
+  }
+
+  /**
+   * Get the new index for paginating depending on the direction.
+   * @param {Number} index - the current index
+   * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
+   */
+  getIndexOf(index, direction){
+    let i = parseInt(index);
+    if(direction === Carousel.Direction.LEFT){
+      if(i > 0){
+        return i - 1;
+      } else if(this.config.mode === Carousel.Mode.SLIDER){
+        return this.stepLength;
+      } else {
+        return 0;
+      }
+    } else if(direction === Carousel.Direction.RIGHT) {
+      if(i < this.stepLength){
+        return i + 1;
+      } else if(this.config.mode === Carousel.Mode.SLIDER){
+        return 0;
+      } else {
+        return this.stepLength;
+      }
+    }
   }
 
   /**
    * Updates the position of the carousel.
    */
-  update(){
-    let distance = this.calculateDistance();
-    this.setPaginationButtonsVisibility();
-    this.loadImages();
-    this.moveContainer(distance);
-  }
+  update(direction) {
 
-  calculateDistance(){
-    let distance =  this.index * this.stepWidth;
-    distance = distance > this.totalReach ? this.totalReach : distance;
-    return ~ distance + 1;
+    this.loadImages();
+
+    if (this.config.mode === Carousel.Mode.DEFAULT) {
+
+      let distance = this.index * this.stepWidth;
+      distance = distance > this.totalReach ? this.totalReach : distance;
+      distance = ~distance + 1;
+      this.setPaginationButtonsVisibility();
+      this.move(distance, this.container);
+
+    } else if(this.config.mode === Carousel.Mode.SLIDER) {
+
+      let lastPosition = direction === Carousel.Direction.LEFT ? Carousel.Direction.RIGHT : Carousel.Direction.LEFT;
+      let lastIndex = this.getIndexOf(this.index, lastPosition);
+      let lastDirection = direction === Carousel.Direction.LEFT ? '' : '-';
+      let lastItem = this.items[lastIndex];
+      let currentDirection = direction === Carousel.Direction.LEFT ? '-' : '';
+      let currentItem = this.items[this.index];
+
+      addClass('no-transition', currentItem);
+      addClass('no-transition', lastItem);
+      this.move(parseInt(currentDirection + this.stepWidth), currentItem);
+
+      setTimeout(() => {
+
+        removeClass('no-transition', currentItem);
+        removeClass('no-transition', lastItem);
+        currentItem.style.transform = 'translate3d(0px, 0, 0)';
+        this.move(0, currentItem);
+        this.move(parseInt(lastDirection + this.stepWidth), lastItem);
+
+      }, 1);
+    }
   }
 
   /**
-   * Moves the container by the given distance.
+   * Moves the element by the given distance.
    * @param {Number} distance - the moving distance
+   * @param {HTMLElement} element
    */
-  moveContainer(distance = 0){
-    this.container.style.transform = 'translate3d(' + distance + 'px, 0, 0)';
-    this.container.style.webkitTransform = 'translate3d(' + distance + 'px, 0, 0)';
+  move(distance, element){
+    element.style.transform = 'translate3d(' + distance + 'px, 0, 0)';
+    element.style.webkitTransform = 'translate3d(' + distance + 'px, 0, 0)';
   }
 
   /**
@@ -438,13 +488,29 @@ class Carousel {
 
   /**
    * Only loads the images of the carousel items that are currently visible.
+   * ToDo: Dependent on the current carousel mode.
    */
   loadImages(){
-    let start = this.index;
-    let itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
-    let end = this.speed === Carousel.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
-    end = end > this.itemsLength ? this.itemsLength : end;
-    for(let i = start; i < end; i++ ){
+
+    let items = [];
+
+    if(this.config.mode === Carousel.Mode.DEFAULT){
+      let start = this.index;
+      let itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
+      let end = this.speed === Carousel.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
+      end = end > this.itemsLength ? this.itemsLength : end;
+      for(let i = start; i < end; i++ ) {
+        items.push(i);
+      }
+    } else if(this.config.mode === Carousel.Mode.SLIDER){
+      items = Array.of(
+        this.getIndexOf(this.index, Carousel.Direction.LEFT),
+        this.index,
+        this.getIndexOf(this.index, Carousel.Direction.RIGHT)
+      );
+    }
+
+    for(let i of items ) {
       let images = this.container.children[i].querySelectorAll('img');
       [].forEach.call(images, image => {
         let src = image.getAttribute('data-src');
@@ -516,6 +582,16 @@ Carousel.Speed = {
 };
 
 /**
+ * Mode Enum string values.
+ * @enum {string}
+ * @readonly
+ */
+Carousel.Mode = {
+  DEFAULT: 'default',
+  SLIDER: 'slider'
+};
+
+/**
  * @typedef Coordinate
  * @type Object
  * @property {number} [x = 0] - The X Coordinate
@@ -528,14 +604,21 @@ Carousel.Coordinate = function(x = 0, y = 0){
   }
 };
 
+
+Carousel.Attributes = [
+  {name: 'gap',   value: 20,                    type: 'Number'},
+  {name: 'mode',  value: Carousel.Mode.DEFAULT, type: 'String'}
+];
+
 /**
  * Handler for creating the element.
  */
 function elementCreatedHandler() {
-  let gap = parseInt(checkValue(this.getAttribute('gap'), 20));
-  this.carousel = new Carousel(this, {
-    gap: gap
-  });
+  let config = {};
+  for(let attribute of Carousel.Attributes){
+    config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
+  }
+  this.carousel = new Carousel(this, config);
 }
 
 /**
@@ -558,8 +641,9 @@ function elementDetachedCallback() {
  * @property {String} attributeName
  */
 function elementAttributeChangedHandler(attributeName) {
-  if(attributeName === 'gap'){
-    this.carousel.config.gap = parseInt(checkValue(this.getAttribute('gap'), 20));
+  if(Carousel.Attributes.hasOwnProperty(attributeName)){
+    let attribute = Carousel.Attributes[attributeName];
+    this.carousel.config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
   }
 }
 
@@ -567,9 +651,17 @@ function elementAttributeChangedHandler(attributeName) {
  * Method for assigning an default value if the given value is undefined or null.
  * @property {Object} value - value to check
  * @property {Object} defaultValue - the default value to be set if the given value is undefined
+ * @property {String} type - the type of the value
  */
-function checkValue(value, defaultValue) {
-  return typeof value !== 'undefined' && value !== null ? value : defaultValue;
+function checkValue(value, defaultValue, type = 'String') {
+  if(value !== 'undefined' && value !== null){
+    if(type === 'Number'){
+      value = parseInt(value);
+    }
+    return value;
+  } else {
+    return defaultValue;
+  }
 }
 
 /**

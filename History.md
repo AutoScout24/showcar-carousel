@@ -1,4 +1,10 @@
 
+1.0.7 / 2016-06-21
+==================
+
+  * introduced the slider mode
+  * bugfixes and improvements
+
 1.0.6 / 2016-06-20
 ==================
 
@@ -20,7 +26,7 @@
   * added events and config plus a public goTo method
 
 1.0.2 / 2016-06-16
-==================
+==================git 
 
   * added node_modules ignore for nodemon watcher
   * updated the documentation

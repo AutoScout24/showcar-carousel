@@ -6,6 +6,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 /**
  * Poly-fill for CustomEvent.
+ * ToDo: Move to ui utils library
  */
 (function () {
   if (typeof window.CustomEvent === "function") return false;
@@ -22,14 +23,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * Add a class to the given DOM element.
  * @param {string} className
- * @param {HTMLElement} domEl
+ * @param {HTMLElement} element
  * @returns {HTMLElement}
+ * ToDo: Move to ui utils library
  */
-function addClass(className, domEl) {
-  if (!domEl.getAttribute) return domEl;
+function addClass(className, element) {
+  if (!element.getAttribute) return element;
 
   var classList = [],
-      classesString = domEl.getAttribute('class');
+      classesString = element.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
     if (classList.indexOf(className) === -1) {
@@ -38,42 +40,44 @@ function addClass(className, domEl) {
   } else {
     classesString = className;
   }
-  domEl.setAttribute('class', classesString);
-  return domEl;
+  element.setAttribute('class', classesString);
+  return element;
 }
 
 /**
  * Remove a class from the given DOM element.
  * @param {string} className
- * @param {HTMLElement} domEl
+ * @param {HTMLElement} element
  * @returns {HTMLElement}
+ * ToDo: Move to ui utils library
  */
-function removeClass(className, domEl) {
-  if (!domEl.getAttribute) return domEl;
+function removeClass(className, element) {
+  if (!element.getAttribute) return element;
 
   var classList = [],
-      classesString = domEl.getAttribute('class');
+      classesString = element.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
     if (classList.indexOf(className) !== -1) {
       classList.splice(classList.indexOf(className), 1);
     }
-    domEl.setAttribute('class', classList.join(' '));
+    element.setAttribute('class', classList.join(' '));
   }
-  return domEl;
+  return element;
 }
 
 /**
  * Check if the given DOM element has a class.
  * @param {string} className
- * @param {HTMLElement} domEl
+ * @param {HTMLElement} element
  * @returns {boolean}
+ * ToDo: Move to ui utils library
  */
-function containsClass(className, domEl) {
-  if (!domEl.getAttribute) return false;
+function containsClass(className, element) {
+  if (!element.getAttribute) return false;
 
   var classList = [],
-      classesString = domEl.getAttribute('class');
+      classesString = element.getAttribute('class');
   if (classesString) {
     classList = classesString.split(' ');
   }
@@ -88,11 +92,7 @@ var Carousel = function () {
 
   /** @constructor */
 
-  function Carousel(element) {
-    var config = arguments.length <= 1 || arguments[1] === undefined ? {
-      gap: 20
-    } : arguments[1];
-
+  function Carousel(element, config) {
     _classCallCheck(this, Carousel);
 
     this.config = config;
@@ -185,12 +185,17 @@ var Carousel = function () {
   }, {
     key: 'redraw',
     value: function redraw() {
-      this.index = 0;
+
       this.resizeItems();
       this.calculateEnvironment();
-      this.setPaginationButtonsVisibility();
+
+      if (this.config.mode === Carousel.Mode.DEFAULT) {
+        this.index = 0;
+        this.move(0, this.container);
+        this.setPaginationButtonsVisibility();
+      }
+
       this.loadImages();
-      this.moveContainer(0);
     }
 
     /**
@@ -312,35 +317,6 @@ var Carousel = function () {
     }
 
     /**
-     * Gets all the necessary dimensions and values for calculating distances and the index.
-     */
-
-  }, {
-    key: 'calculateEnvironment',
-    value: function calculateEnvironment() {
-      this.itemsLength = this.container.children.length;
-      this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
-      this.totalReach = this.container.offsetWidth - this.element.offsetWidth;
-      this.stepLength = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
-      this.stepWidth = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
-    }
-
-    /**
-     * Get the new index for paginating depending on the direction.
-     * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
-     */
-
-  }, {
-    key: 'getNewIndex',
-    value: function getNewIndex(direction) {
-      if (direction === Carousel.Direction.LEFT && this.index > 0) {
-        this.index -= 1;
-      } else if (direction === Carousel.Direction.RIGHT && this.index < this.stepLength) {
-        this.index += 1;
-      }
-    }
-
-    /**
      * Wraps all the carousel items in a wrapper plus a container.
      */
 
@@ -400,7 +376,12 @@ var Carousel = function () {
         var direction = _arr[_i];
         this.createPaginationButton(direction);
       }
+
       removeClass('hide', this.pagination.right);
+
+      if (this.config.mode === Carousel.Mode.SLIDER) {
+        removeClass('hide', this.pagination.left);
+      }
     }
 
     /**
@@ -455,7 +436,7 @@ var Carousel = function () {
       this.triggerEvent('slide', {
         index: this.index
       });
-      this.update();
+      this.update(Carousel.Direction.RIGHT);
     }
 
     /**
@@ -466,12 +447,55 @@ var Carousel = function () {
   }, {
     key: 'paginate',
     value: function paginate(direction) {
-      this.getNewIndex(direction);
+      this.index = this.getIndexOf(this.index, direction);
       this.triggerEvent('slide', {
         direction: direction,
         index: this.index
       });
-      this.update();
+      this.update(direction);
+    }
+
+    /**
+     * Gets all the necessary dimensions and values for calculating distances and the index.
+     */
+
+  }, {
+    key: 'calculateEnvironment',
+    value: function calculateEnvironment() {
+      this.itemsLength = this.container.children.length;
+      this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
+      this.totalReach = this.container.offsetWidth - this.element.offsetWidth;
+      this.stepLength = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
+      this.stepWidth = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
+    }
+
+    /**
+     * Get the new index for paginating depending on the direction.
+     * @param {Number} index - the current index
+     * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
+     */
+
+  }, {
+    key: 'getIndexOf',
+    value: function getIndexOf(index, direction) {
+      var i = parseInt(index);
+      if (direction === Carousel.Direction.LEFT) {
+        if (i > 0) {
+          return i - 1;
+        } else if (this.config.mode === Carousel.Mode.SLIDER) {
+          return this.stepLength;
+        } else {
+          return 0;
+        }
+      } else if (direction === Carousel.Direction.RIGHT) {
+        if (i < this.stepLength) {
+          return i + 1;
+        } else if (this.config.mode === Carousel.Mode.SLIDER) {
+          return 0;
+        } else {
+          return this.stepLength;
+        }
+      }
     }
 
     /**
@@ -480,32 +504,55 @@ var Carousel = function () {
 
   }, {
     key: 'update',
-    value: function update() {
-      var distance = this.calculateDistance();
-      this.setPaginationButtonsVisibility();
+    value: function update(direction) {
+      var _this5 = this;
+
       this.loadImages();
-      this.moveContainer(distance);
-    }
-  }, {
-    key: 'calculateDistance',
-    value: function calculateDistance() {
-      var distance = this.index * this.stepWidth;
-      distance = distance > this.totalReach ? this.totalReach : distance;
-      return ~distance + 1;
+
+      if (this.config.mode === Carousel.Mode.DEFAULT) {
+
+        var distance = this.index * this.stepWidth;
+        distance = distance > this.totalReach ? this.totalReach : distance;
+        distance = ~distance + 1;
+        this.setPaginationButtonsVisibility();
+        this.move(distance, this.container);
+      } else if (this.config.mode === Carousel.Mode.SLIDER) {
+        (function () {
+
+          var lastPosition = direction === Carousel.Direction.LEFT ? Carousel.Direction.RIGHT : Carousel.Direction.LEFT;
+          var lastIndex = _this5.getIndexOf(_this5.index, lastPosition);
+          var lastDirection = direction === Carousel.Direction.LEFT ? '' : '-';
+          var lastItem = _this5.items[lastIndex];
+          var currentDirection = direction === Carousel.Direction.LEFT ? '-' : '';
+          var currentItem = _this5.items[_this5.index];
+
+          addClass('no-transition', currentItem);
+          addClass('no-transition', lastItem);
+          _this5.move(parseInt(currentDirection + _this5.stepWidth), currentItem);
+
+          setTimeout(function () {
+
+            removeClass('no-transition', currentItem);
+            removeClass('no-transition', lastItem);
+            currentItem.style.transform = 'translate3d(0px, 0, 0)';
+            _this5.move(0, currentItem);
+            _this5.move(parseInt(lastDirection + _this5.stepWidth), lastItem);
+          }, 1);
+        })();
+      }
     }
 
     /**
-     * Moves the container by the given distance.
+     * Moves the element by the given distance.
      * @param {Number} distance - the moving distance
+     * @param {HTMLElement} element
      */
 
   }, {
-    key: 'moveContainer',
-    value: function moveContainer() {
-      var distance = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-
-      this.container.style.transform = 'translate3d(' + distance + 'px, 0, 0)';
-      this.container.style.webkitTransform = 'translate3d(' + distance + 'px, 0, 0)';
+    key: 'move',
+    value: function move(distance, element) {
+      element.style.transform = 'translate3d(' + distance + 'px, 0, 0)';
+      element.style.webkitTransform = 'translate3d(' + distance + 'px, 0, 0)';
     }
 
     /**
@@ -529,24 +576,57 @@ var Carousel = function () {
 
     /**
      * Only loads the images of the carousel items that are currently visible.
+     * ToDo: Dependent on the current carousel mode.
      */
 
   }, {
     key: 'loadImages',
     value: function loadImages() {
-      var start = this.index;
-      var itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
-      var end = this.speed === Carousel.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
-      end = end > this.itemsLength ? this.itemsLength : end;
-      for (var i = start; i < end; i++) {
-        var images = this.container.children[i].querySelectorAll('img');
-        [].forEach.call(images, function (image) {
-          var src = image.getAttribute('data-src');
-          if (src !== null) {
-            image.setAttribute('src', src);
-            image.removeAttribute('data-src');
+
+      var items = [];
+
+      if (this.config.mode === Carousel.Mode.DEFAULT) {
+        var start = this.index;
+        var itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
+        var end = this.speed === Carousel.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
+        end = end > this.itemsLength ? this.itemsLength : end;
+        for (var i = start; i < end; i++) {
+          items.push(i);
+        }
+      } else if (this.config.mode === Carousel.Mode.SLIDER) {
+        items = Array.of(this.getIndexOf(this.index, Carousel.Direction.LEFT), this.index, this.getIndexOf(this.index, Carousel.Direction.RIGHT));
+      }
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _i2 = _step.value;
+
+          var images = this.container.children[_i2].querySelectorAll('img');
+          [].forEach.call(images, function (image) {
+            var src = image.getAttribute('data-src');
+            if (src !== null) {
+              image.setAttribute('src', src);
+              image.removeAttribute('data-src');
+            }
+          });
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
           }
-        });
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
       }
     }
 
@@ -631,6 +711,16 @@ Carousel.Speed = {
 };
 
 /**
+ * Mode Enum string values.
+ * @enum {string}
+ * @readonly
+ */
+Carousel.Mode = {
+  DEFAULT: 'default',
+  SLIDER: 'slider'
+};
+
+/**
  * @typedef Coordinate
  * @type Object
  * @property {number} [x = 0] - The X Coordinate
@@ -646,14 +736,39 @@ Carousel.Coordinate = function () {
   };
 };
 
+Carousel.Attributes = [{ name: 'gap', value: 20, type: 'Number' }, { name: 'mode', value: Carousel.Mode.DEFAULT, type: 'String' }];
+
 /**
  * Handler for creating the element.
  */
 function elementCreatedHandler() {
-  var gap = parseInt(checkValue(this.getAttribute('gap'), 20));
-  this.carousel = new Carousel(this, {
-    gap: gap
-  });
+  var config = {};
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = Carousel.Attributes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var attribute = _step2.value;
+
+      config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
+    }
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
+  }
+
+  this.carousel = new Carousel(this, config);
 }
 
 /**
@@ -676,8 +791,9 @@ function elementDetachedCallback() {
  * @property {String} attributeName
  */
 function elementAttributeChangedHandler(attributeName) {
-  if (attributeName === 'gap') {
-    this.carousel.config.gap = parseInt(checkValue(this.getAttribute('gap'), 20));
+  if (Carousel.Attributes.hasOwnProperty(attributeName)) {
+    var attribute = Carousel.Attributes[attributeName];
+    this.carousel.config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
   }
 }
 
@@ -685,9 +801,19 @@ function elementAttributeChangedHandler(attributeName) {
  * Method for assigning an default value if the given value is undefined or null.
  * @property {Object} value - value to check
  * @property {Object} defaultValue - the default value to be set if the given value is undefined
+ * @property {String} type - the type of the value
  */
 function checkValue(value, defaultValue) {
-  return typeof value !== 'undefined' && value !== null ? value : defaultValue;
+  var type = arguments.length <= 2 || arguments[2] === undefined ? 'String' : arguments[2];
+
+  if (value !== 'undefined' && value !== null) {
+    if (type === 'Number') {
+      value = parseInt(value);
+    }
+    return value;
+  } else {
+    return defaultValue;
+  }
 }
 
 /**
