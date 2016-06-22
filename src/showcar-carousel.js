@@ -441,6 +441,8 @@ class Carousel {
    */
   update(direction) {
 
+    this.triggerChange();
+
     this.loadImages();
 
     if (this.config.mode === Carousel.Mode.DEFAULT) {
@@ -546,6 +548,14 @@ class Carousel {
   triggerEvent(type,payload){
     let event = new CustomEvent(type, {detail: payload});
     this.element.dispatchEvent(event);
+  }
+
+  /**
+   * Triggers an event for tracking.
+   */
+  triggerChange() {
+    let event = new CustomEvent('as24-carousel:change', {detail: {id: this.element.id}});
+    window.document.dispatchEvent(event);
   }
 
   /**

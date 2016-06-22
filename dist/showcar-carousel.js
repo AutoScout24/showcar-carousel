@@ -522,6 +522,8 @@ var Carousel = function () {
     value: function update(direction) {
       var _this6 = this;
 
+      this.triggerChange();
+
       this.loadImages();
 
       if (this.config.mode === Carousel.Mode.DEFAULT) {
@@ -657,6 +659,17 @@ var Carousel = function () {
     value: function triggerEvent(type, payload) {
       var event = new CustomEvent(type, { detail: payload });
       this.element.dispatchEvent(event);
+    }
+
+    /**
+     * Triggers an event for tracking.
+     */
+
+  }, {
+    key: 'triggerChange',
+    value: function triggerChange() {
+      var event = new CustomEvent('as24-carousel:change', { detail: { id: this.element.id } });
+      window.document.dispatchEvent(event);
     }
 
     /**
