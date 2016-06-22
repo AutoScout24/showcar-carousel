@@ -100,6 +100,7 @@ class Carousel {
     };
 
     this.index = 0;
+    this.lastIndex = 0;
     this.refWidth = 330;
     this.itemWidth = 330;
     this.touchStart = {};
@@ -171,9 +172,21 @@ class Carousel {
     this.calculateEnvironment();
 
     if(this.config.mode === Carousel.Mode.DEFAULT){
+
       this.index = 0;
       this.move(0, this.container);
       this.setPaginationButtonsVisibility();
+
+    } else if(this.config.mode === Carousel.Mode.SLIDER){
+
+      [].forEach.call(this.items, (element, index) => {
+        if(index !== this.index){
+          addClass('no-transition', element);
+          this.move(parseInt(this.stepWidth), element);
+          removeClass('no-transition', element);
+        }
+      });
+
     }
 
     this.loadImages();
@@ -363,6 +376,7 @@ class Carousel {
    * @param {Number} index
    */
   goTo(index){
+    this.lastIndex = parseInt(this.index);
     this.index = index;
     this.triggerEvent('slide',{
       index: this.index
@@ -375,6 +389,7 @@ class Carousel {
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
    */
   paginate(direction){
+    this.lastIndex = parseInt(this.index);
     this.index = this.getIndexOf(this.index, direction);
     this.triggerEvent('slide',{
       direction: direction,
@@ -432,15 +447,16 @@ class Carousel {
       let distance = this.index * this.stepWidth;
       distance = distance > this.totalReach ? this.totalReach : distance;
       distance = ~distance + 1;
+
       this.setPaginationButtonsVisibility();
       this.move(distance, this.container);
 
-    } else if(this.config.mode === Carousel.Mode.SLIDER) {
+    } else if(this.config.mode === Carousel.Mode.SLIDER && this.lastIndex !== this.index) {
 
-      let lastPosition = direction === Carousel.Direction.LEFT ? Carousel.Direction.RIGHT : Carousel.Direction.LEFT;
-      let lastIndex = this.getIndexOf(this.index, lastPosition);
+      let lastIndex = this.lastIndex;
       let lastDirection = direction === Carousel.Direction.LEFT ? '' : '-';
       let lastItem = this.items[lastIndex];
+
       let currentDirection = direction === Carousel.Direction.LEFT ? '-' : '';
       let currentItem = this.items[this.index];
 
@@ -455,7 +471,6 @@ class Carousel {
         currentItem.style.transform = 'translate3d(0px, 0, 0)';
         this.move(0, currentItem);
         this.move(parseInt(lastDirection + this.stepWidth), lastItem);
-
       }, 1);
     }
   }

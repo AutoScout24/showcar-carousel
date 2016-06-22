@@ -111,6 +111,7 @@ var Carousel = function () {
     };
 
     this.index = 0;
+    this.lastIndex = 0;
     this.refWidth = 330;
     this.itemWidth = 330;
     this.touchStart = {};
@@ -185,14 +186,25 @@ var Carousel = function () {
   }, {
     key: 'redraw',
     value: function redraw() {
+      var _this = this;
 
       this.resizeItems();
       this.calculateEnvironment();
 
       if (this.config.mode === Carousel.Mode.DEFAULT) {
+
         this.index = 0;
         this.move(0, this.container);
         this.setPaginationButtonsVisibility();
+      } else if (this.config.mode === Carousel.Mode.SLIDER) {
+
+        [].forEach.call(this.items, function (element, index) {
+          if (index !== _this.index) {
+            addClass('no-transition', element);
+            _this.move(parseInt(_this.stepWidth), element);
+            removeClass('no-transition', element);
+          }
+        });
       }
 
       this.loadImages();
@@ -205,13 +217,13 @@ var Carousel = function () {
   }, {
     key: 'resizeItems',
     value: function resizeItems() {
-      var _this = this;
+      var _this2 = this;
 
       this.orgWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
       if (this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth) {
         this.itemWidth = this.element.offsetWidth - this.config.gap;
         [].forEach.call(this.items, function (element) {
-          return element.style.width = _this.itemWidth - _this.config.gap + 'px';
+          return element.style.width = _this2.itemWidth - _this2.config.gap + 'px';
         });
       } else {
         this.itemWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
@@ -323,7 +335,7 @@ var Carousel = function () {
   }, {
     key: 'addContainer',
     value: function addContainer() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (containsClass('as24-carousel-wrapper', this.element.firstChild)) {
         this.wrapper = this.element.querySelector('.as24-carousel-wrapper');
@@ -339,7 +351,7 @@ var Carousel = function () {
 
       [].forEach.call(this.element.children, function (element) {
         var item = element.cloneNode(true);
-        _this2.container.appendChild(item);
+        _this3.container.appendChild(item);
       });
 
       this.wrapper.appendChild(this.container);
@@ -354,10 +366,10 @@ var Carousel = function () {
   }, {
     key: 'removeContainer',
     value: function removeContainer() {
-      var _this3 = this;
+      var _this4 = this;
 
       [].forEach.call(this.container.children, function (element) {
-        _this3.container.removeChild(element);
+        _this4.container.removeChild(element);
       });
       this.wrapper.removeChild(this.container);
       this.element.removeChild(this.wrapper);
@@ -405,7 +417,7 @@ var Carousel = function () {
   }, {
     key: 'createPaginationButton',
     value: function createPaginationButton(direction) {
-      var _this4 = this;
+      var _this5 = this;
 
       var button = this.pagination[direction] = this.pager.cloneNode(true);
       button.setAttribute('data-direction', direction);
@@ -413,7 +425,7 @@ var Carousel = function () {
       button.addEventListener('mouseup', function (e) {
         e.stopPropagation();
         e.preventDefault();
-        _this4.paginate(direction);
+        _this5.paginate(direction);
       });
 
       button.addEventListener('click', function (e) {
@@ -432,6 +444,7 @@ var Carousel = function () {
   }, {
     key: 'goTo',
     value: function goTo(index) {
+      this.lastIndex = parseInt(this.index);
       this.index = index;
       this.triggerEvent('slide', {
         index: this.index
@@ -447,6 +460,7 @@ var Carousel = function () {
   }, {
     key: 'paginate',
     value: function paginate(direction) {
+      this.lastIndex = parseInt(this.index);
       this.index = this.getIndexOf(this.index, direction);
       this.triggerEvent('slide', {
         direction: direction,
@@ -505,7 +519,7 @@ var Carousel = function () {
   }, {
     key: 'update',
     value: function update(direction) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.loadImages();
 
@@ -514,29 +528,30 @@ var Carousel = function () {
         var distance = this.index * this.stepWidth;
         distance = distance > this.totalReach ? this.totalReach : distance;
         distance = ~distance + 1;
+
         this.setPaginationButtonsVisibility();
         this.move(distance, this.container);
-      } else if (this.config.mode === Carousel.Mode.SLIDER) {
+      } else if (this.config.mode === Carousel.Mode.SLIDER && this.lastIndex !== this.index) {
         (function () {
 
-          var lastPosition = direction === Carousel.Direction.LEFT ? Carousel.Direction.RIGHT : Carousel.Direction.LEFT;
-          var lastIndex = _this5.getIndexOf(_this5.index, lastPosition);
+          var lastIndex = _this6.lastIndex;
           var lastDirection = direction === Carousel.Direction.LEFT ? '' : '-';
-          var lastItem = _this5.items[lastIndex];
+          var lastItem = _this6.items[lastIndex];
+
           var currentDirection = direction === Carousel.Direction.LEFT ? '-' : '';
-          var currentItem = _this5.items[_this5.index];
+          var currentItem = _this6.items[_this6.index];
 
           addClass('no-transition', currentItem);
           addClass('no-transition', lastItem);
-          _this5.move(parseInt(currentDirection + _this5.stepWidth), currentItem);
+          _this6.move(parseInt(currentDirection + _this6.stepWidth), currentItem);
 
           setTimeout(function () {
 
             removeClass('no-transition', currentItem);
             removeClass('no-transition', lastItem);
             currentItem.style.transform = 'translate3d(0px, 0, 0)';
-            _this5.move(0, currentItem);
-            _this5.move(parseInt(lastDirection + _this5.stepWidth), lastItem);
+            _this6.move(0, currentItem);
+            _this6.move(parseInt(lastDirection + _this6.stepWidth), lastItem);
           }, 1);
         })();
       }
