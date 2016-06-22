@@ -480,6 +480,7 @@ var Carousel = function () {
       this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
       this.totalReach = this.container.offsetWidth - this.element.offsetWidth;
       this.stepLength = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
+      if (this.config.mode === Carousel.Mode.SLIDER) this.stepLength = this.container.children.length - 1;
       this.stepWidth = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
     }
 

@@ -93,6 +93,10 @@ as24-carousel {
             backface-visibility: hidden; }
   as24-carousel[mode="slider"] {
     max-width: 480px; }
+    as24-carousel[mode="slider"] .as24-pagination[data-direction="left"] {
+      left: 0px; }
+    as24-carousel[mode="slider"] .as24-pagination[data-direction="right"] {
+      right: 0px; }
     as24-carousel[mode="slider"] .as24-carousel-wrapper {
       position: relative;
       height: 0;

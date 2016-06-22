@@ -141,6 +141,15 @@ as24-carousel {
 
     max-width: 480px;
 
+    .as24-pagination {
+      &[data-direction="left"] {
+        left: 0px;
+      }
+      &[data-direction="right"] {
+        right: 0px;
+      }
+    }
+
     .as24-carousel-wrapper {
       position: relative;
       height: 0;
