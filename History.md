@@ -1,4 +1,9 @@
 
+1.0.11 / 2016-06-23
+==================
+
+  * refactored parts of the code due to some issues with old browsers and some arrow style changes
+
 1.0.10 / 2016-06-22
 ==================
 

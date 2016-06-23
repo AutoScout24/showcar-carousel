@@ -1,8 +1,8 @@
 /**
- * Poly-fill for CustomEvent.
+ * Poly-fill for "CustomEvent".
  * ToDo: Move to ui utils library
  */
-(function () {
+(function(){
   if ( typeof window.CustomEvent === "function" ) return false;
   function CustomEvent ( event, params ) {
     params = params || { bubbles: false, cancelable: false, detail: undefined };
@@ -12,6 +12,18 @@
   }
   CustomEvent.prototype = window.Event.prototype;
   window.CustomEvent = CustomEvent;
+})();
+
+/**
+ * Poly-fill for "Array.of".
+ * ToDo: Move to ui utils library
+ */
+(function(){
+if (!Array.of) {
+  Array.of = function() {
+    return Array.prototype.slice.call(arguments);
+  };
+}
 })();
 
 /**
@@ -94,6 +106,21 @@ class Carousel {
     this.touchMoveListener = null;
     this.touchEndListener = null;
 
+    this.Enums = {
+      Direction: {
+        LEFT: 'left',
+        RIGHT: 'right'
+      },
+      Speed: {
+        SLOW: 'slow',
+        FAST: 'fast'
+      },
+      Mode: {
+        DEFAULT: 'default',
+        SLIDER: 'slider'
+      }
+    };
+
     this.pagination = {
       left: null,
       right: null
@@ -105,12 +132,25 @@ class Carousel {
     this.itemWidth = 330;
     this.touchStart = {};
 
-    this.speed = Carousel.Speed.SLOW;
+    this.speed = this.Enums.Speed.SLOW;
 
     this.pager = document.createElement('a');
     addClass('as24-pagination', this.pager);
     addClass('hide', this.pager);
     this.pager.href = '#';
+  }
+
+  /**
+   * @typedef Coordinate
+   * @type Object
+   * @property {number} [x = 0] - The X Coordinate
+   * @property {number} [y = 0] - The Y Coordinate
+   */
+  Coordinate(x = 0, y = 0){
+    return {
+      x: x,
+      y: y
+    }
   }
 
   /**
@@ -171,13 +211,13 @@ class Carousel {
     this.resizeItems();
     this.calculateEnvironment();
 
-    if(this.config.mode === Carousel.Mode.DEFAULT){
+    if(this.config.mode === this.Enums.Mode.DEFAULT){
 
       this.index = 0;
       this.move(0, this.container);
       this.setPaginationButtonsVisibility();
 
-    } else if(this.config.mode === Carousel.Mode.SLIDER){
+    } else if(this.config.mode === this.Enums.Mode.SLIDER){
 
       [].forEach.call(this.items, (element, index) => {
         if(index !== this.index){
@@ -253,9 +293,9 @@ class Carousel {
 
     for (let i = 0; i < howMany; i++) {
       if (touchDiffX > 0) {
-        this.paginate(Carousel.Direction.RIGHT);
+        this.paginate(this.Enums.Direction.RIGHT);
       } else if (touchDiffX < 0) {
-        this.paginate(Carousel.Direction.LEFT);
+        this.paginate(this.Enums.Direction.LEFT);
       }
     }
   }
@@ -267,7 +307,7 @@ class Carousel {
    */
   getTouchCoords(event) {
     let touch = event.touches && event.touches[0];
-    return new Carousel.Coordinate(
+    return new this.Coordinate(
       event.clientX || (touch && touch.clientX),
       event.clientY || (touch && touch.clientY)
     );
@@ -330,13 +370,13 @@ class Carousel {
    */
   addPagination() {
     this.removePagination();
-    for (let direction of [Carousel.Direction.LEFT, Carousel.Direction.RIGHT]){
+    for (let direction of [this.Enums.Direction.LEFT, this.Enums.Direction.RIGHT]){
       this.createPaginationButton(direction);
     }
 
     removeClass('hide', this.pagination.right);
 
-    if(this.config.mode === Carousel.Mode.SLIDER){
+    if(this.config.mode === this.Enums.Mode.SLIDER){
       removeClass('hide', this.pagination.left);
     }
   }
@@ -381,7 +421,7 @@ class Carousel {
     this.triggerEvent('slide',{
       index: this.index
     });
-    this.update(Carousel.Direction.RIGHT);
+    this.update(this.Enums.Direction.RIGHT);
   }
 
   /**
@@ -405,9 +445,9 @@ class Carousel {
     this.itemsLength  = this.container.children.length;
     this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
     this.totalReach   = this.container.offsetWidth - this.element.offsetWidth;
-    this.stepLength   = this.speed === Carousel.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
-    if(this.config.mode === Carousel.Mode.SLIDER) this.stepLength = this.container.children.length - 1;
-    this.stepWidth    = this.speed === Carousel.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
+    this.stepLength   = this.speed === this.Enums.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
+    if(this.config.mode === this.Enums.Mode.SLIDER) this.stepLength = this.container.children.length - 1;
+    this.stepWidth    = this.speed === this.Enums.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
   }
 
   /**
@@ -417,18 +457,18 @@ class Carousel {
    */
   getIndexOf(index, direction){
     let i = parseInt(index);
-    if(direction === Carousel.Direction.LEFT){
+    if(direction === this.Enums.Direction.LEFT){
       if(i > 0){
         return i - 1;
-      } else if(this.config.mode === Carousel.Mode.SLIDER){
+      } else if(this.config.mode === this.Enums.Mode.SLIDER){
         return this.stepLength;
       } else {
         return 0;
       }
-    } else if(direction === Carousel.Direction.RIGHT) {
+    } else if(direction === this.Enums.Direction.RIGHT) {
       if(i < this.stepLength){
         return i + 1;
-      } else if(this.config.mode === Carousel.Mode.SLIDER){
+      } else if(this.config.mode === this.Enums.Mode.SLIDER){
         return 0;
       } else {
         return this.stepLength;
@@ -445,7 +485,7 @@ class Carousel {
 
     this.loadImages();
 
-    if (this.config.mode === Carousel.Mode.DEFAULT) {
+    if (this.config.mode === this.Enums.Mode.DEFAULT) {
 
       let distance = this.index * this.stepWidth;
       distance = distance > this.totalReach ? this.totalReach : distance;
@@ -454,13 +494,13 @@ class Carousel {
       this.setPaginationButtonsVisibility();
       this.move(distance, this.container);
 
-    } else if(this.config.mode === Carousel.Mode.SLIDER && this.lastIndex !== this.index) {
+    } else if(this.config.mode === this.Enums.Mode.SLIDER && this.lastIndex !== this.index) {
 
       let lastIndex = this.lastIndex;
-      let lastDirection = direction === Carousel.Direction.LEFT ? '' : '-';
+      let lastDirection = direction === this.Enums.Direction.LEFT ? '' : '-';
       let lastItem = this.items[lastIndex];
 
-      let currentDirection = direction === Carousel.Direction.LEFT ? '-' : '';
+      let currentDirection = direction === this.Enums.Direction.LEFT ? '-' : '';
       let currentItem = this.items[this.index];
 
       addClass('no-transition', currentItem);
@@ -512,23 +552,23 @@ class Carousel {
 
     let items = [];
 
-    if(this.config.mode === Carousel.Mode.DEFAULT){
+    if(this.config.mode === this.Enums.Mode.DEFAULT){
       let start = this.index;
       let itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
-      let end = this.speed === Carousel.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
+      let end = this.speed === this.Enums.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
       end = end > this.itemsLength ? this.itemsLength : end;
       for(let i = start; i < end; i++ ) {
         items.push(i);
       }
-    } else if(this.config.mode === Carousel.Mode.SLIDER){
+    } else if(this.config.mode === this.Enums.Mode.SLIDER){
       items = Array.of(
-        this.getIndexOf(this.index, Carousel.Direction.LEFT),
+        this.getIndexOf(this.index, this.Enums.Direction.LEFT),
         this.index,
-        this.getIndexOf(this.index, Carousel.Direction.RIGHT)
+        this.getIndexOf(this.index, this.Enums.Direction.RIGHT)
       );
     }
 
-    for(let i of items ) {
+    [].forEach.call(items, i => {
       let images = this.container.children[i].querySelectorAll('img');
       [].forEach.call(images, image => {
         let src = image.getAttribute('data-src');
@@ -537,7 +577,7 @@ class Carousel {
           image.removeAttribute('data-src');
         }
       });
-    }
+    });
   }
 
   /**
@@ -586,130 +626,91 @@ class Carousel {
   }
 }
 
+(function(){
 
-/**
- * Direction Enum string values.
- * @enum {string}
- * @readonly
- */
-Carousel.Direction = {
-  LEFT: 'left',
-  RIGHT: 'right'
-};
+  /**
+   * Allowed element attributes and there defaults.
+   */
+  let attributes = [
+      {name: 'gap',   value: 20,        type: 'Number'},
+      {name: 'mode',  value: 'default', type: 'String'}
+  ];
 
-/**
- * Speed Enum string values.
- * @enum {string}
- * @readonly
- */
-Carousel.Speed = {
-  SLOW: 'slow',
-  FAST: 'fast'
-};
+  /**
+   * Handler for creating the element.
+   */
+  let elementCreatedHandler = function() {
+    let config = {};
+    [].forEach.call(attributes, attribute => {
+      config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
+    });
+    this.carousel = new Carousel(this, config);
+  };
 
-/**
- * Mode Enum string values.
- * @enum {string}
- * @readonly
- */
-Carousel.Mode = {
-  DEFAULT: 'default',
-  SLIDER: 'slider'
-};
+  /**
+   * Handler for the attachment of the element to the dom.
+   */
+  let elementAttachedHandler = function() {
+    this.carousel.attached();
+  };
 
-/**
- * @typedef Coordinate
- * @type Object
- * @property {number} [x = 0] - The X Coordinate
- * @property {number} [y = 0] - The Y Coordinate
- */
-Carousel.Coordinate = function(x = 0, y = 0){
-  return {
-    x: x,
-    y: y
-  }
-};
+  /**
+   * Handler for detachment of the element from the dom.
+   */
+  let elementDetachedCallback = function() {
+    this.carousel.detached();
+    delete this.carousel;
+  };
 
-
-Carousel.Attributes = [
-  {name: 'gap',   value: 20,                    type: 'Number'},
-  {name: 'mode',  value: Carousel.Mode.DEFAULT, type: 'String'}
-];
-
-/**
- * Handler for creating the element.
- */
-function elementCreatedHandler() {
-  let config = {};
-  for(let attribute of Carousel.Attributes){
-    config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
-  }
-  this.carousel = new Carousel(this, config);
-}
-
-/**
- * Handler for the attachment of the element to the dom.
- */
-function elementAttachedHandler() {
-  this.carousel.attached();
-}
-
-/**
- * Handler for detachment of the element from the dom.
- */
-function elementDetachedCallback() {
-  this.carousel.detached();
-  delete this.carousel;
-}
-
-/**
- * Handler for the element attribute changes.
- * @property {String} attributeName
- */
-function elementAttributeChangedHandler(attributeName) {
-  if(Carousel.Attributes.hasOwnProperty(attributeName)){
-    let attribute = Carousel.Attributes[attributeName];
-    this.carousel.config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
-  }
-}
-
-/**
- * Method for assigning an default value if the given value is undefined or null.
- * @property {Object} value - value to check
- * @property {Object} defaultValue - the default value to be set if the given value is undefined
- * @property {String} type - the type of the value
- */
-function checkValue(value, defaultValue, type = 'String') {
-  if(value !== 'undefined' && value !== null){
-    if(type === 'Number'){
-      value = parseInt(value);
+  /**
+   * Handler for the element attribute changes.
+   * @property {String} attributeName
+   */
+  let elementAttributeChangedHandler = function(attributeName) {
+    if(attributes.hasOwnProperty(attributeName)){
+      let attribute = attributes[attributeName];
+      this.carousel.config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
     }
-    return value;
-  } else {
-    return defaultValue;
-  }
-}
+  };
 
-/**
- * Try to register the carousel component.
- */
-try {
-  document.registerElement('as24-carousel', {
-    prototype: Object.assign(
-      Object.create( HTMLElement.prototype, {
-        createdCallback:          { value: elementCreatedHandler },
-        attachedCallback:         { value: elementAttachedHandler },
-        detachedCallback:         { value: elementDetachedCallback },
-        attributeChangedCallback: { value: elementAttributeChangedHandler }
-      }), {
-        redraw:   function (){ this.carousel.redraw(); },
-        goTo:     function (index){ this.carousel.goTo(index); },
-        getIndex: function (){ return this.carousel.index; }
+  /**
+   * Method for assigning an default value if the given value is undefined or null.
+   * @property {Object} value - value to check
+   * @property {Object} defaultValue - the default value to be set if the given value is undefined
+   * @property {String} type - the type of the value
+   */
+  let checkValue = function (value, defaultValue, type = 'String') {
+    if(value !== 'undefined' && value !== null){
+      if(type === 'Number'){
+        value = parseInt(value);
       }
-    )
-  });
-} catch (e) {
-  if (window && window.console) {
-    window.console.warn('Failed to register CustomElement "as24-carousel".', e);
+      return value;
+    } else {
+      return defaultValue;
+    }
+  };
+
+  /**
+   * Try to register the carousel component.
+   */
+  try {
+    document.registerElement('as24-carousel', {
+      prototype: Object.assign(
+        Object.create( HTMLElement.prototype, {
+          createdCallback:          { value: elementCreatedHandler },
+          attachedCallback:         { value: elementAttachedHandler },
+          detachedCallback:         { value: elementDetachedCallback },
+          attributeChangedCallback: { value: elementAttributeChangedHandler }
+        }), {
+          redraw:   function (){ this.carousel.redraw(); },
+          goTo:     function (index){ this.carousel.goTo(index); },
+          getIndex: function (){ return this.carousel.index; }
+        }
+      )
+    });
+  } catch (e) {
+    if (window && window.console) {
+      window.console.warn('Failed to register CustomElement "as24-carousel".', e);
+    }
   }
-}
+})();

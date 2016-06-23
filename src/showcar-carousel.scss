@@ -1,6 +1,27 @@
-$item-width-xs: calc(100vw - 20px);
-$item-width-s: calc(100vw - 40px);
-$item-width-m: 310px;
+// Vars carousel mode ( default )
+$carousel-item-width-xs: calc(100vw - 20px);
+$carousel-item-width-s: calc(100vw - 40px);
+$carousel-item-width-m: 310px;
+$carousel-gap: 20px;
+
+// Lazy image aspect ratio load hack for fixing the flickering bug on webkit
+// Currently the style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
+// Aspect ratio of the image ( 100% width / 75% height = 1.333 )
+$carousel-image-aspect-ratio: 75%;
+$carousel-description-padding: 20px 20px 28px;
+$carousel-background-color: rgba(0, 0, 0, .5);
+$carousel-pagination-width: 50px;
+$carousel-pagination-height: 50px;
+$carousel-pagination-arrow-size: 30%;
+
+// Vars slider mode ( default )
+$slider-max-width: 640px;
+$slider-pagination-width: 40px;
+$slider-pagination-height: 60px;
+$slider-pagination-arrow-size: 15px;
+$slider-pagination-arrow-position: center;
+$slider-aspect-ratio: 75%;
+$slider-gap: 0px;
 
 as24-carousel {
   display: block;
@@ -12,21 +33,21 @@ as24-carousel {
     border: 2px solid transparent;
     position: absolute;
     top: 50%;
-    margin-top: -25px;
+    margin-top: -$carousel-pagination-height/2;
     vertical-align: center;
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 0, 0, .5) url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI4IDQ4Ij48c3R5bGU+LnN0MHtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNmZmZ9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcuNCAyNC4xTDMuMSA0OCAwIDQ1LjFsMjEuNC0yMUwwIDMuMSAzLjEgMHoiLz48L3N2Zz4=) no-repeat 18px center;
-    background-size: 30%;
+    width: $carousel-pagination-width;
+    height: $carousel-pagination-height;
+    background: $carousel-background-color url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI4IDQ4Ij48c3R5bGU+LnN0MHtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNmZmZ9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcuNCAyNC4xTDMuMSA0OCAwIDQ1LjFsMjEuNC0yMUwwIDMuMSAzLjEgMHoiLz48L3N2Zz4=) no-repeat 18px center;
+    background-size: $carousel-pagination-arrow-size;
     transition: background-color 0.3s, opacity .3s;
 
     &[data-direction="left"] {
-      left: 10px;
+      left: $carousel-gap/2;
       transform: rotate(180deg);
     }
 
     &[data-direction="right"] {
-      right: 10px;
+      right: $carousel-gap/2;
     }
 
     &.hide {
@@ -50,8 +71,8 @@ as24-carousel {
   as24-carousel-item {
     border: 1px solid #dcdcdc;
     display: inline-block;
-    width: $item-width-xs;
-    margin: 0 10px;
+    width: $carousel-item-width-xs;
+    margin: 0 $carousel-gap/2;
     background-color: white;
     text-align: center;
     line-height: 1.5rem;
@@ -62,8 +83,6 @@ as24-carousel {
       display: block;
     }
 
-    // Lazy image aspect ratio load hack for fixing the flickering bug on webkit
-    // Currently the style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
 
     .as24-carousel-image-container {
       position: relative;
@@ -71,8 +90,7 @@ as24-carousel {
       overflow: hidden;
       height: 0;
 
-      // Aspect ratio of the image ( 100% width / 75% height = 1.333 )
-      padding-bottom: 75%;
+      padding-bottom: $carousel-image-aspect-ratio;
 
       img {
         // Expanding the image to the bounds of its parent container ( caution distortion! if aspect ratio is not set correctly )
@@ -88,7 +106,7 @@ as24-carousel {
 
     .as24-carousel-description {
 
-      padding: 20px 20px 28px;
+      padding: $carousel-description-padding;
       vertical-align: top;
 
       h2, h3, h4, h5 {
@@ -107,19 +125,19 @@ as24-carousel {
 
     @media screen and (min-width: 320px) {
 
-      width: $item-width-s;
+      width: $carousel-item-width-s;
 
       &:first-child {
-        margin-left: 20px;
+        margin-left: $carousel-gap;
       }
 
       &:last-child {
-        margin-right: 20px;
+        margin-right: $carousel-gap;
       }
     }
 
     @media screen and (min-width: 480px) {
-      width: $item-width-m;
+      width: $carousel-item-width-m;
     }
   }
 
@@ -139,9 +157,16 @@ as24-carousel {
   // MODE: SLIDER
   &[mode="slider"] {
 
-    max-width: 480px;
+    max-width: $slider-max-width;
 
     .as24-pagination {
+
+      width: $slider-pagination-width;
+      height: $slider-pagination-height;
+      margin-top: -$slider-pagination-width/2;
+      background-size: $slider-pagination-arrow-size;
+      background-position: $slider-pagination-arrow-position;
+
       &[data-direction="left"] {
         left: 0px;
       }
@@ -153,7 +178,7 @@ as24-carousel {
     .as24-carousel-wrapper {
       position: relative;
       height: 0;
-      padding-bottom: 75%;
+      padding-bottom: $slider-aspect-ratio;
       .as24-carousel-container {
         position: absolute;
         top: 0;
@@ -165,7 +190,7 @@ as24-carousel {
 
     as24-carousel-item {
       position: absolute;
-      top:0;
+      top: 0;
       left: 0;
 
       transition: transform .3s;
@@ -174,7 +199,7 @@ as24-carousel {
       width: 100%;
       height: 100%;
       border: none;
-      margin: 0;
+      margin: $slider-gap;
 
       &:first-of-type {
         transform: translate3d(0, 0, 0);
@@ -185,12 +210,12 @@ as24-carousel {
       }
 
       @media screen and (min-width: 320px) {
-        margin: 0;
+        margin: $slider-gap;
         &:first-child {
-          margin: 0;
+          margin: $slider-gap;
         }
         &:last-child {
-          margin: 0;
+          margin: $slider-gap;
         }
       }
     }

@@ -92,11 +92,17 @@ as24-carousel {
     -webkit-backface-visibility: hidden;
             backface-visibility: hidden; }
   as24-carousel[mode="slider"] {
-    max-width: 480px; }
-    as24-carousel[mode="slider"] .as24-pagination[data-direction="left"] {
-      left: 0px; }
-    as24-carousel[mode="slider"] .as24-pagination[data-direction="right"] {
-      right: 0px; }
+    max-width: 640px; }
+    as24-carousel[mode="slider"] .as24-pagination {
+      width: 40px;
+      height: 60px;
+      margin-top: -20px;
+      background-size: 15px;
+      background-position: center; }
+      as24-carousel[mode="slider"] .as24-pagination[data-direction="left"] {
+        left: 0px; }
+      as24-carousel[mode="slider"] .as24-pagination[data-direction="right"] {
+        right: 0px; }
     as24-carousel[mode="slider"] .as24-carousel-wrapper {
       position: relative;
       height: 0;
@@ -122,7 +128,7 @@ as24-carousel {
       width: 100%;
       height: 100%;
       border: none;
-      margin: 0; }
+      margin: 0px; }
       as24-carousel[mode="slider"] as24-carousel-item:first-of-type {
         -webkit-transform: translate3d(0, 0, 0);
                 transform: translate3d(0, 0, 0); }
@@ -131,8 +137,8 @@ as24-carousel {
         transition: none; }
       @media screen and (min-width: 320px) {
         as24-carousel[mode="slider"] as24-carousel-item {
-          margin: 0; }
+          margin: 0px; }
           as24-carousel[mode="slider"] as24-carousel-item:first-child {
-            margin: 0; }
+            margin: 0px; }
           as24-carousel[mode="slider"] as24-carousel-item:last-child {
-            margin: 0; } }
+            margin: 0px; } }
