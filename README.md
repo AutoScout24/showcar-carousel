@@ -2,7 +2,7 @@
 
 This module provides a easy to use carousel.
 
-#####*Note: [v2.0.0] Breaking markup changes! There is no <as24-carousel-item> element anymore. Please have a look at the updated example*
+#####*Note: [v2.0.0] Breaking markup changes! There is no `<as24-carousel-item>` element anymore. Please have a look at the updated example*
 
 ***
 
