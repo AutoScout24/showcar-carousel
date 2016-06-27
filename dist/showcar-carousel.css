@@ -1,81 +1,14 @@
 as24-carousel {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   display: block;
   position: relative;
   white-space: nowrap;
-  overflow: hidden; }
-  as24-carousel .as24-pagination {
-    border: 2px solid transparent;
-    position: absolute;
-    top: 50%;
-    margin-top: -25px;
-    vertical-align: center;
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 0, 0, 0.5) url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI4IDQ4Ij48c3R5bGU+LnN0MHtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNmZmZ9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcuNCAyNC4xTDMuMSA0OCAwIDQ1LjFsMjEuNC0yMUwwIDMuMSAzLjEgMHoiLz48L3N2Zz4=) no-repeat 18px center;
-    background-size: 30%;
-    -webkit-transition: background-color 0.3s, opacity .3s;
-    transition: background-color 0.3s, opacity .3s; }
-    as24-carousel .as24-pagination[data-direction="left"] {
-      left: 10px;
-      -webkit-transform: rotate(180deg);
-              transform: rotate(180deg); }
-    as24-carousel .as24-pagination[data-direction="right"] {
-      right: 10px; }
-    as24-carousel .as24-pagination.hide {
-      opacity: 0; }
-    as24-carousel .as24-pagination:hover:not(.hide) {
-      background-color: rgba(0, 0, 0, 0.8); }
-    as24-carousel .as24-pagination:focus {
-      outline: none; }
-  as24-carousel > a {
-    text-decoration: none; }
-  as24-carousel as24-carousel-item {
-    border: 1px solid #dcdcdc;
-    display: inline-block;
-    width: calc(100vw - 20px);
-    margin: 0 10px;
-    background-color: white;
-    text-align: center;
-    line-height: 1.5rem;
-    vertical-align: top;
-    margin-bottom: 1px; }
-    as24-carousel as24-carousel-item > a {
-      display: block; }
-    as24-carousel as24-carousel-item .as24-carousel-image-container {
-      position: relative;
-      display: block;
-      overflow: hidden;
-      height: 0;
-      padding-bottom: 75%; }
-      as24-carousel as24-carousel-item .as24-carousel-image-container img {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #ddd; }
-    as24-carousel as24-carousel-item .as24-carousel-description {
-      padding: 20px 20px 28px;
-      vertical-align: top; }
-      as24-carousel as24-carousel-item .as24-carousel-description h2, as24-carousel as24-carousel-item .as24-carousel-description h3, as24-carousel as24-carousel-item .as24-carousel-description h4, as24-carousel as24-carousel-item .as24-carousel-description h5 {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        width: 100%;
-        display: block; }
-      as24-carousel as24-carousel-item .as24-carousel-description p {
-        color: #333; }
-    @media screen and (min-width: 320px) {
-      as24-carousel as24-carousel-item {
-        width: calc(100vw - 40px); }
-        as24-carousel as24-carousel-item:first-child {
-          margin-left: 20px; }
-        as24-carousel as24-carousel-item:last-child {
-          margin-right: 20px; } }
-    @media screen and (min-width: 480px) {
-      as24-carousel as24-carousel-item {
-        width: 310px; } }
+  overflow: hidden;
+  width: 100%;
+  outline-style: none; }
   as24-carousel .as24-carousel-wrapper {
     overflow: hidden; }
   as24-carousel .as24-carousel-container {
@@ -91,17 +24,111 @@ as24-carousel {
             transform: translate3d(0, 0, 0);
     -webkit-backface-visibility: hidden;
             backface-visibility: hidden; }
+  as24-carousel .as24-pagination-indicator {
+    position: absolute;
+    color: white;
+    display: inline-block;
+    padding: 7px;
+    background-color: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    left: 0; }
+    as24-carousel .as24-pagination-indicator.no-transition {
+      -webkit-transition: none;
+      transition: none; }
+  as24-carousel .as24-pagination-button {
+    border: 2px solid transparent;
+    position: absolute;
+    top: 50%;
+    margin-top: -25px;
+    vertical-align: center;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.5) url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI4IDQ4Ij48c3R5bGU+LnN0MHtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNmZmZ9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcuNCAyNC4xTDMuMSA0OCAwIDQ1LjFsMjEuNC0yMUwwIDMuMSAzLjEgMHoiLz48L3N2Zz4=) no-repeat 18px center;
+    background-size: 30%;
+    background-position: center center;
+    outline-style: none;
+    -webkit-transition: background-color .3s, opacity .3s;
+    transition: background-color .3s, opacity .3s; }
+    as24-carousel .as24-pagination-button.no-transition {
+      -webkit-transition: none;
+      transition: none; }
+    as24-carousel .as24-pagination-button[data-direction="left"] {
+      left: 10px;
+      -webkit-transform: rotate(180deg);
+              transform: rotate(180deg); }
+    as24-carousel .as24-pagination-button[data-direction="right"] {
+      right: 10px; }
+    as24-carousel .as24-pagination-button.hide {
+      opacity: 0; }
+    as24-carousel .as24-pagination-button:hover:not(.hide) {
+      background-color: rgba(0, 0, 0, 0.8); }
+    as24-carousel .as24-pagination-button:focus {
+      outline: none; }
+  as24-carousel > a {
+    text-decoration: none;
+    outline-style: none; }
+  as24-carousel .as24-carousel-item {
+    border: 1px solid #dcdcdc;
+    display: inline-block;
+    width: calc(100vw - 20px);
+    margin: 0 10px;
+    background-color: white;
+    text-align: center;
+    line-height: 1.5rem;
+    vertical-align: top;
+    margin-bottom: 1px;
+    outline-style: none; }
+    as24-carousel .as24-carousel-item > a {
+      display: block;
+      outline-style: none; }
+    as24-carousel .as24-carousel-item .as24-carousel-image-container {
+      position: relative;
+      display: block;
+      overflow: hidden;
+      height: 0;
+      padding-bottom: 75%; }
+      as24-carousel .as24-carousel-item .as24-carousel-image-container img {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #ddd; }
+    as24-carousel .as24-carousel-item .as24-carousel-description {
+      padding: 20px 20px 28px;
+      vertical-align: top; }
+      as24-carousel .as24-carousel-item .as24-carousel-description h2, as24-carousel .as24-carousel-item .as24-carousel-description h3, as24-carousel .as24-carousel-item .as24-carousel-description h4, as24-carousel .as24-carousel-item .as24-carousel-description h5 {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
+        display: block; }
+      as24-carousel .as24-carousel-item .as24-carousel-description p {
+        color: #333; }
+    @media screen and (min-width: 320px) {
+      as24-carousel .as24-carousel-item {
+        width: calc(100vw - 40px); }
+        as24-carousel .as24-carousel-item:first-child {
+          margin-left: 20px; }
+        as24-carousel .as24-carousel-item:last-child {
+          margin-right: 20px; } }
+    @media screen and (min-width: 480px) {
+      as24-carousel .as24-carousel-item {
+        width: 310px; } }
   as24-carousel[mode="slider"] {
-    max-width: 640px; }
-    as24-carousel[mode="slider"] .as24-pagination {
+    position: relative; }
+    as24-carousel[mode="slider"]:hover {
+      color: white; }
+    as24-carousel[mode="slider"] .as24-pagination-button {
       width: 40px;
       height: 60px;
       margin-top: -20px;
       background-size: 15px;
-      background-position: center; }
-      as24-carousel[mode="slider"] .as24-pagination[data-direction="left"] {
+      background-position: center center; }
+      as24-carousel[mode="slider"] .as24-pagination-button[data-direction="left"] {
         left: 0px; }
-      as24-carousel[mode="slider"] .as24-pagination[data-direction="right"] {
+      as24-carousel[mode="slider"] .as24-pagination-button[data-direction="right"] {
         right: 0px; }
     as24-carousel[mode="slider"] .as24-carousel-wrapper {
       position: relative;
@@ -113,7 +140,22 @@ as24-carousel {
         left: 0;
         width: 100%;
         height: 100%; }
-    as24-carousel[mode="slider"] as24-carousel-item {
+    as24-carousel[mode="slider"].dynamic-ratio .as24-carousel-wrapper {
+      height: 480px;
+      width: 100%;
+      padding-bottom: 0; }
+    as24-carousel[mode="slider"].dynamic-ratio .as24-carousel-item {
+      max-width: 640px; }
+    as24-carousel[mode="slider"].dynamic-ratio .as24-pagination-button {
+      height: 100%;
+      margin-top: 0;
+      background-size: 15px;
+      top: 0; }
+      as24-carousel[mode="slider"].dynamic-ratio .as24-pagination-button[data-direction="left"] {
+        background-position: right 15px center; }
+      as24-carousel[mode="slider"].dynamic-ratio .as24-pagination-button[data-direction="right"] {
+        background-position: right 15px center; }
+    as24-carousel[mode="slider"] .as24-carousel-item {
       position: absolute;
       top: 0;
       left: 0;
@@ -129,16 +171,16 @@ as24-carousel {
       height: 100%;
       border: none;
       margin: 0px; }
-      as24-carousel[mode="slider"] as24-carousel-item:first-of-type {
+      as24-carousel[mode="slider"] .as24-carousel-item:first-of-type {
         -webkit-transform: translate3d(0, 0, 0);
                 transform: translate3d(0, 0, 0); }
-      as24-carousel[mode="slider"] as24-carousel-item.no-transition {
+      as24-carousel[mode="slider"] .as24-carousel-item.no-transition {
         -webkit-transition: none;
         transition: none; }
       @media screen and (min-width: 320px) {
-        as24-carousel[mode="slider"] as24-carousel-item {
+        as24-carousel[mode="slider"] .as24-carousel-item {
           margin: 0px; }
-          as24-carousel[mode="slider"] as24-carousel-item:first-child {
+          as24-carousel[mode="slider"] .as24-carousel-item:first-child {
             margin: 0px; }
-          as24-carousel[mode="slider"] as24-carousel-item:last-child {
+          as24-carousel[mode="slider"] .as24-carousel-item:last-child {
             margin: 0px; } }

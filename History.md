@@ -1,4 +1,19 @@
 
+2.0.0 / 2016-06-27
+==================
+
+  * introduced some new features
+  * refactored the slider mode
+  * added preview
+  * added pagination indicator
+  * some bugfixes and style changes
+  * added new example
+  * updated the readme
+  * fixed some resizing issues
+  * cleaned up the markup
+  * and more...
+
+
 1.0.11 / 2016-06-23
 ==================
 

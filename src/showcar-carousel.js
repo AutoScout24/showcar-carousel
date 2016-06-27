@@ -1,6 +1,6 @@
 /**
  * Poly-fill for "CustomEvent".
- * ToDo: Move to ui utils library
+ * ToDo: v3 -> Move to ui utils library.
  */
 (function(){
   if ( typeof window.CustomEvent === "function" ) return false;
@@ -16,7 +16,7 @@
 
 /**
  * Poly-fill for "Array.of".
- * ToDo: Move to ui utils library
+ * ToDo: v3 -> Move to ui utils library.
  */
 (function(){
 if (!Array.of) {
@@ -31,7 +31,7 @@ if (!Array.of) {
  * @param {string} className
  * @param {HTMLElement} element
  * @returns {HTMLElement}
- * ToDo: Move to ui utils library
+ * ToDo: v3 -> Move to ui utils library.
  */
 function addClass(className, element) {
   if (!element.getAttribute) return element;
@@ -54,7 +54,7 @@ function addClass(className, element) {
  * @param {string} className
  * @param {HTMLElement} element
  * @returns {HTMLElement}
- * ToDo: Move to ui utils library
+ * ToDo: v3 -> Move to ui utils library.
  */
 function removeClass(className, element) {
   if (!element.getAttribute) return element;
@@ -75,7 +75,7 @@ function removeClass(className, element) {
  * @param {string} className
  * @param {HTMLElement} element
  * @returns {boolean}
- * ToDo: Move to ui utils library
+ * ToDo: v3 -> Move to ui utils library.
  */
 function containsClass(className, element) {
   if (!element.getAttribute) return false;
@@ -90,6 +90,8 @@ function containsClass(className, element) {
 
 /**
  * Main Class for the Carousel component.
+ * ToDo: v3 -> Create a CarouselBase class with all the basics where the final carousel and slider should extend from.
+ * ToDo: v3 -> Remove the carousel mode instead use two custom elements with own classes. ( as24-carousel, as24-slider )
  */
 class Carousel {
 
@@ -123,7 +125,8 @@ class Carousel {
 
     this.pagination = {
       left: null,
-      right: null
+      right: null,
+      indicator: null
     };
 
     this.index = 0;
@@ -131,13 +134,10 @@ class Carousel {
     this.refWidth = 330;
     this.itemWidth = 330;
     this.touchStart = {};
+    this.itemsLength = 1;
 
     this.speed = this.Enums.Speed.SLOW;
-
-    this.pager = document.createElement('a');
-    addClass('as24-pagination', this.pager);
-    addClass('hide', this.pager);
-    this.pager.href = '#';
+    this.time = null;
   }
 
   /**
@@ -147,44 +147,42 @@ class Carousel {
    * @property {number} [y = 0] - The Y Coordinate
    */
   Coordinate(x = 0, y = 0){
-    return {
-      x: x,
-      y: y
-    }
+    return { x: x, y: y }
   }
 
   /**
    * Gets all carousel items.
    */
   get items() {
-    return this.element.querySelectorAll('as24-carousel-item');
+    return this.element.querySelectorAll('.as24-carousel-item');
   }
 
   /**
    * Initializes the carousel by adding all necessary bits and bolts.
    */
   attached() {
-    // Get the initial window with
+    // Get the initial window with.
     this.windowWidth = this.getWindowWidth();
 
-    // Create Listeners
+    // Create Listeners.
     this.resizeListener     = this.resizeTimeoutHandler.bind(this);
     this.touchStartListener = this.touchStartEventHandler.bind(this);
     this.touchMoveListener  = this.touchMoveEventHandler.bind(this);
     this.touchEndListener   = this.touchEndEventHandler.bind(this);
 
-    // Add Listeners
+    // Add Listeners.
     window.addEventListener(      'resize',     this.resizeListener,      true);
     this.element.addEventListener('touchstart', this.touchStartListener,  true);
     this.element.addEventListener('touchmove',  this.touchMoveListener,   true);
     this.element.addEventListener('touchend',   this.touchEndListener,    true);
 
-    // Add all necessary items and do the math
+    // Add container and pagination buttons.
     this.addContainer();
-    this.resizeItems();
     this.addPagination();
-    this.calculateEnvironment();
-    this.loadImages();
+    this.addIndicator();
+
+    // Redraw the scene.
+    this.redraw();
   }
 
   /**
@@ -200,48 +198,71 @@ class Carousel {
     // Remove dynamically created Elements
     this.removeContainer();
     this.removePagination();
+    this.removeIndicator();
   }
 
   /**
    * Redraw the whole carousel.
    * @public
+   * ToDo: v3 -> should be extended by Carousel and Slider class.
    */
   redraw() {
 
     this.resizeItems();
     this.calculateEnvironment();
 
+    // ToDo: v3 -> move to Carousel class.
     if(this.config.mode === this.Enums.Mode.DEFAULT){
-
       this.index = 0;
-      this.move(0, this.container);
-      this.setPaginationButtonsVisibility();
+      this.updateDefault();
 
+    // ToDo: v3 -> move to Slider class.
     } else if(this.config.mode === this.Enums.Mode.SLIDER){
-
-      [].forEach.call(this.items, (element, index) => {
-        if(index !== this.index){
-          addClass('no-transition', element);
-          this.move(parseInt(this.stepWidth), element);
-          removeClass('no-transition', element);
-        }
-      });
-
+      this.updateSlider({transition: false});
     }
 
-    this.loadImages();
+    this.updateIndicator();
   }
 
   /**
    * Resizes the carousel items.
    */
   resizeItems(){
+
+    // ToDo: v3 -> move to Slider class.
+    if(this.config.mode === this.Enums.Mode.SLIDER &&
+      this.config.preview &&
+      this.element.offsetWidth > this.config.previewBreakpoint
+    ){
+      addClass('dynamic-ratio', this.element);
+    } else {
+      removeClass('dynamic-ratio', this.element);
+    }
+
     this.orgWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
     if(this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth){
       this.itemWidth = this.element.offsetWidth - this.config.gap;
       [].forEach.call(this.items, element => element.style.width = `${this.itemWidth-this.config.gap}px`);
     } else {
       this.itemWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
+    }
+
+    if(this.config.mode === this.Enums.Mode.SLIDER && this.config.preview){
+      if(this.element.offsetWidth > this.config.previewBreakpoint){
+        let buttons = this.element.querySelectorAll('[data-direction]');
+        let offset = (this.element.offsetWidth - this.itemWidth)/2;
+        let width = offset > 40 ? offset : 40;
+        [].forEach.call(buttons, element => {
+          element.style.width = `${width}px`;
+        });
+        if(this.config.indicator){
+          this.pagination.indicator.style.left = `${width}px`;
+        }
+      } else {
+        if(this.config.indicator){
+          this.pagination.indicator.style.left = null;
+        }
+      }
     }
   }
 
@@ -252,7 +273,7 @@ class Carousel {
   touchStartEventHandler(event) {
     const target = event.target;
     this.resetTouch();
-    if (!containsClass('as24-pagination', target)) {
+    if (!containsClass('as24-pagination-button', target)) {
       this.touchStart = this.getTouchCoords(event);
     }
   }
@@ -341,7 +362,7 @@ class Carousel {
     this.wrapper = document.createElement('div');
     addClass('as24-carousel-wrapper', this.wrapper);
 
-    this.container = document.createElement('div');
+    this.container = document.createElement('ul');
     addClass('as24-carousel-container', this.container);
 
     [].forEach.call(this.element.children, element => {
@@ -367,22 +388,23 @@ class Carousel {
 
   /**
    * Adds the 'left' and 'right 'pagination buttons.
+   * ToDo: v3 -> should be extended by Slider class.
    */
   addPagination() {
     this.removePagination();
     for (let direction of [this.Enums.Direction.LEFT, this.Enums.Direction.RIGHT]){
       this.createPaginationButton(direction);
     }
-
     removeClass('hide', this.pagination.right);
 
+    // ToDo: v3 -> move to Slider class.
     if(this.config.mode === this.Enums.Mode.SLIDER){
       removeClass('hide', this.pagination.left);
     }
   }
 
   /**
-   * Removes the 'left' and 'right 'pagination buttons.
+   * Removes the pagination 'left', 'right' buttons and indicator.
    */
   removePagination() {
     let buttons = this.element.querySelectorAll('[data-direction]');
@@ -392,11 +414,33 @@ class Carousel {
   }
 
   /**
+   * Adds the page indicator
+   */
+  addIndicator(){
+    if(!this.config.indicator) return;
+    this.pagination.indicator = document.createElement('div');
+    addClass('as24-pagination-indicator', this.pagination.indicator);
+    this.element.appendChild(this.pagination.indicator);
+    this.updateIndicator();
+  }
+
+  /**
+   * Removes the page indicator
+   */
+  removeIndicator(){
+    let indicator = this.element.querySelector('.as24-pagination-indicator');
+    if(indicator !== null) this.element.removeChild(indicator);
+  }
+
+  /**
    * Creates the pagination buttons and event listeners.
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
    */
   createPaginationButton(direction) {
-    let button = this.pagination[direction] = this.pager.cloneNode(true);
+    let button = this.pagination[direction] = document.createElement('a');
+    addClass('as24-pagination-button', button);
+    addClass('hide', button);
+    button.href = '#';
     button.setAttribute('data-direction',direction);
 
     button.addEventListener('mouseup', e => {
@@ -440,6 +484,7 @@ class Carousel {
 
   /**
    * Gets all the necessary dimensions and values for calculating distances and the index.
+   * ToDo: v3 -> should be extended by Carousel and Slider class.
    */
   calculateEnvironment(){
     this.itemsLength  = this.container.children.length;
@@ -454,6 +499,7 @@ class Carousel {
    * Get the new index for paginating depending on the direction.
    * @param {Number} index - the current index
    * @param {Direction|String} direction - the pagination direction. 'right' or 'left'
+   * ToDo: v3 -> should be extended by Carousel and Slider class.
    */
   getIndexOf(index, direction){
     let i = parseInt(index);
@@ -478,50 +524,147 @@ class Carousel {
 
   /**
    * Updates the position of the carousel.
+   * ToDo: v3 -> should be extended by Carousel and Slider class.
    */
   update(direction) {
+    this.triggerEvent('as24-carousel:change', {
+      detail: {
+        id: this.element.id
+      }
+    }, window.document);
 
-    this.triggerChange();
-
-    this.loadImages();
+    this.updateIndicator();
 
     if (this.config.mode === this.Enums.Mode.DEFAULT) {
-
-      let distance = this.index * this.stepWidth;
-      distance = distance > this.totalReach ? this.totalReach : distance;
-      distance = ~distance + 1;
-
-      this.setPaginationButtonsVisibility();
-      this.move(distance, this.container);
-
+      this.updateDefault();
     } else if(this.config.mode === this.Enums.Mode.SLIDER && this.lastIndex !== this.index) {
-
-      let lastIndex = this.lastIndex;
-      let lastDirection = direction === this.Enums.Direction.LEFT ? '' : '-';
-      let lastItem = this.items[lastIndex];
-
-      let currentDirection = direction === this.Enums.Direction.LEFT ? '-' : '';
-      let currentItem = this.items[this.index];
-
-      addClass('no-transition', currentItem);
-      addClass('no-transition', lastItem);
-      this.move(parseInt(currentDirection + this.stepWidth), currentItem);
-
-      setTimeout(() => {
-
-        removeClass('no-transition', currentItem);
-        removeClass('no-transition', lastItem);
-        currentItem.style.transform = 'translate3d(0px, 0, 0)';
-        this.move(0, currentItem);
-        this.move(parseInt(lastDirection + this.stepWidth), lastItem);
-      }, 1);
+      this.updateSlider({
+        direction: direction
+      });
     }
   }
 
   /**
+   * Update the default carousel
+   * ToDo: v3 -> move to Carousel class.
+   */
+  updateDefault(){
+
+    let distance = this.index * this.stepWidth;
+    distance = distance > this.totalReach ? this.totalReach : distance;
+    distance = ~distance + 1;
+
+    let items = [];
+    let start = this.index;
+    let itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
+    let end = this.speed === this.Enums.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
+    end = end > this.itemsLength ? this.itemsLength : end;
+    for(let i = start; i < end; i++ ) {
+      items.push(i);
+    }
+
+    this.loadImages(items);
+    this.setPaginationButtonsVisibility();
+    this.move(distance, this.container);
+  }
+
+  /**
+   * Updates the slider carousel position.
+   * @param {Object} config - the update configuration for the slider.
+   * @return {Array} affected items (for image loading).
+   * ToDo: v3 -> move to Slider class.
+   */
+  updateSlider(config = {direction: this.Enums.Direction.RIGHT, transition: true}){
+
+    let {direction, transition: transition = true} = config;
+    let left = this.Enums.Direction.LEFT;
+    let right = this.Enums.Direction.RIGHT;
+    let previewSize = this.element.offsetWidth > this.config.previewBreakpoint && this.config.preview ? 2 : 1;
+    let offset = this.config.preview ? (this.element.offsetWidth - this.itemWidth)/2 : 0;
+    let currentItem = this.items[this.index];
+
+    // slowing down the hard hitters ;)
+    let userSpeed = this.endTime();
+    this.startTime();
+    let animationSpeed = userSpeed > 300 ? 300 : 0;
+    [].forEach.call(this.items, element => {
+      addClass('no-transition', element);
+      element.style.transitionDuration = `${animationSpeed}ms`;
+    });
+
+    if(transition) removeClass('no-transition', currentItem);
+    this.move(offset, currentItem);
+
+    let previous = this.positionItems({
+      current: this.index,
+      side: left,
+      direction: direction,
+      previewSize: previewSize,
+      transition: transition,
+      offset: offset
+    });
+
+    let next = this.positionItems({
+      current: this.index,
+      side: right,
+      direction: direction,
+      previewSize: previewSize,
+      transition: transition,
+      offset: offset
+    });
+
+    let current = [this.index];
+    let affected = [...new Set([].concat(previous,current,next))];
+    var all = Array.apply(null, Array(this.items.length)).map(function (x, i) { return i });
+    let excluded = all.filter((el) => { return !affected.includes(el);});
+
+    excluded.forEach(i => {
+      this.move(this.element.offsetWidth, this.items[i]);
+    });
+
+    this.loadImages(affected);
+    return affected;
+  }
+
+  /**
+   * Positions and animates the items by the rules given in the config.
+   * @param {Object} config - the movement configuration for the items.
+   */
+  positionItems(config = {previewSize: 2, transition: true}){
+    let affected = [];
+    let {current, side, direction, previewSize, transition, offset} = config;
+
+    let left = this.Enums.Direction.LEFT;
+    let right = this.Enums.Direction.RIGHT;
+
+    var index = parseInt(current);
+    let removeTransition = side === left ? right : left;
+
+    for(let i = 1; i <= previewSize; i++){
+      index = this.getIndexOf(index,side);
+      affected.push(index);
+      if((i < previewSize || i === previewSize && direction === removeTransition) && transition){
+        removeClass('no-transition', this.items[index]);
+      }
+      let distance = this.itemWidth * i;
+      distance = side === right ? offset + distance : offset - distance;
+      this.move(distance, this.items[index]);
+    }
+
+    return affected;
+  }
+
+  /**
+   * Updates the pagination indicator count based on the index.
+   */
+  updateIndicator(){
+    if(this.pagination.indicator !== null) this.pagination.indicator.innerHTML = `${this.index+1}/${this.itemsLength}`;
+  }
+
+  /**
    * Moves the element by the given distance.
-   * @param {Number} distance - the moving distance
-   * @param {HTMLElement} element
+   * @param {Number} distance - the moving distance.
+   * @param {HTMLElement} element.
    */
   move(distance, element){
     element.style.transform = 'translate3d(' + distance + 'px, 0, 0)';
@@ -545,29 +688,10 @@ class Carousel {
   }
 
   /**
-   * Only loads the images of the carousel items that are currently visible.
-   * ToDo: Dependent on the current carousel mode.
+   * Lazy loads the images of the carousel items.
+   * @param {Array} items - the items to be loaded.
    */
-  loadImages(){
-
-    let items = [];
-
-    if(this.config.mode === this.Enums.Mode.DEFAULT){
-      let start = this.index;
-      let itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
-      let end = this.speed === this.Enums.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
-      end = end > this.itemsLength ? this.itemsLength : end;
-      for(let i = start; i < end; i++ ) {
-        items.push(i);
-      }
-    } else if(this.config.mode === this.Enums.Mode.SLIDER){
-      items = Array.of(
-        this.getIndexOf(this.index, this.Enums.Direction.LEFT),
-        this.index,
-        this.getIndexOf(this.index, this.Enums.Direction.RIGHT)
-      );
-    }
-
+  loadImages(items = []){
     [].forEach.call(items, i => {
       let images = this.container.children[i].querySelectorAll('img');
       [].forEach.call(images, image => {
@@ -582,20 +706,13 @@ class Carousel {
 
   /**
    * Triggers an custom event with the given name and payload.
-   * @param {String} type - name of the event
-   * @param {Object} payload - payload of the event
+   * @param {String} type - name of the event.
+   * @param {Object} payload - payload of the event.
+   * @param {HTMLElement} element - the element from where to dispatch the event from.
    */
-  triggerEvent(type,payload){
+  triggerEvent(type,payload,element = this.element){
     let event = new CustomEvent(type, {detail: payload});
-    this.element.dispatchEvent(event);
-  }
-
-  /**
-   * Triggers an event for tracking.
-   */
-  triggerChange() {
-    let event = new CustomEvent('as24-carousel:change', {detail: {id: this.element.id}});
-    window.document.dispatchEvent(event);
+    element.dispatchEvent(event)
   }
 
   /**
@@ -613,8 +730,10 @@ class Carousel {
    * Resize timeout call blocker.
    */
   resizeTimeoutHandler(){
-    clearTimeout(this.resizeTimeout);
-    this.resizeTimeout = setTimeout(this.resizeHandler.bind(this), 300);
+    // ToDo: v3 -> Uncomment the following two lines and remove the last one if there is a need for an resize maniac execution blocker.
+    // clearTimeout(this.resizeTimeout);
+    // this.resizeTimeout = setTimeout(this.resizeHandler.bind(this), 300);
+    this.resizeHandler();
   }
 
   /**
@@ -624,16 +743,39 @@ class Carousel {
   getWindowWidth() {
     return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
   }
+
+  /**
+   * Starts the time measurement.
+   */
+  startTime(){
+    this.time = new Date();
+  }
+
+  /**
+   * Ends the time measurement.
+   * @return {Number} time in ms.
+   */
+  endTime(){
+    if(this.time !== null){
+      let now = new Date();
+      return now - this.time;
+    } else {
+      return 300;
+    }
+  }
 }
 
 (function(){
 
   /**
-   * Allowed element attributes and there defaults.
+   * Allowed custom element attributes and there defaults.
    */
   let attributes = [
-      {name: 'gap',   value: 20,        type: 'Number'},
-      {name: 'mode',  value: 'default', type: 'String'}
+      {name: 'gap',               value: 20,        type: 'Number'},
+      {name: 'mode',              value: 'default', type: 'String'},
+      {name: 'preview',           value: true,      type: 'Boolean'},
+      {name: 'previewBreakpoint', value: 640,       type: 'Number'},
+      {name: 'indicator',         value: false,     type: 'Boolean'}
   ];
 
   /**
@@ -664,7 +806,7 @@ class Carousel {
 
   /**
    * Handler for the element attribute changes.
-   * @property {String} attributeName
+   * @property {String} attributeName.
    */
   let elementAttributeChangedHandler = function(attributeName) {
     if(attributes.hasOwnProperty(attributeName)){
@@ -675,14 +817,17 @@ class Carousel {
 
   /**
    * Method for assigning an default value if the given value is undefined or null.
-   * @property {Object} value - value to check
-   * @property {Object} defaultValue - the default value to be set if the given value is undefined
-   * @property {String} type - the type of the value
+   * @property {Object} value - value to check.
+   * @property {Object} defaultValue - the default value to be set if the given value is undefined.
+   * @property {String} type - the type of the value.
    */
   let checkValue = function (value, defaultValue, type = 'String') {
     if(value !== 'undefined' && value !== null){
       if(type === 'Number'){
         value = parseInt(value);
+      }
+      if(type === 'Boolean'){
+        value = value == 'true';
       }
       return value;
     } else {
@@ -692,6 +837,7 @@ class Carousel {
 
   /**
    * Try to register the carousel component.
+   * ToDo: v3 -> instead carousel mode instead use two custom elements with own classes. ( as24-carousel, as24-slider )
    */
   try {
     document.registerElement('as24-carousel', {
