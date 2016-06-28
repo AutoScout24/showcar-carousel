@@ -263,15 +263,15 @@ var Carousel = function () {
       var _this = this;
 
       // ToDo: v3 -> move to Slider class.
-      if (this.config.mode === this.Enums.Mode.SLIDER && this.config.preview && this.element.offsetWidth > this.config.previewBreakpoint) {
+      if (this.config.mode === this.Enums.Mode.SLIDER && this.config.preview && this.getElementWidth() > this.config.previewBreakpoint) {
         addClass('dynamic-ratio', this.element);
       } else {
         removeClass('dynamic-ratio', this.element);
       }
 
       this.orgWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
-      if (this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth) {
-        this.itemWidth = this.element.offsetWidth - this.config.gap;
+      if (this.orgWidth === this.refWidth && this.getElementWidth() < this.refWidth) {
+        this.itemWidth = this.getElementWidth() - this.config.gap;
         [].forEach.call(this.items, function (element) {
           return element.style.width = _this.itemWidth - _this.config.gap + 'px';
         });
@@ -280,10 +280,10 @@ var Carousel = function () {
       }
 
       if (this.config.mode === this.Enums.Mode.SLIDER && this.config.preview) {
-        if (this.element.offsetWidth > this.config.previewBreakpoint) {
+        if (this.getElementWidth() > this.config.previewBreakpoint) {
           (function () {
             var buttons = _this.element.querySelectorAll('[data-direction]');
-            var offset = (_this.element.offsetWidth - _this.itemWidth) / 2;
+            var offset = (_this.getElementWidth() - _this.itemWidth) / 2;
             var width = offset > 40 ? offset : 40;
             [].forEach.call(buttons, function (element) {
               element.style.width = width + 'px';
@@ -487,6 +487,7 @@ var Carousel = function () {
   }, {
     key: 'addIndicator',
     value: function addIndicator() {
+      this.removeIndicator();
       if (!this.config.indicator) return;
       this.pagination.indicator = document.createElement('div');
       addClass('as24-pagination-indicator', this.pagination.indicator);
@@ -548,7 +549,9 @@ var Carousel = function () {
       this.triggerEvent('slide', {
         index: this.index
       });
-      this.update(this.Enums.Direction.RIGHT);
+      this.update({
+        transition: false
+      });
     }
 
     /**
@@ -565,7 +568,9 @@ var Carousel = function () {
         direction: direction,
         index: this.index
       });
-      this.update(direction);
+      this.update({
+        direction: direction
+      });
     }
 
     /**
@@ -577,11 +582,11 @@ var Carousel = function () {
     key: 'calculateEnvironment',
     value: function calculateEnvironment() {
       this.itemsLength = this.container.children.length;
-      this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
-      this.totalReach = this.container.offsetWidth - this.element.offsetWidth;
+      this.itemsVisible = Math.floor(this.getElementWidth() / this.itemWidth);
+      this.totalReach = this.container.offsetWidth - this.getElementWidth();
       this.stepLength = this.speed === this.Enums.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
       if (this.config.mode === this.Enums.Mode.SLIDER) this.stepLength = this.container.children.length - 1;
-      this.stepWidth = this.speed === this.Enums.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
+      this.stepWidth = this.speed === this.Enums.Speed.SLOW ? this.itemWidth : Math.floor(this.getElementWidth() / this.itemWidth) * this.itemWidth;
     }
 
     /**
@@ -621,7 +626,10 @@ var Carousel = function () {
 
   }, {
     key: 'update',
-    value: function update(direction) {
+    value: function update() {
+      var config = arguments.length <= 0 || arguments[0] === undefined ? { direction: this.Enums.Direction.RIGHT, transition: true } : arguments[0];
+
+
       this.triggerEvent('as24-carousel:change', {
         detail: {
           id: this.element.id
@@ -633,9 +641,7 @@ var Carousel = function () {
       if (this.config.mode === this.Enums.Mode.DEFAULT) {
         this.updateDefault();
       } else if (this.config.mode === this.Enums.Mode.SLIDER && this.lastIndex !== this.index) {
-        this.updateSlider({
-          direction: direction
-        });
+        this.updateSlider(config);
       }
     }
 
@@ -654,7 +660,7 @@ var Carousel = function () {
 
       var items = [];
       var start = this.index;
-      var itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
+      var itemsVisible = Math.ceil(this.getElementWidth() / this.itemWidth);
       var end = this.speed === this.Enums.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
       end = end > this.itemsLength ? this.itemsLength : end;
       for (var i = start; i < end; i++) {
@@ -685,8 +691,8 @@ var Carousel = function () {
 
       var left = this.Enums.Direction.LEFT;
       var right = this.Enums.Direction.RIGHT;
-      var previewSize = this.element.offsetWidth > this.config.previewBreakpoint && this.config.preview ? 2 : 1;
-      var offset = this.config.preview ? (this.element.offsetWidth - this.itemWidth) / 2 : 0;
+      var previewSize = this.getElementWidth() > this.config.previewBreakpoint && this.config.preview ? 2 : 1;
+      var offset = this.config.preview ? (this.getElementWidth() - this.itemWidth) / 2 : 0;
       var currentItem = this.items[this.index];
 
       // slowing down the hard hitters ;)
@@ -729,7 +735,7 @@ var Carousel = function () {
       });
 
       excluded.forEach(function (i) {
-        _this5.move(_this5.element.offsetWidth, _this5.items[i]);
+        _this5.move(_this5.getElementWidth(), _this5.items[i]);
       });
 
       this.loadImages(affected);
@@ -886,13 +892,27 @@ var Carousel = function () {
 
     /**
      * gets the current client height.
-     * @returns {number}
+     * @returns {Number} the width.
      */
 
   }, {
     key: 'getWindowWidth',
     value: function getWindowWidth() {
       return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    }
+
+    /**
+     * Get the element width without padding.
+     * @return {Number} the width.
+     */
+
+  }, {
+    key: 'getElementWidth',
+    value: function getElementWidth() {
+      var computed = getComputedStyle(this.element);
+      var width = this.element.offsetWidth;
+      width -= parseFloat(computed.paddingLeft) + parseFloat(computed.paddingRight);
+      return width;
     }
 
     /**
@@ -1018,6 +1038,9 @@ var Carousel = function () {
         },
         getIndex: function getIndex() {
           return this.carousel.index;
+        },
+        getStepLength: function getStepLength() {
+          return this.carousel.stepLength;
         }
       })
     });

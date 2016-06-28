@@ -1,4 +1,10 @@
 
+2.0.1 / 2016-06-28
+==================
+
+  * bugfixes and optimizations for the upcoming gallery component
+  * small readme fix
+
 2.0.0 / 2016-06-27
 ==================
 
@@ -61,7 +67,7 @@
   * added events and config plus a public goTo method
 
 1.0.2 / 2016-06-16
-==================git 
+================== 
 
   * added node_modules ignore for nodemon watcher
   * updated the documentation

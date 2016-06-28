@@ -19,11 +19,11 @@
  * ToDo: v3 -> Move to ui utils library.
  */
 (function(){
-if (!Array.of) {
-  Array.of = function() {
-    return Array.prototype.slice.call(arguments);
-  };
-}
+  if (!Array.of) {
+    Array.of = function() {
+      return Array.prototype.slice.call(arguments);
+    };
+  }
 })();
 
 /**
@@ -216,7 +216,7 @@ class Carousel {
       this.index = 0;
       this.updateDefault();
 
-    // ToDo: v3 -> move to Slider class.
+      // ToDo: v3 -> move to Slider class.
     } else if(this.config.mode === this.Enums.Mode.SLIDER){
       this.updateSlider({transition: false});
     }
@@ -232,7 +232,7 @@ class Carousel {
     // ToDo: v3 -> move to Slider class.
     if(this.config.mode === this.Enums.Mode.SLIDER &&
       this.config.preview &&
-      this.element.offsetWidth > this.config.previewBreakpoint
+      this.getElementWidth() > this.config.previewBreakpoint
     ){
       addClass('dynamic-ratio', this.element);
     } else {
@@ -240,17 +240,17 @@ class Carousel {
     }
 
     this.orgWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
-    if(this.orgWidth === this.refWidth && this.element.offsetWidth < this.refWidth){
-      this.itemWidth = this.element.offsetWidth - this.config.gap;
+    if(this.orgWidth === this.refWidth && this.getElementWidth() < this.refWidth){
+      this.itemWidth = this.getElementWidth() - this.config.gap;
       [].forEach.call(this.items, element => element.style.width = `${this.itemWidth-this.config.gap}px`);
     } else {
       this.itemWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
     }
 
     if(this.config.mode === this.Enums.Mode.SLIDER && this.config.preview){
-      if(this.element.offsetWidth > this.config.previewBreakpoint){
+      if(this.getElementWidth() > this.config.previewBreakpoint){
         let buttons = this.element.querySelectorAll('[data-direction]');
-        let offset = (this.element.offsetWidth - this.itemWidth)/2;
+        let offset = (this.getElementWidth() - this.itemWidth)/2;
         let width = offset > 40 ? offset : 40;
         [].forEach.call(buttons, element => {
           element.style.width = `${width}px`;
@@ -417,6 +417,7 @@ class Carousel {
    * Adds the page indicator
    */
   addIndicator(){
+    this.removeIndicator();
     if(!this.config.indicator) return;
     this.pagination.indicator = document.createElement('div');
     addClass('as24-pagination-indicator', this.pagination.indicator);
@@ -465,7 +466,9 @@ class Carousel {
     this.triggerEvent('slide',{
       index: this.index
     });
-    this.update(this.Enums.Direction.RIGHT);
+    this.update({
+      transition: false
+    });
   }
 
   /**
@@ -479,7 +482,9 @@ class Carousel {
       direction: direction,
       index: this.index
     });
-    this.update(direction);
+    this.update({
+      direction: direction
+    });
   }
 
   /**
@@ -488,11 +493,11 @@ class Carousel {
    */
   calculateEnvironment(){
     this.itemsLength  = this.container.children.length;
-    this.itemsVisible = Math.floor(this.element.offsetWidth / this.itemWidth);
-    this.totalReach   = this.container.offsetWidth - this.element.offsetWidth;
+    this.itemsVisible = Math.floor(this.getElementWidth() / this.itemWidth);
+    this.totalReach   = this.container.offsetWidth - this.getElementWidth();
     this.stepLength   = this.speed === this.Enums.Speed.SLOW ? this.itemsLength - this.itemsVisible : Math.ceil(this.itemsLength / this.itemsVisible);
     if(this.config.mode === this.Enums.Mode.SLIDER) this.stepLength = this.container.children.length - 1;
-    this.stepWidth    = this.speed === this.Enums.Speed.SLOW ? this.itemWidth : Math.floor(this.element.offsetWidth / this.itemWidth) * this.itemWidth;
+    this.stepWidth    = this.speed === this.Enums.Speed.SLOW ? this.itemWidth : Math.floor(this.getElementWidth() / this.itemWidth) * this.itemWidth;
   }
 
   /**
@@ -526,7 +531,8 @@ class Carousel {
    * Updates the position of the carousel.
    * ToDo: v3 -> should be extended by Carousel and Slider class.
    */
-  update(direction) {
+  update(config = {direction: this.Enums.Direction.RIGHT, transition: true}) {
+
     this.triggerEvent('as24-carousel:change', {
       detail: {
         id: this.element.id
@@ -538,9 +544,7 @@ class Carousel {
     if (this.config.mode === this.Enums.Mode.DEFAULT) {
       this.updateDefault();
     } else if(this.config.mode === this.Enums.Mode.SLIDER && this.lastIndex !== this.index) {
-      this.updateSlider({
-        direction: direction
-      });
+      this.updateSlider(config);
     }
   }
 
@@ -556,7 +560,7 @@ class Carousel {
 
     let items = [];
     let start = this.index;
-    let itemsVisible = Math.ceil(this.element.offsetWidth / this.itemWidth);
+    let itemsVisible = Math.ceil(this.getElementWidth() / this.itemWidth);
     let end = this.speed === this.Enums.Speed.SLOW ? this.index + itemsVisible : (this.index + 1) * itemsVisible;
     end = end > this.itemsLength ? this.itemsLength : end;
     for(let i = start; i < end; i++ ) {
@@ -579,8 +583,8 @@ class Carousel {
     let {direction, transition: transition = true} = config;
     let left = this.Enums.Direction.LEFT;
     let right = this.Enums.Direction.RIGHT;
-    let previewSize = this.element.offsetWidth > this.config.previewBreakpoint && this.config.preview ? 2 : 1;
-    let offset = this.config.preview ? (this.element.offsetWidth - this.itemWidth)/2 : 0;
+    let previewSize = this.getElementWidth() > this.config.previewBreakpoint && this.config.preview ? 2 : 1;
+    let offset = this.config.preview ? (this.getElementWidth() - this.itemWidth)/2 : 0;
     let currentItem = this.items[this.index];
 
     // slowing down the hard hitters ;)
@@ -619,7 +623,7 @@ class Carousel {
     let excluded = all.filter((el) => { return !affected.includes(el);});
 
     excluded.forEach(i => {
-      this.move(this.element.offsetWidth, this.items[i]);
+      this.move(this.getElementWidth(), this.items[i]);
     });
 
     this.loadImages(affected);
@@ -738,10 +742,21 @@ class Carousel {
 
   /**
    * gets the current client height.
-   * @returns {number}
+   * @returns {Number} the width.
    */
   getWindowWidth() {
     return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  }
+
+  /**
+   * Get the element width without padding.
+   * @return {Number} the width.
+   */
+  getElementWidth() {
+    let computed = getComputedStyle(this.element);
+    let width = this.element.offsetWidth;
+    width -= parseFloat(computed.paddingLeft) + parseFloat(computed.paddingRight);
+    return width;
   }
 
   /**
@@ -771,11 +786,11 @@ class Carousel {
    * Allowed custom element attributes and there defaults.
    */
   let attributes = [
-      {name: 'gap',               value: 20,        type: 'Number'},
-      {name: 'mode',              value: 'default', type: 'String'},
-      {name: 'preview',           value: true,      type: 'Boolean'},
-      {name: 'previewBreakpoint', value: 640,       type: 'Number'},
-      {name: 'indicator',         value: false,     type: 'Boolean'}
+    {name: 'gap',               value: 20,        type: 'Number'},
+    {name: 'mode',              value: 'default', type: 'String'},
+    {name: 'preview',           value: true,      type: 'Boolean'},
+    {name: 'previewBreakpoint', value: 640,       type: 'Number'},
+    {name: 'indicator',         value: false,     type: 'Boolean'}
   ];
 
   /**
@@ -848,9 +863,10 @@ class Carousel {
           detachedCallback:         { value: elementDetachedCallback },
           attributeChangedCallback: { value: elementAttributeChangedHandler }
         }), {
-          redraw:   function (){ this.carousel.redraw(); },
-          goTo:     function (index){ this.carousel.goTo(index); },
-          getIndex: function (){ return this.carousel.index; }
+          redraw:         function (){ this.carousel.redraw(); },
+          goTo:           function (index){ this.carousel.goTo(index); },
+          getIndex:       function (){ return this.carousel.index; },
+          getStepLength:  function (){ return this.carousel.stepLength }
         }
       )
     });
