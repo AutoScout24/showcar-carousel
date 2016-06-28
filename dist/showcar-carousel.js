@@ -4,8 +4,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
@@ -35,42 +33,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
   }
 })();
-
-/**
- * Poly-fill for "[].includes()".
- * ToDo: v3 -> Move to ui utils library.
- */
-if (!Array.prototype.includes) {
-  Array.prototype.includes = function (searchElement /*, fromIndex*/) {
-    'use strict';
-
-    var O = Object(this);
-    var len = parseInt(O.length, 10) || 0;
-    if (len === 0) {
-      return false;
-    }
-    var n = parseInt(arguments[1], 10) || 0;
-    var k;
-    if (n >= 0) {
-      k = n;
-    } else {
-      k = len + n;
-      if (k < 0) {
-        k = 0;
-      }
-    }
-    var currentElement;
-    var searchIsNaN = isNaN(searchElement);
-    while (k < len) {
-      currentElement = O[k];
-      if (searchElement === currentElement || searchIsNaN && isNaN(currentElement)) {
-        return true;
-      }
-      k++;
-    }
-    return false;
-  };
-}
 
 /**
  * Add a class to the given DOM element.
@@ -763,17 +725,16 @@ var Carousel = function () {
         offset: offset
       });
 
-      var current = [this.index];
-      var affected = [].concat(_toConsumableArray(new Set([].concat(previous, current, next))));
-      var all = Array.apply(null, Array(this.items.length)).map(function (x, i) {
-        return i;
-      });
-      var excluded = all.filter(function (el) {
-        return !affected.includes(el);
-      });
+      // Sadly IE doesn't allowed me to do this
+      // let affected = [...new Set([].concat(previous,current,next))];
+      // var all = Array.apply(null, Array(this.items.length)).map(function (x, i) { return i });
+      // let excluded = all.filter((el) => { return !affected.includes(el);});
 
-      excluded.forEach(function (i) {
-        _this5.move(_this5.getElementWidth(), _this5.items[i]);
+      // So i did this...
+      var current = [this.index];
+      var affected = [].concat(previous, current, next);
+      [].forEach.call(this.items, function (element, index) {
+        if (affected.indexOf(index) === -1) _this5.move(_this5.getElementWidth(), _this5.items[index]);
       });
 
       this.loadImages(affected);
