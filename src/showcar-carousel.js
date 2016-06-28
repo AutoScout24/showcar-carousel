@@ -462,6 +462,7 @@ class Carousel {
    */
   goTo(index){
     this.lastIndex = parseInt(this.index);
+    if(index < 0) index = 0;
     this.index = index;
     this.triggerEvent('slide',{
       index: this.index
@@ -557,6 +558,7 @@ class Carousel {
     let distance = this.index * this.stepWidth;
     distance = distance > this.totalReach ? this.totalReach : distance;
     distance = ~distance + 1;
+    distance = this.stepLength > 0 ? distance : 0;
 
     let items = [];
     let start = this.index;
@@ -684,7 +686,7 @@ class Carousel {
     } else {
       removeClass('hide', this.pagination.left);
     }
-    if(this.index === this.stepLength){
+    if(this.index === this.stepLength || this.stepLength <= 0){
       addClass('hide', this.pagination.right);
     } else {
       removeClass('hide', this.pagination.right);
