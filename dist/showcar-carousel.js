@@ -545,6 +545,7 @@ var Carousel = function () {
     key: 'goTo',
     value: function goTo(index) {
       this.lastIndex = parseInt(this.index);
+      if (index < 0) index = 0;
       this.index = index;
       this.triggerEvent('slide', {
         index: this.index
@@ -657,6 +658,7 @@ var Carousel = function () {
       var distance = this.index * this.stepWidth;
       distance = distance > this.totalReach ? this.totalReach : distance;
       distance = ~distance + 1;
+      distance = this.stepLength > 0 ? distance : 0;
 
       var items = [];
       var start = this.index;
@@ -816,7 +818,7 @@ var Carousel = function () {
       } else {
         removeClass('hide', this.pagination.left);
       }
-      if (this.index === this.stepLength) {
+      if (this.index === this.stepLength || this.stepLength <= 0) {
         addClass('hide', this.pagination.right);
       } else {
         removeClass('hide', this.pagination.right);
