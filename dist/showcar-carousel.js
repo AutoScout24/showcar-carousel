@@ -37,6 +37,42 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 })();
 
 /**
+ * Poly-fill for "[].includes()".
+ * ToDo: v3 -> Move to ui utils library.
+ */
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function (searchElement /*, fromIndex*/) {
+    'use strict';
+
+    var O = Object(this);
+    var len = parseInt(O.length, 10) || 0;
+    if (len === 0) {
+      return false;
+    }
+    var n = parseInt(arguments[1], 10) || 0;
+    var k;
+    if (n >= 0) {
+      k = n;
+    } else {
+      k = len + n;
+      if (k < 0) {
+        k = 0;
+      }
+    }
+    var currentElement;
+    var searchIsNaN = isNaN(searchElement);
+    while (k < len) {
+      currentElement = O[k];
+      if (searchElement === currentElement || searchIsNaN && isNaN(currentElement)) {
+        return true;
+      }
+      k++;
+    }
+    return false;
+  };
+}
+
+/**
  * Add a class to the given DOM element.
  * @param {string} className
  * @param {HTMLElement} element

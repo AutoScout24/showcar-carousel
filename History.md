@@ -1,4 +1,9 @@
 
+2.0.4 / 2016-06-28
+==================
+
+  * added an polyfill for IE's missing Array.prototype.includes
+
 2.0.3 / 2016-06-28
 ==================
 
