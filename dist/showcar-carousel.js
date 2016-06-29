@@ -413,7 +413,7 @@ var Carousel = function () {
       this.wrapper = document.createElement('div');
       addClass('as24-carousel-wrapper', this.wrapper);
 
-      this.container = document.createElement('ul');
+      this.container = document.createElement('div');
       addClass('as24-carousel-container', this.container);
 
       [].forEach.call(this.element.children, function (element) {

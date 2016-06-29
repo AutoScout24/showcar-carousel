@@ -33,7 +33,7 @@ See the following example below:
 ```html
 <as24-carousel>
 
-  <li class="as24-carousel-item">
+  <div class="as24-carousel-item">
     <a href="http://autoscout24.com">
       <div class="as24-carousel-image-container">
         <img data-src="http://placehold.it/320x240?text=1,320x240"
@@ -45,7 +45,7 @@ See the following example below:
         <p>Content</p>
       </div>
     </a>
-  </li>
+  </div>
   ...
   
 </as24-carousel>
@@ -66,13 +66,13 @@ If you want to use it just add the following attributes to activate it. (Have an
                  gap="0"
                  preview="true"
                  indicator="true">
-    <li class="as24-carousel-item">
+    <div class="as24-carousel-item">
       <div class="as24-carousel-image-container">
         <img data-src="http://placehold.it/640x480?text=1,640x480"
              src=""
              alt="">
       </div>
-    </li>
+    </div>
       ...
     
   </as24-carousel>
