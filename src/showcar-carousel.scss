@@ -63,7 +63,8 @@ as24-carousel {
     background-color: $slider-pagination-indicator-background-color;
     bottom: 0;
     left: 0;
-    //transition: left .3s;
+    min-width: 40px;
+    text-align: center;
     &.no-transition {
       transition: none;
     }

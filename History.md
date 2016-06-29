@@ -1,4 +1,11 @@
 
+2.0.6 / 2016-06-29
+==================
+
+  * fixed the element attribute change handler
+  * fixed the button and indicator resizing issue.
+  * some minor css changes
+
 2.0.5 / 2016-06-28
 ==================
 

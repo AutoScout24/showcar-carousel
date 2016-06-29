@@ -247,21 +247,20 @@ class Carousel {
       this.itemWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
     }
 
-    if(this.config.mode === this.Enums.Mode.SLIDER && this.config.preview){
-      if(this.getElementWidth() > this.config.previewBreakpoint){
-        let buttons = this.element.querySelectorAll('[data-direction]');
+    if(this.config.mode === this.Enums.Mode.SLIDER){
+      let width = 40;
+      let left = null;
+      if(this.getElementWidth() > this.config.previewBreakpoint && this.config.preview){
         let offset = (this.getElementWidth() - this.itemWidth)/2;
-        let width = offset > 40 ? offset : 40;
-        [].forEach.call(buttons, element => {
-          element.style.width = `${width}px`;
-        });
-        if(this.config.indicator){
-          this.pagination.indicator.style.left = `${width}px`;
-        }
-      } else {
-        if(this.config.indicator){
-          this.pagination.indicator.style.left = null;
-        }
+        width = offset > 40 ? offset : 40;
+        left = `${width}px`
+      }
+      let buttons = this.element.querySelectorAll('[data-direction]');
+      [].forEach.call(buttons, element => {
+        element.style.width = `${width}px`;
+      });
+      if(this.config.indicator){
+        this.pagination.indicator.style.left = left;
       }
     }
   }
@@ -829,10 +828,11 @@ class Carousel {
    * @property {String} attributeName.
    */
   let elementAttributeChangedHandler = function(attributeName) {
-    if(attributes.hasOwnProperty(attributeName)){
-      let attribute = attributes[attributeName];
-      this.carousel.config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
-    }
+    [].forEach.call(attributes, attribute => {
+      if(attribute.name === attributeName){
+        this.carousel.config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
+      }
+    });
   };
 
   /**

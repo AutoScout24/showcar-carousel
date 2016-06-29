@@ -277,24 +277,23 @@ var Carousel = function () {
         this.itemWidth = this.items[0].getBoundingClientRect().width + this.config.gap;
       }
 
-      if (this.config.mode === this.Enums.Mode.SLIDER && this.config.preview) {
-        if (this.getElementWidth() > this.config.previewBreakpoint) {
-          (function () {
-            var buttons = _this.element.querySelectorAll('[data-direction]');
+      if (this.config.mode === this.Enums.Mode.SLIDER) {
+        (function () {
+          var width = 40;
+          var left = null;
+          if (_this.getElementWidth() > _this.config.previewBreakpoint && _this.config.preview) {
             var offset = (_this.getElementWidth() - _this.itemWidth) / 2;
-            var width = offset > 40 ? offset : 40;
-            [].forEach.call(buttons, function (element) {
-              element.style.width = width + 'px';
-            });
-            if (_this.config.indicator) {
-              _this.pagination.indicator.style.left = width + 'px';
-            }
-          })();
-        } else {
-          if (this.config.indicator) {
-            this.pagination.indicator.style.left = null;
+            width = offset > 40 ? offset : 40;
+            left = width + 'px';
           }
-        }
+          var buttons = _this.element.querySelectorAll('[data-direction]');
+          [].forEach.call(buttons, function (element) {
+            element.style.width = width + 'px';
+          });
+          if (_this.config.indicator) {
+            _this.pagination.indicator.style.left = left;
+          }
+        })();
       }
     }
 
@@ -989,10 +988,13 @@ var Carousel = function () {
    * @property {String} attributeName.
    */
   var elementAttributeChangedHandler = function elementAttributeChangedHandler(attributeName) {
-    if (attributes.hasOwnProperty(attributeName)) {
-      var attribute = attributes[attributeName];
-      this.carousel.config[attribute.name] = checkValue(this.getAttribute(attribute.name), attribute.value, attribute.type);
-    }
+    var _this8 = this;
+
+    [].forEach.call(attributes, function (attribute) {
+      if (attribute.name === attributeName) {
+        _this8.carousel.config[attribute.name] = checkValue(_this8.getAttribute(attribute.name), attribute.value, attribute.type);
+      }
+    });
   };
 
   /**
