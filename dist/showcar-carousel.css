@@ -83,6 +83,9 @@ as24-carousel {
     as24-carousel .as24-carousel-item > a {
       display: block;
       outline-style: none; }
+    as24-carousel .as24-carousel-item.no-transition {
+      -webkit-transition: none;
+      transition: none; }
     as24-carousel .as24-carousel-item .as24-carousel-image-container {
       position: relative;
       display: block;

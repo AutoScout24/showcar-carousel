@@ -674,7 +674,6 @@ var Carousel = function () {
     /**
      * Updates the slider carousel position.
      * @param {Object} config - the update configuration for the slider.
-     * @return {Array} affected items (for image loading).
      * ToDo: v3 -> move to Slider class.
      */
 
@@ -688,56 +687,106 @@ var Carousel = function () {
       var _config$transition = config.transition;
       var transition = _config$transition === undefined ? true : _config$transition;
 
-      var left = this.Enums.Direction.LEFT;
-      var right = this.Enums.Direction.RIGHT;
-      var previewSize = this.getElementWidth() > this.config.previewBreakpoint && this.config.preview ? 2 : 1;
-      var offset = this.config.preview ? (this.getElementWidth() - this.itemWidth) / 2 : 0;
-      var currentItem = this.items[this.index];
+      var previewState = this.getElementWidth() > this.config.previewBreakpoint && this.config.preview;
+      var initialPosition = direction === this.Enums.Direction.RIGHT ? this.getElementWidth() : ~this.getElementWidth() + 1;
 
       // slowing down the hard hitters ;)
       var userSpeed = this.endTime();
       this.startTime();
       var animationSpeed = userSpeed > 300 ? 300 : 0;
-      [].forEach.call(this.items, function (element) {
+
+      [].forEach.call(this.items, function (element, index) {
         addClass('no-transition', element);
+        if (previewState === false && index !== _this5.lastIndex) _this5.move(initialPosition, element);
         element.style.transitionDuration = animationSpeed + 'ms';
       });
+
+      var positionConfig = {
+        previewState: previewState,
+        previewSize: previewState ? 2 : 1,
+        offset: previewState ? (this.getElementWidth() - this.itemWidth) / 2 : 0,
+        initialPosition: initialPosition,
+        direction: direction,
+        transition: transition
+      };
+
+      console.log();
+
+      if (transition) {
+        setTimeout(function () {
+          this._positionAllItems(positionConfig);
+        }.bind(this), 10);
+      } else {
+        this._positionAllItems(positionConfig);
+      }
+    }
+
+    /**
+     * Positions and animates all items by the rules given in the config.
+     * @param {Object} config - the movement configuration for the items.
+     * @private
+     */
+
+  }, {
+    key: '_positionAllItems',
+    value: function _positionAllItems(config) {
+      var _this6 = this;
+
+      var direction = config.direction;
+      var transition = config.transition;
+      var offset = config.offset;
+      var initialPosition = config.initialPosition;
+      var previewState = config.previewState;
+      var previewSize = config.previewSize;
+
+      var currentItem = this.items[this.index];
 
       if (transition) removeClass('no-transition', currentItem);
       this.move(offset, currentItem);
 
-      var previous = this.positionItems({
+      var previous = void 0,
+          next = void 0;
+      var positionConfig = {
         current: this.index,
-        side: left,
         direction: direction,
         previewSize: previewSize,
         transition: transition,
         offset: offset
-      });
+      };
 
-      var next = this.positionItems({
-        current: this.index,
-        side: right,
-        direction: direction,
-        previewSize: previewSize,
-        transition: transition,
-        offset: offset
-      });
+      var lastElement = this.items[this.lastIndex];
 
-      // Sadly IE doesn't allowed me to do this
-      // let affected = [...new Set([].concat(previous,current,next))];
-      // var all = Array.apply(null, Array(this.items.length)).map(function (x, i) { return i });
-      // let excluded = all.filter((el) => { return !affected.includes(el);});
+      if (direction === this.Enums.Direction.LEFT || previewState) {
+        if (previewState) {
+          positionConfig.side = this.Enums.Direction.LEFT;
+          previous = this.positionItems(positionConfig);
+        } else {
+          if (transition) removeClass('no-transition', lastElement);
+          this.move(this.getElementWidth(), lastElement);
+        }
+      }
 
-      // So i did this...
-      var current = [this.index];
-      var affected = [].concat(previous, current, next);
-      [].forEach.call(this.items, function (element, index) {
-        if (affected.indexOf(index) === -1) _this5.move(_this5.getElementWidth(), _this5.items[index]);
-      });
+      if (direction === this.Enums.Direction.RIGHT || previewState) {
+        if (previewState) {
+          positionConfig.side = this.Enums.Direction.RIGHT;
+          next = this.positionItems(positionConfig);
+        } else {
+          if (transition) removeClass('no-transition', lastElement);
+          this.move(~this.getElementWidth() + 1, lastElement);
+        }
+      }
+
+      var affected = previewState ? [].concat(previous, [this.index], next) : [this.index];
+      if (previewState) {
+        [].forEach.call(this.items, function (element, index) {
+          if (affected.indexOf(index) === -1) {
+            addClass('no-transition', element);
+            _this6.move(initialPosition, element);
+          }
+        });
+      }
 
       this.loadImages(affected);
-      return affected;
     }
 
     /**
@@ -829,12 +878,12 @@ var Carousel = function () {
   }, {
     key: 'loadImages',
     value: function loadImages() {
-      var _this6 = this;
+      var _this7 = this;
 
       var items = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
       [].forEach.call(items, function (i) {
-        var images = _this6.container.children[i].querySelectorAll('img');
+        var images = _this7.container.children[i].querySelectorAll('img');
         [].forEach.call(images, function (image) {
           var src = image.getAttribute('data-src');
           if (src !== null) {
@@ -953,17 +1002,17 @@ var Carousel = function () {
   /**
    * Allowed custom element attributes and there defaults.
    */
-  var attributes = [{ name: 'gap', value: 20, type: 'Number' }, { name: 'mode', value: 'default', type: 'String' }, { name: 'preview', value: true, type: 'Boolean' }, { name: 'previewBreakpoint', value: 640, type: 'Number' }, { name: 'indicator', value: false, type: 'Boolean' }];
+  var attributes = [{ name: 'gap', value: 20, type: 'Number' }, { name: 'mode', value: 'default', type: 'String' }, { name: 'preview', value: false, type: 'Boolean' }, { name: 'previewBreakpoint', value: 640, type: 'Number' }, { name: 'indicator', value: false, type: 'Boolean' }];
 
   /**
    * Handler for creating the element.
    */
   var elementCreatedHandler = function elementCreatedHandler() {
-    var _this7 = this;
+    var _this8 = this;
 
     var config = {};
     [].forEach.call(attributes, function (attribute) {
-      config[attribute.name] = checkValue(_this7.getAttribute(attribute.name), attribute.value, attribute.type);
+      config[attribute.name] = checkValue(_this8.getAttribute(attribute.name), attribute.value, attribute.type);
     });
     this.carousel = new Carousel(this, config);
   };
@@ -988,11 +1037,11 @@ var Carousel = function () {
    * @property {String} attributeName.
    */
   var elementAttributeChangedHandler = function elementAttributeChangedHandler(attributeName) {
-    var _this8 = this;
+    var _this9 = this;
 
     [].forEach.call(attributes, function (attribute) {
       if (attribute.name === attributeName) {
-        _this8.carousel.config[attribute.name] = checkValue(_this8.getAttribute(attribute.name), attribute.value, attribute.type);
+        _this9.carousel.config[attribute.name] = checkValue(_this9.getAttribute(attribute.name), attribute.value, attribute.type);
       }
     });
   };

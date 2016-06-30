@@ -135,6 +135,9 @@ as24-carousel {
       outline-style: none;
     }
 
+    &.no-transition {
+      transition: none;
+    }
 
     .as24-carousel-image-container {
       position: relative;

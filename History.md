@@ -1,4 +1,13 @@
 
+2.0.8 / 2016-06-30
+==================
+
+  * fixed a couple of slider bugs.
+  * only one image gets loaded and 2 images get animated in the slider mode when the preview is not visible
+  * default preview is set to false
+  * changed markup in the example
+  * some small css fixes
+
 2.0.7 / 2016-06-29
 ==================
 
