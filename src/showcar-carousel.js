@@ -391,9 +391,10 @@ class Carousel {
    */
   addPagination() {
     this.removePagination();
-    for (let direction of [this.Enums.Direction.LEFT, this.Enums.Direction.RIGHT]){
-      this.createPaginationButton(direction);
-    }
+
+    this.createPaginationButton(this.Enums.Direction.LEFT);
+    this.createPaginationButton(this.Enums.Direction.RIGHT);
+
     removeClass('hide', this.pagination.right);
 
     // ToDo: v3 -> move to Slider class.
