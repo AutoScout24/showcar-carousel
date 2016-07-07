@@ -28,6 +28,7 @@ $slider-pagination-button-arrow-size: 15px;
 $slider-aspect-ratio: 75%;
 $slider-gap: 0px;
 
+$slider-pagination-indicator-font-size: 0.75rem;
 $slider-pagination-indicator-padding: 7px;
 $slider-pagination-indicator-background-color: $background-color;
 
@@ -61,6 +62,8 @@ as24-carousel {
     display: inline-block;
     padding: $slider-pagination-indicator-padding;
     background-color: $slider-pagination-indicator-background-color;
+    font-size: $slider-pagination-indicator-font-size;
+    width: 50px;
     bottom: 0;
     left: 0;
     min-width: 40px;
