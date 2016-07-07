@@ -539,7 +539,6 @@
         Carousel.prototype.updateSlider = function (config) {
             var _this = this;
             var direction = config.direction, _a = config.transition, transition = _a === void 0 ? true : _a;
-            direction = direction || this.Enums.Direction.RIGHT;
             var previewState = this.getElementWidth() > this.config.previewBreakpoint && this.config.preview;
             var initialPosition = direction === this.Enums.Direction.RIGHT ? this.getElementWidth() : ~this.getElementWidth() + 1;
             // slowing down the hard hitters ;)

@@ -602,7 +602,6 @@
     updateSlider(config){
 
       let {direction, transition: transition = true} = config;
-      direction = direction || this.Enums.Direction.RIGHT;
       let previewState = this.getElementWidth() > this.config.previewBreakpoint && this.config.preview;
       let initialPosition = direction === this.Enums.Direction.RIGHT ? this.getElementWidth() : ~ this.getElementWidth() + 1;
 
