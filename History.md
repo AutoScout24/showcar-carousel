@@ -1,4 +1,10 @@
 
+2.1.1 / 2016-07-07
+==================
+
+  * Moved to TypeScript
+  * changed font-size and height of pagination indicator
+
 2.0.8 / 2016-06-30
 ==================
 
