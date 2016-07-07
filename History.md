@@ -1,4 +1,11 @@
 
+2.1.3 / 2016-07-07
+==================
+
+  * bumped version
+  * removed margin from slider pagination buttons
+  * 2.1.2: Fixed first image loading
+
 2.1.1 / 2016-07-07
 ==================
 
