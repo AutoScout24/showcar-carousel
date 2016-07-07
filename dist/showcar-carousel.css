@@ -130,7 +130,6 @@ as24-carousel {
     as24-carousel[mode="slider"] .as24-pagination-button {
       width: 40px;
       height: 60px;
-      margin-top: -20px;
       background-size: 15px;
       background-position: center center; }
       as24-carousel[mode="slider"] .as24-pagination-button[data-direction="left"] {
