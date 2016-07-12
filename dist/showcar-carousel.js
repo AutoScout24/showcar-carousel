@@ -498,9 +498,7 @@
          */
         Carousel.prototype.update = function (config) {
             this.triggerEvent('as24-carousel:change', {
-                detail: {
-                    id: this.element.id
-                }
+                id: this.element.id
             }, window.document);
             this.updateIndicator();
             if (this.config.mode === this.Enums.Mode.DEFAULT) {
