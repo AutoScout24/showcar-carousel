@@ -555,9 +555,7 @@
     update(config) {
 
       this.triggerEvent('as24-carousel:change', {
-        detail: {
-          id: this.element.id
-        }
+        id: this.element.id
       }, window.document);
 
       this.updateIndicator();
