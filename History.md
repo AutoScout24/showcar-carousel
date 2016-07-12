@@ -1,4 +1,12 @@
 
+2.1.4 / 2016-07-12
+==================
+
+  * Fixed custom event data
+  * Changed way for centering of pagination buttons using tranform now and recreated distribution files
+  * Additionally removed the margin-top setting which is not necessary anymore
+  * Changed way for centering of pagination buttons using tranform now
+
 2.1.3 / 2016-07-07
 ==================
 
