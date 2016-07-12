@@ -1,8 +1,5 @@
 as24-carousel {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  user-select: none;
   display: block;
   position: relative;
   white-space: nowrap;
@@ -14,16 +11,10 @@ as24-carousel {
   as24-carousel .as24-carousel-container {
     display: inline-block;
     white-space: nowrap;
-    -webkit-transition: -webkit-transform .9s;
-    transition: -webkit-transform .9s;
     transition: transform .9s;
-    transition: transform .9s, -webkit-transform .9s;
-    -webkit-perspective: 1000px;
-            perspective: 1000px;
-    -webkit-transform: translate3d(0, 0, 0);
-            transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-            backface-visibility: hidden; }
+    perspective: 1000px;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden; }
   as24-carousel .as24-pagination-indicator {
     position: absolute;
     color: white;
@@ -37,31 +28,26 @@ as24-carousel {
     min-width: 40px;
     text-align: center; }
     as24-carousel .as24-pagination-indicator.no-transition {
-      -webkit-transition: none;
       transition: none; }
   as24-carousel .as24-pagination-button {
     border: 2px solid transparent;
     position: absolute;
     top: 50%;
-    margin-top: -25px;
-    vertical-align: center;
     width: 50px;
     height: 50px;
     background: rgba(0, 0, 0, 0.5) url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI4IDQ4Ij48c3R5bGU+LnN0MHtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNmZmZ9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcuNCAyNC4xTDMuMSA0OCAwIDQ1LjFsMjEuNC0yMUwwIDMuMSAzLjEgMHoiLz48L3N2Zz4=) no-repeat 18px center;
     background-size: 30%;
     background-position: center center;
     outline-style: none;
-    -webkit-transition: background-color .3s, opacity .3s;
     transition: background-color .3s, opacity .3s; }
     as24-carousel .as24-pagination-button.no-transition {
-      -webkit-transition: none;
       transition: none; }
     as24-carousel .as24-pagination-button[data-direction="left"] {
       left: 10px;
-      -webkit-transform: rotate(180deg);
-              transform: rotate(180deg); }
+      transform: scaleX(-1) translateY(-50%); }
     as24-carousel .as24-pagination-button[data-direction="right"] {
-      right: 10px; }
+      right: 10px;
+      transform: translateY(-50%); }
     as24-carousel .as24-pagination-button.hide {
       opacity: 0; }
     as24-carousel .as24-pagination-button:hover:not(.hide) {
@@ -86,7 +72,6 @@ as24-carousel {
       display: block;
       outline-style: none; }
     as24-carousel .as24-carousel-item.no-transition {
-      -webkit-transition: none;
       transition: none; }
     as24-carousel .as24-carousel-item .as24-carousel-image-container {
       position: relative;
@@ -165,23 +150,16 @@ as24-carousel {
       position: absolute;
       top: 0;
       left: 0;
-      -webkit-transition: -webkit-transform .3s;
-      transition: -webkit-transform .3s;
       transition: transform .3s;
-      transition: transform .3s, -webkit-transform .3s;
-      -webkit-perspective: 1000px;
-              perspective: 1000px;
-      -webkit-transform: translate3d(100%, 0, 0);
-              transform: translate3d(100%, 0, 0);
+      perspective: 1000px;
+      transform: translate3d(100%, 0, 0);
       width: 100%;
       height: 100%;
       border: none;
       margin: 0px; }
       as24-carousel[mode="slider"] .as24-carousel-item:first-of-type {
-        -webkit-transform: translate3d(0, 0, 0);
-                transform: translate3d(0, 0, 0); }
+        transform: translate3d(0, 0, 0); }
       as24-carousel[mode="slider"] .as24-carousel-item.no-transition {
-        -webkit-transition: none;
         transition: none; }
       @media screen and (min-width: 320px) {
         as24-carousel[mode="slider"] .as24-carousel-item {
