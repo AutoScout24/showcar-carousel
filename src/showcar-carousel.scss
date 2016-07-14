@@ -244,10 +244,8 @@ as24-carousel {
         max-width: $slider-max-width;
       }
       .as24-pagination-button {
-        height: 100%;
-        margin-top: 0;
         background-size: $slider-pagination-button-arrow-size;
-        top: 0;
+        height: 100%;
 
         &[data-direction="left"] {
           background-position: right 15px center;
