@@ -488,7 +488,8 @@
         index: this.index
       });
       this.update({
-        transition: false
+        transition: false,
+        direction: index > this.lastIndex ?  this.Enums.Direction.RIGHT : this.Enums.Direction.LEFT
       });
     }
 
