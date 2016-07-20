@@ -1,4 +1,9 @@
 
+2.1.7 / 2016-07-20
+==================
+
+  * Pass directions when slider is switching position
+
 2.1.4 / 2016-07-12
 ==================
 
