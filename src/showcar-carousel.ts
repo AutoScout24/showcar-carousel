@@ -273,7 +273,7 @@
         let left = null;
         if(this.getElementWidth() > this.config.previewBreakpoint && this.config.preview){
           let offset = (this.getElementWidth() - this.itemWidth)/2;
-          width = offset > 40 ? offset : 40;
+          width = offset > 40 ? Math.ceil(offset) : 40;
           left = `${width}px`
         }
         let buttons = this.element.querySelectorAll('[data-direction]');

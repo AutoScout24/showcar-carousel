@@ -238,7 +238,7 @@
                 var left = null;
                 if (this.getElementWidth() > this.config.previewBreakpoint && this.config.preview) {
                     var offset = (this.getElementWidth() - this.itemWidth) / 2;
-                    width_1 = offset > 40 ? offset : 40;
+                    width_1 = offset > 40 ? Math.ceil(offset) : 40;
                     left = width_1 + "px";
                 }
                 var buttons = this.element.querySelectorAll('[data-direction]');
