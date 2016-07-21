@@ -60,7 +60,7 @@ as24-carousel {
     position: absolute;
     color: white;
     display: inline-block;
-    padding: $slider-pagination-indicator-padding;
+    padding: $slider-pagination-indicator-padding 0;
     background-color: $slider-pagination-indicator-background-color;
     font-size: $slider-pagination-indicator-font-size;
     width: 50px;
