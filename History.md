@@ -1,4 +1,9 @@
 
+2.1.9 / 2016-07-21
+==================
+
+  * Rounded width of pagination buttons to avoid ugly empty stripes effect
+
 2.1.8 / 2016-07-20
 ==================
 
