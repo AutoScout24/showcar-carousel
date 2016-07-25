@@ -231,7 +231,12 @@
                 [].forEach.call(this.items(), function (element) { return element.style.width = (_this.itemWidth - _this.config.gap) + "px"; });
             }
             else {
-                this.itemWidth = this.items()[0].getBoundingClientRect().width + this.config.gap;
+                if (this.orgWidth === 0) {
+                    this.itemWidth = 640 + this.config.gap;
+                }
+                else {
+                    this.itemWidth = this.items()[0].getBoundingClientRect().width + this.config.gap;
+                }
             }
             if (this.config.mode === this.Enums.Mode.SLIDER) {
                 var width_1 = 40;

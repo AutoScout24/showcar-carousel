@@ -267,8 +267,7 @@
       } else {
         if(this.orgWidth === 0) {
           this.itemWidth = 640 + this.config.gap;
-        }
-        else {
+        } else {
           this.itemWidth = this.items()[0].getBoundingClientRect().width + this.config.gap;
         }
       }
