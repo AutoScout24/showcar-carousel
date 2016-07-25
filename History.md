@@ -1,4 +1,9 @@
 
+2.1.11 / 2016-07-25
+==================
+
+  * Temporary fix for safari lightbox switch mode. Will need to be adapted when showcar-pictures supports larger picture sizes.
+
 2.1.10 / 2016-07-21
 ==================
 
