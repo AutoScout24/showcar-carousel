@@ -265,7 +265,12 @@
         this.itemWidth = this.getElementWidth() - this.config.gap;
         [].forEach.call(this.items(), element => element.style.width = `${this.itemWidth-this.config.gap}px`);
       } else {
-        this.itemWidth = this.items()[0].getBoundingClientRect().width + this.config.gap;
+        if(this.orgWidth === 0) {
+          this.itemWidth = 640 + this.config.gap;
+        }
+        else {
+          this.itemWidth = this.items()[0].getBoundingClientRect().width + this.config.gap;
+        }
       }
 
       if(this.config.mode === this.Enums.Mode.SLIDER){
