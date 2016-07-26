@@ -616,6 +616,7 @@
       [].forEach.call(this.items(), (element, index) => {
         addClass('no-transition', element);
         if(previewState === false && index !== this.lastIndex) this.move(initialPosition, element);
+        element.style.zIndex = 0;
         element.style.transitionDuration = `${animationSpeed}ms`;
       });
 
@@ -627,8 +628,6 @@
         direction: direction,
         transition: transition
       };
-
-      console.log();
 
       if(transition){
         setTimeout(function(){
@@ -688,6 +687,7 @@
       if(previewState){
         [].forEach.call(this.items(), (element, index) => {
           if(affected.indexOf(index) === -1) {
+            element.style.zIndex = -100;
             addClass('no-transition', element);
             this.move(initialPosition, element);
           }
