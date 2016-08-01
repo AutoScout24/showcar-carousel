@@ -1,10 +1,5 @@
 as24-carousel {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  display: -webkit-box;
-  display: -ms-flexbox;
+  user-select: none;
   display: flex;
   position: relative;
   white-space: nowrap;
@@ -12,30 +7,16 @@ as24-carousel {
   width: 100%;
   outline-style: none; }
   as24-carousel .as24-carousel-wrapper {
-    -webkit-box-flex: 1;
-        -ms-flex: 1;
-            flex: 1;
-    display: -webkit-box;
-    display: -ms-flexbox;
+    flex: 1;
     display: flex; }
   as24-carousel .as24-carousel-container {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-flex: 1;
-        -ms-flex: 1 0 auto;
-            flex: 1 0 auto;
+    flex: 1 0 auto;
     white-space: nowrap;
-    -webkit-transition: -webkit-transform .9s;
-    transition: -webkit-transform .9s;
     transition: transform .9s;
-    transition: transform .9s, -webkit-transform .9s;
-    -webkit-perspective: 1000px;
-            perspective: 1000px;
-    -webkit-transform: translate3d(0, 0, 0);
-            transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-            backface-visibility: hidden; }
+    perspective: 1000px;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden; }
   as24-carousel .as24-pagination-indicator {
     position: absolute;
     color: white;
@@ -49,7 +30,6 @@ as24-carousel {
     min-width: 40px;
     text-align: center; }
     as24-carousel .as24-pagination-indicator.no-transition {
-      -webkit-transition: none;
       transition: none; }
   as24-carousel .as24-pagination-button {
     border: 2px solid transparent;
@@ -61,19 +41,15 @@ as24-carousel {
     background-size: 30%;
     background-position: center center;
     outline-style: none;
-    -webkit-transition: background-color .3s, opacity .3s;
     transition: background-color .3s, opacity .3s; }
     as24-carousel .as24-pagination-button.no-transition {
-      -webkit-transition: none;
       transition: none; }
     as24-carousel .as24-pagination-button[data-direction="left"] {
       left: 10px;
-      -webkit-transform: scaleX(-1) translateY(-50%);
-              transform: scaleX(-1) translateY(-50%); }
+      transform: scaleX(-1) translateY(-50%); }
     as24-carousel .as24-pagination-button[data-direction="right"] {
       right: 10px;
-      -webkit-transform: translateY(-50%);
-              transform: translateY(-50%); }
+      transform: translateY(-50%); }
     as24-carousel .as24-pagination-button.hide {
       opacity: 0; }
     as24-carousel .as24-pagination-button:hover:not(.hide) {
@@ -85,19 +61,14 @@ as24-carousel {
     outline-style: none; }
   as24-carousel .as24-carousel-item {
     border: 1px solid #dcdcdc;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     margin: 0 10px;
     background-color: white;
     text-align: center;
     line-height: 1.5rem;
-    -webkit-box-flex: 1;
-        -ms-flex: 1 0 auto;
-            flex: 1 0 auto;
+    flex: 1 0 auto;
     outline-style: none; }
     as24-carousel .as24-carousel-item.no-transition {
-      -webkit-transition: none;
       transition: none; }
     @media screen and (min-width: 320px) {
       as24-carousel .as24-carousel-item:first-child {
@@ -130,7 +101,6 @@ as24-carousel {
     left: 0;
     border: none; }
     as24-carousel[mode="slider"] .as24-carousel-item.no-transition {
-      -webkit-transition: none;
       transition: none; }
     @media screen and (min-width: 320px) {
       as24-carousel[mode="slider"] .as24-carousel-item {

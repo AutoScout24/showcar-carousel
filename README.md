@@ -16,7 +16,7 @@ Visit the [example](https://autoscout24.github.io/showcar-carousel/) on github p
 Just run the following command in the root of the carousel library.
 
 ```
-$> npm start
+$ npm start
 ```
 This will open a small express server on your local machine where you can see the running example.
 
@@ -27,27 +27,16 @@ Visit: [http://localhost:8080](http://localhost:8080)
 #### HTML Code
 
 The whole carousel is defined by an `as24-carousel` element. 
-Each item needs to be wrapped inside a `li` element with an `as24-carousel-item` class.
+Each carousel item must have `as24-carousel-item` class.
 See the following example below:
 
 ```html
 <as24-carousel>
-
+  ...
   <div class="as24-carousel-item">
-    <a href="http://autoscout24.com">
-      <div class="as24-carousel-image-container">
-        <img data-src="http://placehold.it/320x240?text=1,320x240"
-             src=""
-             alt="">
-      </div>
-      <div class="as24-carousel-description">
-        <h5>Headline</h5>
-        <p>Content</p>
-      </div>
-    </a>
+    <!-- content here -->
   </div>
   ...
-  
 </as24-carousel>
 ```
 
@@ -87,21 +76,28 @@ If you want to use it just add the following attributes to activate it. (Have an
  For better performance it is possible to lazy load images.
  Therefor just replace the `src` attribute of your `img` with an `data-src` attribute.
 
-#### CSS Styling ( Changing the image aspect ratio)
+#### CSS Styling
 
-Currently the default style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
-In order to change the aspect ratio of the images in the carousel add the following to you implementation.
+The library uses Flexbox as box model. Also, the carousel item does not depend on the content. Thus, you have to specify the dimensions of the items in your CSS file.
+
+```html
+<as24-carousel class="top-cars">
+  ...
+  <div class="as24-carousel-item">
+    <!-- content here -->
+  </div>
+  ...
+</as24-carousel>
+```
 
 ```css
-  /* CAROUSEL ITEM */
-  as24-carousel-item > .carousel-image-container {
-    /* Aspect ratio of the image ( 100% width / 75% height = 1.333 ) */
-    padding-bottom: 75%;
-  }
+.top-cars as24-carousel-item {
+  width: 310px;
+  height: 280px;
+}
 ```
 
 #### JS Interface
-
 
 ##### Re-rendering the complete carousel after manually setting the size:
 If you need to change the width of the carousel dynamically, you can call the ``redraw()`` method, to force the carousel to recalculate its sizings and positionings.
@@ -130,32 +126,29 @@ document.getElementById('carousel-example').goTo(2);
 The following events are triggered on the carousel element:
 
 - `slide` is called on every image index change.  
-- ...
-
-
 
 
 ## Installation
 
 #### How to install:
 
-  To install showcar-carousel within your project use npm.
+To install showcar-carousel within your project use npm.
 
-  ```
-  $> npm install showcar-carousel --save
-  ```
+```
+$> npm install showcar-carousel --save
+```
 
-  Afterwards you need to add the css and js to your page.
+Afterwards you need to add the css and js to your page.
 
-  ```html
-  <link rel="stylesheet" href="../dist/showcar-carousel.css">
-  ```
+```html
+<link rel="stylesheet" href="../dist/showcar-carousel.css">
+```
 
-  ```html
-  <script src="../dist/showcar-carousel.js"></script>
-  ```
+```html
+<script src="../dist/showcar-carousel.js"></script>
+```
 
-  *Note: showcar-carousel has no further dependencies.*
+*Note: showcar-carousel has no further dependencies.*
 
 ***
 
