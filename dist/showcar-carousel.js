@@ -112,11 +112,11 @@
             this.container = null;
             this.wrapper = null;
             this.stepLength = null;
-            this.resizeTimeout = null;
             this.resizeListener = null;
             this.touchStartListener = null;
             this.touchMoveListener = null;
             this.touchEndListener = null;
+            this.imgSrcDataAttrName = 'data-src';
             this.windowWidth = 0;
             this.orgWidth = 0;
             this.Enums = {
@@ -177,7 +177,7 @@
             this.addPagination();
             this.addIndicator();
             // Redraw the scene.
-            this.redraw();
+            this.redraw('data-src');
         };
         /**
          * Initializes the carousel by adding all necessary bits and bolts.
@@ -198,7 +198,9 @@
          * @public
          * ToDo: v3 -> should be extended by Carousel and Slider class.
          */
-        Carousel.prototype.redraw = function () {
+        Carousel.prototype.redraw = function (dataAttrName) {
+            if (dataAttrName === void 0) { dataAttrName = ''; }
+            this.imgSrcDataAttrName = dataAttrName;
             this.resizeItems();
             this.calculateEnvironment();
             // ToDo: v3 -> move to Carousel class.
@@ -695,10 +697,9 @@
             [].forEach.call(items, function (i) {
                 var images = _this.container.children[i].querySelectorAll('img');
                 [].forEach.call(images, function (image) {
-                    var src = image.getAttribute('data-src');
+                    var src = image.getAttribute(_this.imgSrcDataAttrName);
                     if (src !== null) {
                         image.setAttribute('src', src);
-                        image.removeAttribute('data-src');
                     }
                 });
             });
@@ -851,7 +852,7 @@
                     detachedCallback: { value: elementDetachedCallback },
                     attributeChangedCallback: { value: elementAttributeChangedHandler }
                 }), {
-                    redraw: function () { this.carousel.redraw(); },
+                    redraw: function (dataAttrName) { this.carousel.redraw(dataAttrName); },
                     goTo: function (index) { this.carousel.goTo(index); },
                     getIndex: function () { return this.carousel.index; },
                     getStepLength: function () { return this.carousel.stepLength; }

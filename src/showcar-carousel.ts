@@ -123,11 +123,11 @@
     wrapper = null;
     stepLength = null;
 
-    resizeTimeout = null;
     resizeListener = null;
     touchStartListener = null;
     touchMoveListener = null;
     touchEndListener = null;
+    imgSrcDataAttrName = 'data-src';
 
     windowWidth = 0;
     orgWidth = 0;
@@ -203,7 +203,7 @@
       this.addIndicator();
 
       // Redraw the scene.
-      this.redraw();
+      this.redraw('data-src');
     }
 
     /**
@@ -227,8 +227,8 @@
      * @public
      * ToDo: v3 -> should be extended by Carousel and Slider class.
      */
-    redraw() {
-
+    redraw(dataAttrName = '') {
+      this.imgSrcDataAttrName = dataAttrName;
       this.resizeItems();
       this.calculateEnvironment();
 
@@ -766,10 +766,9 @@
       [].forEach.call(items, i => {
         let images = this.container.children[i].querySelectorAll('img');
         [].forEach.call(images, image => {
-          let src = image.getAttribute('data-src');
-          if(src !== null){
-            image.setAttribute('src',src);
-            image.removeAttribute('data-src');
+          let src = image.getAttribute(this.imgSrcDataAttrName);
+          if(src !== null) {
+            image.setAttribute('src', src);
           }
         });
       });
@@ -931,7 +930,7 @@
             detachedCallback:         { value: elementDetachedCallback },
             attributeChangedCallback: { value: elementAttributeChangedHandler }
           }), {
-            redraw:         function (){ this.carousel.redraw(); },
+            redraw:         function (dataAttrName){ this.carousel.redraw(dataAttrName); },
             goTo:           function (index){ this.carousel.goTo(index); },
             getIndex:       function (){ return this.carousel.index; },
             getStepLength:  function (){ return this.carousel.stepLength }

@@ -1,4 +1,9 @@
 
+3.0.2 / 2016-08-01
+==================
+
+  * Carousel Item has no background, redraw method takes a string that specifies which attr to use to load an image
+
 3.0.0 / 2016-08-01
 ==================
 
