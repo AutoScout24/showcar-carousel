@@ -123,6 +123,8 @@
     wrapper = null;
     stepLength = null;
 
+    role:string = 'unspecified-role';
+
     resizeListener = null;
     touchStartListener = null;
     touchMoveListener = null;
@@ -172,6 +174,7 @@
       this.config = config;
       this.element = element;
       this.speed = this.Enums.Speed.SLOW;
+      this.role = this.element.getAttribute('role');
     }
 
     items() {
@@ -488,9 +491,11 @@
       this.lastIndex = this.index;
       if(index < 0) index = 0;
       this.index = index;
-      this.triggerEvent('slide',{
+      this.triggerEvent('as24-carousel.slide', {
+        id: this.element.id,
+        role: this.role,
         index: this.index
-      });
+      }, true);
       this.update({
         transition: false,
         direction: index > this.lastIndex ?  this.Enums.Direction.RIGHT : this.Enums.Direction.LEFT
@@ -504,10 +509,12 @@
     paginate(direction){
       this.lastIndex = this.index;
       this.index = this.getIndexOf(this.index, direction);
-      this.triggerEvent('slide',{
+      this.triggerEvent('as24-carousel.slide', {
+        id: this.element.id,
+        role: this.role,
         direction: direction,
         index: this.index
-      });
+      }, true);
       this.update({
         direction: direction
       });
@@ -558,11 +565,6 @@
      * ToDo: v3 -> should be extended by Carousel and Slider class.
      */
     update(config) {
-
-      this.triggerEvent('as24-carousel:change', {
-        id: this.element.id
-      }, window.document);
-
       this.updateIndicator();
 
       if (this.config.mode === this.Enums.Mode.DEFAULT) {
@@ -695,6 +697,7 @@
       }
 
       this.loadImages(affected);
+
     }
 
     /**
@@ -780,9 +783,12 @@
      * @param {Object} payload - payload of the event.
      * @param {HTMLElement} element - the element from where to dispatch the event from.
      */
-    triggerEvent(type,payload,element = this.element){
-      let event = new CustomEvent(type, {detail: payload});
-      element.dispatchEvent(event)
+    triggerEvent(type, payload, bubbles = false, element = this.element){
+      let event = new CustomEvent(type, {
+        detail: payload,
+        bubbles: bubbles
+      });
+      element.dispatchEvent(event);
     }
 
     /**
