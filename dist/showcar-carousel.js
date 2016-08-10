@@ -435,11 +435,6 @@
             if (index < 0)
                 index = 0;
             this.index = index;
-            this.triggerEvent('as24-carousel.slide', {
-                id: this.element.id,
-                role: this.role,
-                index: this.index
-            }, true);
             this.update({
                 transition: false,
                 direction: index > this.lastIndex ? this.Enums.Direction.RIGHT : this.Enums.Direction.LEFT
