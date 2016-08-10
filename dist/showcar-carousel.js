@@ -447,12 +447,6 @@
         Carousel.prototype.paginate = function (direction) {
             this.lastIndex = this.index;
             this.index = this.getIndexOf(this.index, direction);
-            this.triggerEvent('as24-carousel.slide', {
-                id: this.element.id,
-                role: this.role,
-                direction: direction,
-                index: this.index
-            }, true);
             this.update({
                 direction: direction
             });
@@ -506,6 +500,12 @@
          * ToDo: v3 -> should be extended by Carousel and Slider class.
          */
         Carousel.prototype.update = function (config) {
+            this.triggerEvent('as24-carousel.slide', {
+                id: this.element.id,
+                role: this.role,
+                direction: config.direction,
+                index: this.index
+            }, true);
             this.updateIndicator();
             if (this.config.mode === this.Enums.Mode.DEFAULT) {
                 this.updateDefault();
