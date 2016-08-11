@@ -60,6 +60,7 @@ as24-carousel {
     text-decoration: none;
     outline-style: none; }
   as24-carousel .as24-carousel-item {
+    background: #fff;
     border: 1px solid #dcdcdc;
     display: flex;
     margin: 0 10px;
