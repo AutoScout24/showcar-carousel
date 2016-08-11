@@ -70,7 +70,17 @@ If you want to use it just add the following attributes to activate it. (Have an
 ```
 
 
+#### DOM Events
 
+ * `as24-carousel.slide` - when carousel has been moved. The playload is following:
+    ```js
+    {
+      id: String,         // Id of the carousel
+      role: String,       // Role attr of the carousel
+      direction: String,  // Sliding direction
+      index: Number       // New slide index
+    }
+    ```
 
 #### lazy loading
  For better performance it is possible to lazy load images.
