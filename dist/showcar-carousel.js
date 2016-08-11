@@ -724,7 +724,7 @@
             var currentWindowWidth = this.getWindowWidth();
             if (this.windowWidth !== currentWindowWidth) {
                 this.windowWidth = currentWindowWidth;
-                this.redraw();
+                this.redraw(this.imgSrcDataAttrName);
             }
         };
         /**
