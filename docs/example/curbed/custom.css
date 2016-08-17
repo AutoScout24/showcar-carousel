@@ -1,0 +1,12 @@
+.area {
+  max-width: 640px;
+}
+
+.area .as24-carousel__container {
+  height: 220px;
+}
+
+.area .as24-carousel__item {
+  width: 310px;
+  padding: 10px;
+}

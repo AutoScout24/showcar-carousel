@@ -1,79 +1,57 @@
-$background-color: rgba(0, 0, 0, .5);
-
-$breakpoint-xs: 320px;
-$breakpoint-s: 480px;
-
-// Vars carousel mode ( default )
-$carousel-item-width-xs: calc(100vw - 20px);
-$carousel-item-width-s: calc(100vw - 40px);
-$carousel-item-width-m: 310px;
 $carousel-gap: 20px;
+
+$animationSpeed: .3s;
 
 // Lazy image aspect ratio load hack for fixing the flickering bug on webkit
 // Currently the style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
 // Aspect ratio of the image ( 100% width / 75% height = 1.333 )
-$carousel-image-aspect-ratio: 75%;
-$carousel-background-color: $background-color;
+$carousel-background-color: rgba(0, 0, 0, .95);
 $carousel-pagination-width: 50px;
 $carousel-pagination-height: 50px;
 $carousel-pagination-arrow-size: 30%;
 
-// Vars slider mode ( default )
-$slider-max-width: 640px;
-$slider-pagination-button-width: 40px;
-$slider-pagination-button-height: 60px;
-$slider-pagination-button-arrow-size: 15px;
-
-$slider-aspect-ratio: 75%;
-$slider-gap: 0px;
-
-$slider-pagination-indicator-font-size: 0.75rem;
-$slider-pagination-indicator-padding: 7px;
-$slider-pagination-indicator-background-color: $background-color;
-
+$pagination-indicator-color: #fff;
+$pagination-indicator-font-size: 0.75rem;
+$pagination-indicator-padding: 7px;
+$pagination-indicator-background-color: $carousel-background-color;
 
 as24-carousel {
   display: flex;
   user-select: none;
   position: relative;
   overflow: hidden;
-  width: 100%;
-  outline-style: none;
+}
 
-  .as24-carousel-wrapper {
-    flex: 1;
-    display: flex;
-  }
+.as24-carousel {
 
-  .as24-carousel-container {
+  @at-root &__container {
     display: flex;
     flex: 1 0 auto;
-    transition: transform .9s;
+    transition: transform $animationSpeed;
     perspective: 1000px;
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
-  }
+    will-change: transform;
 
-  // CAROUSEL INDICATOR
-  .as24-pagination-indicator {
-    position: absolute;
-    color: #fff;
-    display: inline-block;
-    padding: $slider-pagination-indicator-padding 0;
-    background-color: $slider-pagination-indicator-background-color;
-    font-size: $slider-pagination-indicator-font-size;
-    width: 50px;
-    bottom: 0;
-    left: 0;
-    min-width: 40px;
-    text-align: center;
-    &.no-transition {
+    &--static {
       transition: none;
     }
   }
 
-  // CAROUSEL PAGINATION
-  .as24-pagination-button {
+  @at-root &__indicator {
+    position: absolute;
+    color: $pagination-indicator-color;
+    padding: $pagination-indicator-padding 0;
+    background-color: $pagination-indicator-background-color;
+    font-size: $pagination-indicator-font-size;
+    bottom: 0;
+    left: 0;
+    min-width: 40px;
+    max-width: 50px;
+    text-align: center;
+  }
+
+  @at-root &__button {
     border: 2px solid transparent;
     position: absolute;
     top: 50%;
@@ -83,11 +61,18 @@ as24-carousel {
     background-size: $carousel-pagination-arrow-size;
     background-position: center center;
     outline-style: none;
-    //transition: background-color .3s, opacity .3s, height .3s, top .3s, margin-top .3s;
     transition: background-color .3s, opacity .3s;
 
-    &.no-transition {
-      transition: none;
+    &:hover:not(.hide) {
+      background-color: rgba(0, 0, 0, .8);
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &--hidden {
+      opacity: 0;
     }
 
     &[data-direction="left"] {
@@ -99,107 +84,20 @@ as24-carousel {
       right: $carousel-gap/2;
       transform: translateY(-50%);
     }
-
-    &.hide {
-      opacity: 0;
-    }
-
-    &:hover:not(.hide) {
-      background-color: rgba(0, 0, 0, .8);
-    }
-
-    &:focus {
-      outline: none;
-    }
   }
 
-  > a {
-    text-decoration: none;
-    outline-style: none;
-  }
-
-  // CAROUSEL ITEM
-  .as24-carousel-item {
+  @at-root &__item {
     display: flex;
     flex-direction: column;
     flex: 1 0 auto;
-    background: #fff;
-    border: 1px solid #dcdcdc;
-    margin: 0 $carousel-gap/2;
+    outline-style: none;
 
-    &.no-transition {
+    &--static {
       transition: none;
     }
 
-    @media screen and (min-width: $breakpoint-xs) {
-      &:first-child {
-        margin-left: $carousel-gap;
-      }
-
-      &:last-child {
-        margin-right: $carousel-gap;
-      }
-    }
-  }
-
-
-  // MODE: SLIDER
-  &[mode="slider"] {
-
-    &:hover {
-      color: white;
-    }
-
-    .as24-pagination-button {
-      width: $slider-pagination-button-width;
-      height: $slider-pagination-button-height;
-      background-size: $slider-pagination-button-arrow-size;
-      background-position: center center;
-
-      &[data-direction="left"] {
-        left: 0;
-      }
-      &[data-direction="right"] {
-        right: 0;
-      }
-    }
-
-    &.dynamic-ratio {
-      .as24-pagination-button {
-        background-size: $slider-pagination-button-arrow-size;
-        height: 100%;
-
-        &[data-direction="left"] {
-          background-position: right 15px center;
-        }
-        &[data-direction="right"] {
-          background-position: right 15px center;
-        }
-      }
-    }
-
-
-    .as24-carousel-item {
-      width: 100%;
-      position: absolute;
-      height: 100%;
-      top: 0;
-      left: 0;
-      border: none;
-
-      &.no-transition {
-        transition: none;
-      }
-
-      @media screen and (min-width: $breakpoint-xs) {
-        margin: $slider-gap;
-        &:first-child {
-          margin: $slider-gap;
-        }
-        &:last-child {
-          margin: $slider-gap;
-        }
-      }
+    &--invisible {
+      display: none;
     }
   }
 }

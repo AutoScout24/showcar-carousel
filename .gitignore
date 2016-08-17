@@ -100,3 +100,9 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# etc
+
+tmp/
+typings/
+test/compiled

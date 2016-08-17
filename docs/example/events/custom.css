@@ -1,0 +1,11 @@
+.as24-carousel__item { width: 310px; }
+.as24-carousel__container { height: 310px; }
+
+.gallery-picture {
+    background: #fff;
+    margin: 5px;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
