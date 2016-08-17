@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "removeComments": true,
+        "module": "es6",
+        "target": "es6",
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "outDir": "../tmp"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

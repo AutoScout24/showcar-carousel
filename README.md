@@ -1,8 +1,6 @@
 # showcar-carousel
 
-This module provides a easy to use carousel.
-
-#####*Note: [v2.0.0] Breaking markup changes! There is no `<as24-carousel-item>` element anymore. Please have a look at the updated example*
+This module provides an easy to use Carousel.
 
 ***
 
@@ -23,65 +21,40 @@ This will open a small express server on your local machine where you can see th
 Visit: [http://localhost:8080](http://localhost:8080)
 
 
-
 #### HTML Code
 
-The whole carousel is defined by an `as24-carousel` element. 
-Each carousel item must have `as24-carousel-item` class.
+The whole carousel is defined by an `as24-carousel` element.
+Each carousel item must have `as24-carousel__item` class.
 See the following example below:
 
 ```html
 <as24-carousel>
-  ...
-  <div class="as24-carousel-item">
-    <!-- content here -->
+
+  <div class="as24-carousel__container" role="container">
+
+    <div class="as24-carousel__item"> <!-- Here goes your content --> </div>
+    <div class="as24-carousel__item"> <!-- Here goes your content --> </div>
+    <!-- ... -->
+    <div class="as24-carousel__item"> <!-- Here goes your content --> </div>
+
   </div>
-  ...
+
+  <a href="#" class="as24-carousel__button" role="nav-button" data-direction="left"></a>
+  <a href="#" class="as24-carousel__button" role="nav-button" data-direction="right"></a>
+
+  <div class="as24-carousel__indicator" role="indicator"></div>
+
 </as24-carousel>
 ```
 
-#####*Note: [v.2.0.0] There is a new optional slide mode available.*
-If you want to use it just add the following attributes to activate it. (Have an look at the updated example)
- 
- - `mode="slider"`: (required) Activates the slider mode.
- - `gap="0"`: (required) Resets the default gap of the carousel items. ( will be removed in an upcoming release )
- - `preview="true"`: Activates the new preview mode.
- - `indicator="true"`: Adds an small pagination indicator. 
+*Note: pagination indicator is not a mandatory element*
 
-```html
-  
-<a href="javascript:void(0);">
-  <as24-carousel mode="slider"
-                 gap="0"
-                 preview="true"
-                 indicator="true">
-    <div class="as24-carousel-item">
-      <div class="as24-carousel-image-container">
-        <img data-src="http://placehold.it/640x480?text=1,640x480"
-             src=""
-             alt="">
-      </div>
-    </div>
-      ...
-    
-  </as24-carousel>
-</a>
-
-```
-
+*Note: please, pay special attention to `role` attributes*
 
 #### DOM Events
 
- * `as24-carousel.tap` - when carousel has been clicked. The playload is as following:
-    ```js
-    {
-      id: String,         // Id of the carousel
-      role: String,       // Role attr of the carousel
-      index: Number       // Slide's index
-    }
-    ```
-
  * `as24-carousel.slide` - when carousel has been moved. The playload is as following:
+
     ```js
     {
       id: String,         // Id of the carousel
@@ -91,61 +64,87 @@ If you want to use it just add the following attributes to activate it. (Have an
     }
     ```
 
-#### lazy loading
- For better performance it is possible to lazy load images.
- Therefor just replace the `src` attribute of your `img` with an `data-src` attribute.
-
 #### CSS Styling
 
-The library uses Flexbox as box model. Also, the carousel item does not depend on the content. Thus, you have to specify the dimensions of the items in your CSS file.
+The library uses Flexbox as box model. Also, the carousel item does not depend on the content. Thus, you have to specify the dimensions of the items in your CSS code. For example,
 
 ```html
 <as24-carousel class="top-cars">
-  ...
-  <div class="as24-carousel-item">
-    <!-- content here -->
+  <div class="as24-carousel__container" role="container">
+    <div class="as24-carousel__item"> <!-- content --> </div>
   </div>
-  ...
 </as24-carousel>
 ```
 
 ```css
-.top-cars as24-carousel-item {
+.top-cars .as24-carousel-container {
+  height: 480px;
+}
+
+.top-cars .as24-carousel-item {
   width: 310px;
   height: 280px;
 }
 ```
 
-#### JS Interface
+### Migration from v3
+* Wrapp your items with
 
-##### Re-rendering the complete carousel after manually setting the size:
-If you need to change the width of the carousel dynamically, you can call the ``redraw()`` method, to force the carousel to recalculate its sizings and positionings.
+	```html
+	<div class="as24-carousel__container" role="container">
+	<!-- items -->
+	</div>
+	``` 
+* Use a new class for the items, `as24-carousel__item`
+
+	```html
+	<div class="as24-carousel-item">...</div>
+	```
+	becomes 
+	
+	```html
+	<div class="as24-carousel__item"></div>
+	```
+
+* Add buttons:
+
+	```html
+	<a href="#" class="as24-carousel__button" role="nav-button" data-direction="left"></a>
+	<a href="#" class="as24-carousel__button" role="nav-button" data-direction="right"></a>
+	```
+* If needed, add indicator (the one that shows x/y images)
+
+	```html
+	<div class="as24-carousel__indicator" role="indicator"></div>
+	```
+
+* Don't forget to review your CSS so that you use proper class names for customisation.
+
+* The component doesn't emit `as24-carousel.tap` event any more. This means you can add event listeners to the content of items or to items directly.
+
+### JS Interface
+
+#### Re-rendering the complete carousel after manually setting the size:
+If you need to change the width of the carousel dynamically, you can call the `redraw()` method, to force the carousel to recalculate its sizings and positionings.
 *Note: Window resizing is included out of the box.*
 
 ```
 document.getElementById('carousel-example').redraw();
 ```
 
-##### Get the current image index:
-In case you want to get current index of the carousel call the ``getIndex()`` method on the carousel element.
+#### Get the current image index:
+In case you want to get current index of the carousel call the `getIndex()` method on the carousel element.
 
 ```
 document.getElementById('carousel-example').getIndex();
 ```
 
-##### Set the current image index:
-For changing the current image index manually call the ``goTo()`` method on the carousel element.
+#### Set the current image index:
+For changing the current image index manually call the `goTo()` method on the carousel element.
 
 ```
 document.getElementById('carousel-example').goTo(2);
 ```
-
-##### Events
-
-The following events are triggered on the carousel element:
-
-- `slide` is called on every image index change.  
-
 
 ## Installation
 
@@ -157,7 +156,7 @@ To install showcar-carousel within your project use npm.
 $> npm install showcar-carousel --save
 ```
 
-Afterwards you need to add the css and js to your page.
+Afterwards you need to include the CSS and JS to your page.
 
 ```html
 <link rel="stylesheet" href="../dist/showcar-carousel.css">
@@ -175,18 +174,18 @@ Afterwards you need to add the css and js to your page.
 
 #### How to contribute:
 
-  * Fork this repository and `$> git clone` your fork. 
+  * Fork this repository and `$> git clone` your fork.
   * Then `$> npm install` the required dependencies.
-  * Start the dev server `$> npm run dev`.
+  * Start the dev server `$> npm run watch`.
   * Visit [http://localhost:8080](http://localhost:8080)
 
 *Note: changes will automatically build and refresh the browser.*
 
 ##### Contribute
 
-  Save your changes and run `$> npm prod`.
+Save your changes and run `$> npm run build`.
 
-  Commit your code _and_ the compiled libraries in _./dist_. Then create a pull-request.
+Commit your code _and_ the compiled libraries in _./dist_. Then create a pull-request.
 
 ## License
 

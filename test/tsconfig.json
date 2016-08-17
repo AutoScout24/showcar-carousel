@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": false,
+    "removeComments": true,
+    "sourceMap": true,
+    "listFiles": true,
+    "outDir": "./compiled",
+    "target": "es5"
+  },
+  "exclude": [
+    "./compiled"
+  ]
+}
