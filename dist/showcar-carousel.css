@@ -1,13 +1,12 @@
 as24-carousel {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
   position: relative;
-  white-space: nowrap;
   overflow: hidden;
   width: 100%;
   outline-style: none; }
@@ -25,7 +24,6 @@ as24-carousel {
     -webkit-box-flex: 1;
         -ms-flex: 1 0 auto;
             flex: 1 0 auto;
-    white-space: nowrap;
     -webkit-transition: -webkit-transform .9s;
     transition: -webkit-transform .9s;
     transition: transform .9s;
@@ -38,7 +36,7 @@ as24-carousel {
             backface-visibility: hidden; }
   as24-carousel .as24-pagination-indicator {
     position: absolute;
-    color: white;
+    color: #fff;
     display: inline-block;
     padding: 7px 0;
     background-color: rgba(0, 0, 0, 0.5);
@@ -84,18 +82,19 @@ as24-carousel {
     text-decoration: none;
     outline-style: none; }
   as24-carousel .as24-carousel-item {
-    background: #fff;
-    border: 1px solid #dcdcdc;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    margin: 0 10px;
-    text-align: center;
-    line-height: 1.5rem;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
     -webkit-box-flex: 1;
         -ms-flex: 1 0 auto;
             flex: 1 0 auto;
-    outline-style: none; }
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    margin: 0 10px; }
     as24-carousel .as24-carousel-item.no-transition {
       -webkit-transition: none;
       transition: none; }

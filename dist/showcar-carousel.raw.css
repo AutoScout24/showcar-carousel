@@ -1,8 +1,7 @@
 as24-carousel {
-  user-select: none;
   display: flex;
+  user-select: none;
   position: relative;
-  white-space: nowrap;
   overflow: hidden;
   width: 100%;
   outline-style: none; }
@@ -12,14 +11,13 @@ as24-carousel {
   as24-carousel .as24-carousel-container {
     display: flex;
     flex: 1 0 auto;
-    white-space: nowrap;
     transition: transform .9s;
     perspective: 1000px;
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden; }
   as24-carousel .as24-pagination-indicator {
     position: absolute;
-    color: white;
+    color: #fff;
     display: inline-block;
     padding: 7px 0;
     background-color: rgba(0, 0, 0, 0.5);
@@ -60,14 +58,12 @@ as24-carousel {
     text-decoration: none;
     outline-style: none; }
   as24-carousel .as24-carousel-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
     background: #fff;
     border: 1px solid #dcdcdc;
-    display: flex;
-    margin: 0 10px;
-    text-align: center;
-    line-height: 1.5rem;
-    flex: 1 0 auto;
-    outline-style: none; }
+    margin: 0 10px; }
     as24-carousel .as24-carousel-item.no-transition {
       transition: none; }
     @media screen and (min-width: 320px) {

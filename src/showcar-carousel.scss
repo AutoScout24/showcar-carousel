@@ -33,10 +33,9 @@ $slider-pagination-indicator-background-color: $background-color;
 
 
 as24-carousel {
-  user-select: none;
   display: flex;
+  user-select: none;
   position: relative;
-  white-space: nowrap;
   overflow: hidden;
   width: 100%;
   outline-style: none;
@@ -49,7 +48,6 @@ as24-carousel {
   .as24-carousel-container {
     display: flex;
     flex: 1 0 auto;
-    white-space: nowrap;
     transition: transform .9s;
     perspective: 1000px;
     transform: translate3d(0, 0, 0);
@@ -59,7 +57,7 @@ as24-carousel {
   // CAROUSEL INDICATOR
   .as24-pagination-indicator {
     position: absolute;
-    color: white;
+    color: #fff;
     display: inline-block;
     padding: $slider-pagination-indicator-padding 0;
     background-color: $slider-pagination-indicator-background-color;
@@ -122,14 +120,12 @@ as24-carousel {
 
   // CAROUSEL ITEM
   .as24-carousel-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
     background: #fff;
     border: 1px solid #dcdcdc;
-    display: flex;
     margin: 0 $carousel-gap/2;
-    text-align: center;
-    line-height: 1.5rem;
-    flex: 1 0 auto;
-    outline-style: none;
 
     &.no-transition {
       transition: none;
