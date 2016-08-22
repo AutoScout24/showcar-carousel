@@ -186,8 +186,12 @@
             // Redraw the scene.
             this.redraw('data-src');
         };
-        Carousel.prototype.itemTapped = function () {
-            this.triggerEvent('as24-carousel.tap', {
+        Carousel.prototype.itemTapped = function (evt) {
+            var target = evt.target || evt.srcElement;
+            if (containsClass('as24-pagination-button', target)) {
+                return;
+            }
+            return this.triggerEvent('as24-carousel.tap', {
                 id: this.element.id,
                 role: this.role,
                 index: this.index

@@ -72,13 +72,22 @@ If you want to use it just add the following attributes to activate it. (Have an
 
 #### DOM Events
 
- * `as24-carousel.slide` - when carousel has been moved. The playload is following:
+ * `as24-carousel.tap` - when carousel has been clicked. The playload is as following:
+    ```js
+    {
+      id: String,         // Id of the carousel
+      role: String,       // Role attr of the carousel
+      index: Number       // Slide's index
+    }
+    ```
+
+ * `as24-carousel.slide` - when carousel has been moved. The playload is as following:
     ```js
     {
       id: String,         // Id of the carousel
       role: String,       // Role attr of the carousel
       direction: String,  // Sliding direction
-      index: Number       // New slide index
+      index: Number       // New Slide's index
     }
     ```
 

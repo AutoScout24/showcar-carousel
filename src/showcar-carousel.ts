@@ -215,8 +215,12 @@
       this.redraw('data-src');
     }
 
-    itemTapped() {
-      this.triggerEvent('as24-carousel.tap', {
+    itemTapped(evt) {
+      let target = evt.target || evt.srcElement;
+      if (containsClass('as24-pagination-button', target)) {
+        return;
+      }
+      return this.triggerEvent('as24-carousel.tap', {
         id: this.element.id,
         role: this.role,
         index: this.index
