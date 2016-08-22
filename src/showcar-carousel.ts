@@ -209,6 +209,24 @@
       this.redraw('data-src');
     }
 
+    addOnItemTapped() {
+      [].forEach.call(this.items(), (item:HTMLElement) => {
+        let eventName = item.ontouchend ? 'touchend'
+          : item.onpointerup ? 'pointerup'
+          : item.onmspointerup ? 'mspointerup'
+          : 'click';
+        item.addEventListener(eventName, this.itemTapped.bind(this));
+      });
+    }
+
+    itemTapped() {
+      this.triggerEvent('as24-carousel.tap', {
+        id: this.element.id,
+        role: this.role,
+        index: this.index
+      }, true);
+    }
+
     /**
      * Initializes the carousel by adding all necessary bits and bolts.
      */
@@ -246,6 +264,7 @@
       }
 
       this.updateIndicator();
+      this.addOnItemTapped();
     }
 
     /**

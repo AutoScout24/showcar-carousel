@@ -181,6 +181,23 @@
             // Redraw the scene.
             this.redraw('data-src');
         };
+        Carousel.prototype.addOnItemTapped = function () {
+            var _this = this;
+            [].forEach.call(this.items(), function (item) {
+                var eventName = item.ontouchend ? 'touchend'
+                    : item.onpointerup ? 'pointerup'
+                        : item.onmspointerup ? 'mspointerup'
+                            : 'click';
+                item.addEventListener(eventName, _this.itemTapped.bind(_this));
+            });
+        };
+        Carousel.prototype.itemTapped = function () {
+            this.triggerEvent('as24-carousel.tap', {
+                id: this.element.id,
+                role: this.role,
+                index: this.index
+            }, true);
+        };
         /**
          * Initializes the carousel by adding all necessary bits and bolts.
          */
@@ -214,6 +231,7 @@
                 this.updateSlider({ transition: false });
             }
             this.updateIndicator();
+            this.addOnItemTapped();
         };
         /**
          * Resizes the carousel items.

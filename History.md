@@ -1,4 +1,11 @@
 
+3.1.7 / 2016-08-22
+==================
+
+  * Added on item tap event
+  * Build improvements: copy dist files after build step
+  * Fixed docs
+
 3.1.6 / 2016-08-19
 ==================
 
