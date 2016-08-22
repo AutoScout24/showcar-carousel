@@ -13,7 +13,7 @@
     "build:sass": "node-sass $npm_package_config_src.scss $npm_package_config_dist.raw.css",
     "build:autoprefixer": "node ./node_modules/postcss-cli/bin/postcss --use autoprefixer -o ./dist/showcar-carousel.css ./dist/showcar-carousel.raw.css",
     "build:cleancss": "cleancss --source-map -o $npm_package_config_dist.min.css ./dist/showcar-carousel.css",
-    "build": "npm run build:ts && npm run build:uglify && npm run build:css",
+    "build": "npm run build:ts && npm run build:uglify && npm run build:css && cp -rf ./dist/showcar-carousel.min.* ./docs",
     "build:clean": "rimraf dist",
     "postbuild": "echo 'Build succeeded!'",
     "prod": "npm run build",
