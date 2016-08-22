@@ -200,6 +200,12 @@
       this.element.addEventListener('touchmove',  this.touchMoveListener,   true);
       this.element.addEventListener('touchend',   this.touchEndListener,    true);
 
+      let eventName = this.element.ontouchend ? 'touchend'
+        : this.element.onpointerup ? 'pointerup'
+        : this.element.onmspointerup ? 'mspointerup'
+        : 'click';
+      this.element.addEventListener(eventName, this.itemTapped.bind(this));
+
       // Add container and pagination buttons.
       this.addContainer();
       this.addPagination();
@@ -207,16 +213,6 @@
 
       // Redraw the scene.
       this.redraw('data-src');
-    }
-
-    addOnItemTapped() {
-      [].forEach.call(this.items(), (item:HTMLElement) => {
-        let eventName = item.ontouchend ? 'touchend'
-          : item.onpointerup ? 'pointerup'
-          : item.onmspointerup ? 'mspointerup'
-          : 'click';
-        item.addEventListener(eventName, this.itemTapped.bind(this));
-      });
     }
 
     itemTapped() {
@@ -264,7 +260,6 @@
       }
 
       this.updateIndicator();
-      this.addOnItemTapped();
     }
 
     /**

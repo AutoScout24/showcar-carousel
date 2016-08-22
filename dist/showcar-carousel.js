@@ -174,22 +174,17 @@
             this.element.addEventListener('touchstart', this.touchStartListener, true);
             this.element.addEventListener('touchmove', this.touchMoveListener, true);
             this.element.addEventListener('touchend', this.touchEndListener, true);
+            var eventName = this.element.ontouchend ? 'touchend'
+                : this.element.onpointerup ? 'pointerup'
+                    : this.element.onmspointerup ? 'mspointerup'
+                        : 'click';
+            this.element.addEventListener(eventName, this.itemTapped.bind(this));
             // Add container and pagination buttons.
             this.addContainer();
             this.addPagination();
             this.addIndicator();
             // Redraw the scene.
             this.redraw('data-src');
-        };
-        Carousel.prototype.addOnItemTapped = function () {
-            var _this = this;
-            [].forEach.call(this.items(), function (item) {
-                var eventName = item.ontouchend ? 'touchend'
-                    : item.onpointerup ? 'pointerup'
-                        : item.onmspointerup ? 'mspointerup'
-                            : 'click';
-                item.addEventListener(eventName, _this.itemTapped.bind(_this));
-            });
         };
         Carousel.prototype.itemTapped = function () {
             this.triggerEvent('as24-carousel.tap', {
@@ -231,7 +226,6 @@
                 this.updateSlider({ transition: false });
             }
             this.updateIndicator();
-            this.addOnItemTapped();
         };
         /**
          * Resizes the carousel items.
