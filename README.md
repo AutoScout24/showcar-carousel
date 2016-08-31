@@ -7,10 +7,11 @@ This module provides an easy to use Carousel.
 ## Usage
 
 #####Live example:
+
 Visit the [example](https://autoscout24.github.io/showcar-carousel/) on github pages.
 
-
 #####Local example:
+
 Just run the following command in the root of the carousel library.
 
 ```
@@ -19,7 +20,6 @@ $ npm start
 This will open a small express server on your local machine where you can see the running example.
 
 Visit: [http://localhost:8080](http://localhost:8080)
-
 
 #### HTML Code
 
@@ -49,7 +49,7 @@ See the following example below:
 
 *Note: pagination indicator is not a mandatory element*
 
-*Note: please, pay special attention to `role` attributes*
+*Note: please, pay attention to `role` attributes*
 
 #### DOM Events
 
@@ -88,49 +88,43 @@ The library uses Flexbox as box model. Also, the carousel item does not depend o
 ```
 
 ### Migration from v3
-* Wrapp your items with
 
-	```html
-	<div class="as24-carousel__container" role="container">
-	<!-- items -->
-	</div>
-	``` 
-* Use a new class for the items, `as24-carousel__item`
+ * Wrapp your items with
 
-	```html
-	<div class="as24-carousel-item">...</div>
-	```
-	becomes 
+    ```html
+    <div class="as24-carousel__container" role="container">
+    <!-- items -->
+    </div>
+    ``` 
+ * Use a new class for the items, `as24-carousel__item`
+
+    ```html
+    <div class="as24-carousel-item">...</div>
+    ```
+    becomes 
 	
-	```html
-	<div class="as24-carousel__item"></div>
-	```
+    ```html
+    <div class="as24-carousel__item"></div>
+    ```
 
-* Add buttons:
+ * Add buttons:
 
-	```html
-	<a href="#" class="as24-carousel__button" role="nav-button" data-direction="left"></a>
-	<a href="#" class="as24-carousel__button" role="nav-button" data-direction="right"></a>
-	```
-* If needed, add indicator (the one that shows x/y images)
+    ```html
+    <a href="#" class="as24-carousel__button" role="nav-button" data-direction="left"></a>
+    <a href="#" class="as24-carousel__button" role="nav-button" data-direction="right"></a>
+    ```
+ 
+ * If needed, add indicator (the one that shows x/y images)
 
-	```html
-	<div class="as24-carousel__indicator" role="indicator"></div>
-	```
+    ```html
+    <div class="as24-carousel__indicator" role="indicator"></div>
+    ```
 
-* Don't forget to review your CSS so that you use proper class names for customisation.
+ * Don't forget to review your CSS so that you use proper class names for customisation.
 
-* The component doesn't emit `as24-carousel.tap` event any more. This means you can add event listeners to the content of items or to items directly.
+ * The component doesn't emit `as24-carousel.tap` event any more. This means you can add event listeners to the content of items or to items directly.
 
 ### JS Interface
-
-#### Re-rendering the complete carousel after manually setting the size:
-If you need to change the width of the carousel dynamically, you can call the `redraw()` method, to force the carousel to recalculate its sizings and positionings.
-*Note: Window resizing is included out of the box.*
-
-```
-document.getElementById('carousel-example').redraw();
-```
 
 #### Get the current image index:
 In case you want to get current index of the carousel call the `getIndex()` method on the carousel element.

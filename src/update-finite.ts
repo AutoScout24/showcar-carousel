@@ -10,7 +10,7 @@ export const getNextOffset = (index: number, itemWidth: number, maxOffset: numbe
 };
 
 export const updateFinite = (dir: number, state: ICarousel): CarouselState => {
-    let {element, container, offset, index, pagination} = state;
+    let { element, container, offset, index, pagination } = state;
     const { itemWidth, maxOffset, itemsVisible } = getVars(element, container);
 
     index = getNextIndex('finite', dir, container.children.length, index, itemsVisible, offset < maxOffset);

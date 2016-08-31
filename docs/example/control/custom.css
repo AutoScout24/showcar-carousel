@@ -10,3 +10,8 @@
   width: 310px;
   padding: 10px;
 }
+
+.controls input,
+.controls button {
+    font-size: 1rem;
+}

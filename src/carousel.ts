@@ -116,7 +116,15 @@ export class Carousel implements ICarousel {
     }
 
     goTo(index: number) {
-        const dir = index > this.index ? 1 : -1;
-        mutate(this, update(dir, this.mode, this));
+        this.index = index > this.container.children.length
+            ? this.container.children.length
+            : index < 1
+                ? 1
+                : index;
+        mutate(this, update(-1, this.mode, this));
+    }
+
+    getIndex(): number {
+        return this.index;
     }
 }
