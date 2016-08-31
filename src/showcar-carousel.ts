@@ -24,7 +24,6 @@ try {
                 detachedCallback: { value: elementDetachedCallback },
                 attributeChangedCallback: { value: function () { } }
             }), {
-                redraw: function () { this.carousel.redraw(); },
                 goTo: function (index) { this.carousel.goTo(index); },
                 getIndex: function () { return this.carousel.index; }
             }

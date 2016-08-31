@@ -69,14 +69,18 @@ var throttle = function throttle(fn, delay) {
 };
 var getElementWidth = function getElementWidth(element, inclMargins) {
     var computed = getComputedStyle(element);
-    var width = parseFloat(computed.width);
-    var ml = parseFloat(computed.marginLeft);
-    var mr = parseFloat(computed.marginRight);
-    var margin = mr === ml ? ml : mr;
+    var width = computed.width,
+        marginLeft = computed.marginLeft,
+        marginRight = computed.marginRight,
+        paddingLeft = computed.paddingLeft,
+        paddingRight = computed.paddingRight;
+    var totalMargin = parseFloat(marginLeft) + parseFloat(marginRight);
+    var totalPadding = parseFloat(paddingLeft) + parseFloat(paddingRight);
+    var resultingWidth = parseFloat(width) + totalPadding;
     if (inclMargins) {
-        width += margin;
+        resultingWidth += totalMargin;
     }
-    return width;
+    return resultingWidth;
 };
 var getTouchCoords = function getTouchCoords(event) {
     var touch = event.touches && event.touches[0];
@@ -332,8 +336,11 @@ var Carousel = function () {
         mutate(this, update(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this.mode, this));
     };
     Carousel.prototype.goTo = function (index) {
-        var dir = index > this.index ? 1 : -1;
-        mutate(this, update(dir, this.mode, this));
+        this.index = index > this.container.children.length ? this.container.children.length : index < 1 ? 1 : index;
+        mutate(this, update(-1, this.mode, this));
+    };
+    Carousel.prototype.getIndex = function () {
+        return this.index;
     };
     return Carousel;
 }();
@@ -357,9 +364,6 @@ try {
             detachedCallback: { value: elementDetachedCallback },
             attributeChangedCallback: { value: function value() {} }
         }), {
-            redraw: function redraw() {
-                this.carousel.redraw();
-            },
             goTo: function goTo(index) {
                 this.carousel.goTo(index);
             },

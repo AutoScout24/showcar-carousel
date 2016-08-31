@@ -70,14 +70,14 @@ export const throttle = (fn: () => any, delay: number) => {
 
 export const getElementWidth = (element: Element, inclMargins: boolean): number => {
     let computed = getComputedStyle(element);
-    let width = parseFloat(computed.width);
-    let ml = parseFloat(computed.marginLeft);
-    let mr = parseFloat(computed.marginRight);
-    let margin = mr === ml ? ml : mr;
+    let { width, marginLeft, marginRight, paddingLeft, paddingRight } = computed;
+    let totalMargin = parseFloat(marginLeft) + parseFloat(marginRight);
+    let totalPadding = parseFloat(paddingLeft) + parseFloat(paddingRight);
+    let resultingWidth = parseFloat(width) + totalPadding;
     if (inclMargins) {
-        width += margin;
+        resultingWidth += totalMargin;
     }
-    return width;
+    return resultingWidth;
 };
 
 export const getTouchCoords = (event: any): Coordinates => {
