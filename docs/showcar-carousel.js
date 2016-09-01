@@ -50,7 +50,7 @@ var getVars = function getVars(element, container) {
     }, 0);
     var maxOffset = totalWidth - rootElemWidth;
     var itemsVisible = Math.floor(rootElemWidth / itemWidth);
-    return { maxOffset: maxOffset, itemWidth: itemWidth, itemsVisible: itemsVisible };
+    return { maxOffset: maxOffset, itemWidth: itemWidth, itemsVisible: itemsVisible, rootElemWidth: rootElemWidth, totalWidth: totalWidth };
 };
 var zipWith = function zipWith(fn, arr1, arr2) {
     return arr2.map(function (val, idx) {
@@ -156,10 +156,12 @@ var updateFinite = function updateFinite(dir, state) {
         index = state.index,
         pagination = state.pagination;
     var _a = getVars(element, container),
+        rootElemWidth = _a.rootElemWidth,
         itemWidth = _a.itemWidth,
         maxOffset = _a.maxOffset,
-        itemsVisible = _a.itemsVisible;
-    offset = getNextOffset(index, itemWidth, maxOffset);
+        itemsVisible = _a.itemsVisible,
+        totalWidth = _a.totalWidth;
+    offset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, itemWidth, maxOffset);
     // side effects
     doUpdateNavigationButtonsState(pagination.left, pagination.right, offset <= 0, offset >= maxOffset);
     if (offset > 0 && offset < maxOffset) {

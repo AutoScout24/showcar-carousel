@@ -49,7 +49,7 @@ export const getVars = (element: CarouselElement, container: HTMLDivElement) => 
     const totalWidth: number = Array.from(container.children).reduce((acc, item) => acc += getElementWidth(item, true), 0);
     const maxOffset: number = totalWidth - rootElemWidth;
     const itemsVisible: number = Math.floor(rootElemWidth / itemWidth);
-    return { maxOffset, itemWidth, itemsVisible };
+    return { maxOffset, itemWidth, itemsVisible, rootElemWidth, totalWidth };
 };
 
 export const zipWith = <T, U>(fn: (a: T, b: U) => U, arr1: T[], arr2: U[]): U[] => {

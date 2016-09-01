@@ -1,4 +1,9 @@
 
+4.0.2 / 2016-09-01
+==================
+
+  * Fixed edge case when images in total take less space then it is available
+
 4.0.1 / 2016-09-01
 ==================
 

@@ -32,6 +32,7 @@ as24-carousel {
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     will-change: transform;
+    justify-content: center;
 
     &--static {
       transition: none;
@@ -89,7 +90,7 @@ as24-carousel {
   @at-root &__item {
     display: flex;
     flex-direction: column;
-    flex: 1 0 auto;
+    flex: 0 0 auto;
     outline-style: none;
 
     &--static {

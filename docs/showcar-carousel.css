@@ -26,7 +26,10 @@ as24-carousel {
           transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
-  will-change: transform; }
+  will-change: transform;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center; }
   .as24-carousel__container--static {
     -webkit-transition: none;
     transition: none; }
@@ -78,9 +81,9 @@ as24-carousel {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-flex: 1;
-      -ms-flex: 1 0 auto;
-          flex: 1 0 auto;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 auto;
+          flex: 0 0 auto;
   outline-style: none; }
   .as24-carousel__item--static {
     -webkit-transition: none;

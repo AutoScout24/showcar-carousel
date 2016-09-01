@@ -6,9 +6,9 @@ import * as SE from './side-effects';
 
 export const updateFinite = (dir: MoveDirection, state: ICarousel): CarouselState => {
     let { element, container, offset, index, pagination } = state;
-    const { itemWidth, maxOffset, itemsVisible } = getVars(element, container);
+    const { rootElemWidth, itemWidth, maxOffset, itemsVisible, totalWidth } = getVars(element, container);
 
-    offset = getNextOffset(index, itemWidth, maxOffset);
+    offset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, itemWidth, maxOffset);
 
     // side effects
     SE.doUpdateNavigationButtonsState(pagination.left, pagination.right, offset <= 0, offset >= maxOffset);
