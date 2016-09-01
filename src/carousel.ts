@@ -127,4 +127,8 @@ export class Carousel implements ICarousel {
     getIndex(): number {
         return this.index;
     }
+
+    redraw(): void {
+        mutate(this, step(0, this));
+    }
 }

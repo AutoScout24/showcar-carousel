@@ -133,6 +133,12 @@ In case you want to get current index of the carousel call the `getIndex()` meth
 document.getElementById('carousel-example').getIndex();
 ```
 
+#### Trigger recalculation of the position of the carousel:
+
+```
+document.getElementById('carousel-example').redraw();
+```
+
 #### Set the current image index:
 For changing the current image index manually call the `goTo()` method on the carousel element.
 

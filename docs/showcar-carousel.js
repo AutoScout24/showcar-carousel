@@ -348,6 +348,9 @@ var Carousel = function () {
     Carousel.prototype.getIndex = function () {
         return this.index;
     };
+    Carousel.prototype.redraw = function () {
+        mutate(this, step(0, this));
+    };
     return Carousel;
 }();
 
@@ -375,6 +378,9 @@ try {
             },
             getIndex: function getIndex() {
                 return this.carousel.index;
+            },
+            redraw: function redraw() {
+                this.carousel.redraw();
             }
         })
     });

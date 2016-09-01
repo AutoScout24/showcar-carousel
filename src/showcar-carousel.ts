@@ -25,7 +25,8 @@ try {
                 attributeChangedCallback: { value: function () { } }
             }), {
                 goTo: function (index) { this.carousel.goTo(index); },
-                getIndex: function () { return this.carousel.index; }
+                getIndex: function () { return this.carousel.index; },
+                redraw: function () { this.carousel.redraw(); }
             }
         )
     });
