@@ -28,19 +28,18 @@ var getInitialItemsOrder = function getInitialItemsOrder(items) {
         return i;
     });
 };
-var getNextIndex = function getNextIndex(mode, dir, maxItems, oldIndex, itemsVisible, canGoRight) {
-    var newIndex = 0;
+var getNextOffset = function getNextOffset(index, itemWidth, maxOffset) {
+    var offset = index * itemWidth;
+    return offset > maxOffset ? maxOffset : offset;
+};
+var getNextIndex = function getNextIndex(mode, dir, maximalIndex, oldIndex, itemsVisible) {
+    var newIndex = oldIndex + dir;
     if (mode === 'infinite') {
-        newIndex = oldIndex + dir;
-        return newIndex < 0 ? maxItems - 1 : newIndex > maxItems - 1 ? 0 : newIndex;
+        return newIndex < 0 ? maximalIndex - itemsVisible : newIndex > maximalIndex - itemsVisible ? 0 : newIndex;
     }
     if (mode === 'finite') {
-        newIndex = oldIndex;
-        if (dir > 0 && !canGoRight) {
-            return oldIndex;
-        }
         newIndex = oldIndex + dir;
-        return newIndex < 0 ? 0 : newIndex;
+        return newIndex < 0 ? 0 : newIndex > maximalIndex - itemsVisible ? maximalIndex - itemsVisible : newIndex;
     }
 };
 var getVars = function getVars(element, container) {
@@ -102,17 +101,11 @@ var Coordinates = function () {
 ;
 
 /// <reference path="./definitions.ts" />
-var doUpdateNavigationButtonsState = function doUpdateNavigationButtonsState(left, right, mode, canGoLeft, canGoRight) {
+var doUpdateNavigationButtonsState = function doUpdateNavigationButtonsState(left, right, canGoLeft, canGoRight) {
     if (left && right) {
-        if (mode === 'infinite') {
-            removeClass('as24-carousel__button--hidden', left);
-            removeClass('as24-carousel__button--hidden', right);
-            return true;
-        } else {
-            toggleClass('as24-carousel__button--hidden', left, canGoLeft);
-            toggleClass('as24-carousel__button--hidden', right, canGoRight);
-            return true;
-        }
+        toggleClass('as24-carousel__button--hidden', left, canGoLeft);
+        toggleClass('as24-carousel__button--hidden', right, canGoRight);
+        return true;
     } else {
         return false;
     }
@@ -156,10 +149,6 @@ var doSetPositioning = function doSetPositioning(howMany, items, order) {
 };
 
 /// <reference path="./definitions.ts" />
-var getNextOffset = function getNextOffset(index, itemWidth, maxOffset) {
-    var offset = index * itemWidth;
-    return offset > maxOffset ? maxOffset : offset;
-};
 var updateFinite = function updateFinite(dir, state) {
     var element = state.element,
         container = state.container,
@@ -170,10 +159,9 @@ var updateFinite = function updateFinite(dir, state) {
         itemWidth = _a.itemWidth,
         maxOffset = _a.maxOffset,
         itemsVisible = _a.itemsVisible;
-    index = getNextIndex('finite', dir, container.children.length, index, itemsVisible, offset < maxOffset);
     offset = getNextOffset(index, itemWidth, maxOffset);
     // side effects
-    doUpdateNavigationButtonsState(pagination.left, pagination.right, 'finite', offset <= 0, offset >= maxOffset);
+    doUpdateNavigationButtonsState(pagination.left, pagination.right, offset <= 0, offset >= maxOffset);
     if (offset > 0 && offset < maxOffset) {
         doNotify(element, dir, index);
     }
@@ -183,17 +171,10 @@ var updateFinite = function updateFinite(dir, state) {
 };
 
 /// <reference path="./definitions.ts" />
-var reorder = function reorder(dir, items) {
-    if (dir < 0) {
-        var x = items[0],
-            rest = items.slice(1);
-        return rest.concat(x);
-    } else if (dir > 0) {
-        var last = items.pop();
-        return [last].concat(items);
-    } else {
-        return items;
-    }
+var reorder = function reorder(index, items) {
+    var fst = items.slice(items.length - index, items.length);
+    var snd = items.slice(0, items.length - index);
+    return fst.concat(snd);
 };
 // This function will be called either by the event listener or in updateInfinite fn.
 var afterInfiniteUpdated = function afterInfiniteUpdated(state, supposeToMoveToLeft) {
@@ -215,7 +196,6 @@ var afterInfiniteUpdated = function afterInfiniteUpdated(state, supposeToMoveToL
 var updateInfinite = function updateInfinite(dir, state) {
     var element = state.element,
         container = state.container,
-        itemsOrder = state.itemsOrder,
         offset = state.offset,
         index = state.index,
         pagination = state.pagination;
@@ -223,10 +203,9 @@ var updateInfinite = function updateInfinite(dir, state) {
         itemWidth = _a.itemWidth,
         itemsVisible = _a.itemsVisible;
     var items = Array.from(container.children);
-    index = getNextIndex('infinite', dir, container.children.length - 1, index);
     offset = dir * itemWidth;
-    itemsOrder = reorder(dir, itemsOrder);
-    // left := dir === -1, right := dir === 1;
+    var initialOrder = getInitialItemsOrder(container.children);
+    var itemsOrder = reorder(index, initialOrder);
     if (dir < 0) {
         addClass('as24-carousel__container--static', container);
         doSetPositioning(2, items, doReorderItems(items, itemsOrder));
@@ -235,21 +214,36 @@ var updateInfinite = function updateInfinite(dir, state) {
     } else if (dir > 0) {
         removeClass('as24-carousel__container--static', container);
         doMove(container, offset);
+    } else {
+        doReorderItems(items, itemsOrder);
     }
-    doUpdateNavigationButtonsState(pagination.left, pagination.right, 'infinite');
     doNotify(element, dir, index);
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     return { index: index, offset: offset, itemsOrder: itemsOrder };
 };
 
 /// <reference path="./definitions.ts" />
-var update = function update(dir, mode, state) {
+var step = function step(dir, state) {
+    var mode = state.mode;
     switch (mode) {
         case 'infinite':
             return updateInfinite(dir, state);
         case 'finite':
             return updateFinite(dir, state);
     }
+};
+var calcStepIndex = function calcStepIndex(dir, state) {
+    var element = state.element,
+        container = state.container,
+        itemsOrder = state.itemsOrder,
+        mode = state.mode,
+        offset = state.offset,
+        index = state.index,
+        pagination = state.pagination;
+    var _a = getVars(element, container),
+        itemWidth = _a.itemWidth,
+        itemsVisible = _a.itemsVisible;
+    return getNextIndex(mode, dir, container.children.length, index, itemsVisible);
 };
 
 /// <reference path="./definitions.ts" />
@@ -283,7 +277,7 @@ var Carousel = function () {
     Carousel.prototype.attached = function () {
         // Create Listeners.
         var _this = this;
-        this.resizeListener = throttle(update.bind(null, 0, this.mode, this), 100);
+        this.resizeListener = throttle(step.bind(null, 0, this.mode, this), 100);
         this.touchStartListener = this.touchStartEventHandler.bind(this);
         this.touchMoveListener = this.touchMoveEventHandler.bind(this);
         this.touchEndListener = this.touchEndEventHandler.bind(this);
@@ -299,14 +293,16 @@ var Carousel = function () {
             btn.addEventListener('mouseup', function (evt) {
                 evt.stopPropagation();
                 evt.preventDefault();
-                mutate(_this, update(direction === 'left' ? -1 : 1, _this.mode, _this));
+                _this.index = calcStepIndex(direction === 'left' ? -1 : 1, _this);
+                mutate(_this, step(direction === 'left' ? -1 : 1, _this));
             });
             btn.addEventListener('click', function (evt) {
                 return evt.preventDefault();
             });
         }, this.element.querySelectorAll('[role="nav-button"]'));
         this.pagination.indicator = this.element.querySelector('[role="indicator"]');
-        mutate(this, update(0, this.mode, this));
+        this.index = 0;
+        mutate(this, step(0, this));
     };
     Carousel.prototype.detached = function () {
         window.removeEventListener('resize', this.resizeListener, true);
@@ -339,11 +335,13 @@ var Carousel = function () {
             return;
         }
         var touchEndCoords = getTouchCoords(event.changedTouches[0]);
-        mutate(this, update(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this.mode, this));
+        this.index = calcStepIndex(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this);
+        mutate(this, step(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this));
     };
     Carousel.prototype.goTo = function (index) {
-        this.index = index > this.container.children.length ? this.container.children.length : index < 1 ? 1 : index;
-        mutate(this, update(-1, this.mode, this));
+        this.index = --index;
+        this.index = calcStepIndex(0, this);
+        mutate(this, step(0, this));
     };
     Carousel.prototype.getIndex = function () {
         return this.index;

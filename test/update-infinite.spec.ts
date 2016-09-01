@@ -7,9 +7,10 @@ describe('Update Infinite', () => {
 
     describe('reorder function', () => {
 
-        it('should place the last element of an array at the beginning when direction is > 0', () => {
+        let arr = [1, 2, 3, 4];
+
+        it('should move 0th element in the array to the index position', () => {
             // given
-            let arr = [1, 2, 3, 4];
 
             // when
             let result = U.reorder(1, arr);
@@ -18,15 +19,14 @@ describe('Update Infinite', () => {
             expect(result).to.deep.equal( [4, 1, 2, 3] );
         });
 
-        it('should place the first element of an array at the end when direction is < 0', () => {
+        it('should move 0th element in the array to the index position', () => {
             // given
-            let arr = [1, 2, 3, 4];
 
             // when
-            let result = U.reorder(-1, arr);
+            let result = U.reorder(2, arr);
 
             // then
-            expect(result).to.deep.equal( [2, 3, 4, 1] );
+            expect(result).to.deep.equal( [3, 4, 1, 2] );
         });
 
     });

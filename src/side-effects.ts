@@ -2,17 +2,11 @@
 
 import * as H from './helpers';
 
-export const doUpdateNavigationButtonsState = (left: HTMLElement, right: HTMLElement, mode: CarouselMode, canGoLeft?: boolean, canGoRight?: boolean): boolean => {
+export const doUpdateNavigationButtonsState = (left: HTMLElement, right: HTMLElement, canGoLeft?: boolean, canGoRight?: boolean): boolean => {
     if (left && right) {
-        if (mode === 'infinite') {
-            H.removeClass('as24-carousel__button--hidden', left);
-            H.removeClass('as24-carousel__button--hidden', right);
-            return true;
-        } else {
-            H.toggleClass('as24-carousel__button--hidden', left, canGoLeft);
-            H.toggleClass('as24-carousel__button--hidden', right, canGoRight);
-            return true;
-        }
+        H.toggleClass('as24-carousel__button--hidden', left, canGoLeft);
+        H.toggleClass('as24-carousel__button--hidden', right, canGoRight);
+        return true;
     } else {
         return false;
     }

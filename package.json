@@ -1,6 +1,6 @@
 {
   "name": "showcar-carousel",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "A simple carousel web component without dependencies.",
   "main": "dist/showcar-carousel.min.js",
   "scripts": {
@@ -22,10 +22,10 @@
     "watch:sass": "node-sass -w ./src/showcar-carousel.scss ./tmp/showcar-carousel.css",
     "watch:autoprefixer": "postcss -w --use autoprefixer -o ./docs/showcar-carousel.css ./tmp/showcar-carousel.css",
     "watch:rollup": "rollup -w -c ./rollup.config.dev.js",
-    "pretest": "typings install && tsc -p test",
+    "pretest": "rimraf ./test/compiled && typings install && tsc -p test",
     "test:tslint": "tslint --project=./src/tsconfig.json",
     "test": "npm run test:tslint && mocha ./test/compiled/test",
-    "posttest": "rm -rf ./test/compiled",
+    "posttest": "rimraf ./test/compiled",
     "docs": "cp -r ./dist/* ./docs",
     "version:major": "npm version major",
     "version:minor": "npm version minor",

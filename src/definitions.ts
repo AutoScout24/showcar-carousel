@@ -4,6 +4,10 @@ interface IPagination {
     indicator: HTMLDivElement;
 }
 
+type MoveDirection = number;
+type CarouselIndex = number;
+type CarouselOffset = number;
+
 type DirectionAttr = "data-direction";
 type DirectionValue = "left" | "right";
 
@@ -24,18 +28,15 @@ interface CarouselElement extends HTMLElement {
 }
 
 interface CarouselState {
-    index: number;
-    offset: number;
+    index: CarouselIndex;
+    offset: CarouselOffset;
     itemsOrder?: SlidesOrder;
 };
 
 interface ICarousel extends CarouselState {
     element: CarouselElement;
     container: HTMLDivElement;
-
     mode: CarouselMode;
-
     pagination: IPagination;
-
     touchStart: Coordinates | any;
 }

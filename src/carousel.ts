@@ -1,7 +1,7 @@
 /// <reference path="./definitions.ts" />
 
-import { addClass, removeClass, containsClass, throttle, forEach, mutate, isSwiping, getElementWidth, getTouchCoords, Coordinates, getInitialItemsOrder } from './helpers';
-import { update } from './logic';
+import { throttle, forEach, mutate, isSwiping, getTouchCoords, Coordinates, getInitialItemsOrder } from './helpers';
+import { step, calcStepIndex } from './logic';
 import { afterInfiniteUpdated } from './update-infinite';
 
 export class Carousel implements ICarousel {
@@ -48,7 +48,7 @@ export class Carousel implements ICarousel {
     attached() {
         // Create Listeners.
 
-        this.resizeListener = throttle(update.bind(null, 0, this.mode, this), 100);
+        this.resizeListener = throttle(step.bind(null, 0, this.mode, this), 100);
         this.touchStartListener = this.touchStartEventHandler.bind(this);
         this.touchMoveListener = this.touchMoveEventHandler.bind(this);
         this.touchEndListener = this.touchEndEventHandler.bind(this);
@@ -66,14 +66,16 @@ export class Carousel implements ICarousel {
             btn.addEventListener('mouseup', (evt: MouseEvent) => {
                 evt.stopPropagation();
                 evt.preventDefault();
-                mutate(this, update(direction === 'left' ? -1 : 1, this.mode, this));
+                this.index = calcStepIndex(direction === 'left' ? -1 : 1, this);
+                mutate(this, step(direction === 'left' ? -1 : 1, this));
             });
             btn.addEventListener('click', evt => evt.preventDefault());
         }, this.element.querySelectorAll('[role="nav-button"]'));
 
         this.pagination.indicator = <HTMLDivElement>this.element.querySelector('[role="indicator"]');
 
-        mutate(this, update(0, this.mode, this));
+        this.index = 0;
+        mutate(this, step(0, this));
     }
 
     detached() {
@@ -112,16 +114,14 @@ export class Carousel implements ICarousel {
             return;
         }
         const touchEndCoords = getTouchCoords(event.changedTouches[0]);
-        mutate(this, update(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this.mode, this));
+        this.index = calcStepIndex(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this);
+        mutate(this, step(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this));
     }
 
     goTo(index: number) {
-        this.index = index > this.container.children.length
-            ? this.container.children.length
-            : index < 1
-                ? 1
-                : index;
-        mutate(this, update(-1, this.mode, this));
+        this.index = --index;
+        this.index = calcStepIndex(0, this);
+        mutate(this, step(0, this));
     }
 
     getIndex(): number {

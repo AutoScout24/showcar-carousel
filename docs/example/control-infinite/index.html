@@ -21,7 +21,7 @@
 
     <div class="fs-view__body">
 
-      <as24-carousel class="carousel-as-slider" loop="infinite">
+      <as24-carousel id="slider" class="carousel-as-slider" loop="infinite">
         <div class="as24-carousel__container" role="container">
           <div class="as24-carousel__item">
             <div class="gallery-picture">
@@ -62,11 +62,22 @@
 
     <div class="fs-view__footer">
     ... in order to find out how to build such gallery
+    <div class="controls">
+        <input id="slide-num" type="number" max="9" min="1"><button id="btn-go">Go</button>
+    </div>
     </div>
 
   </div>
 
   <script src="../../showcar-carousel.js"></script>
+  <script>
+        var btn = document.getElementById('btn-go');
+        var inp = document.getElementById('slide-num');
+        var slider = document.getElementById('slider');
+        btn.addEventListener('click', function() {
+            slider.goTo(+inp.value);
+        });
+    </script>
 </body>
 
 </html>

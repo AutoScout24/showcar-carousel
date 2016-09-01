@@ -24,19 +24,22 @@ export const mutate = (dst, src): void => {
 
 export const getInitialItemsOrder = (items: ArrayLike<any>): SlidesOrder => Array.from(items).map((x, i) => i);
 
-export const getNextIndex = (mode: CarouselMode, dir: number, maxItems: number, oldIndex: number, itemsVisible?: number, canGoRight?: boolean): number => {
-    let newIndex = 0;
+export const getNextOffset = (index: number, itemWidth: number, maxOffset: number): number => {
+    let offset = index * itemWidth;
+    return offset > maxOffset ? maxOffset : offset;
+};
+
+export const getNextIndex = (mode: CarouselMode, dir: MoveDirection, maximalIndex: number, oldIndex: CarouselIndex, itemsVisible: number): number => {
+    let newIndex = oldIndex + dir;
     if (mode === 'infinite') {
-        newIndex = oldIndex + dir;
-        return newIndex < 0 ? maxItems - 1 : newIndex > maxItems - 1 ? 0 : newIndex;
+        return newIndex < 0 ? (maximalIndex - itemsVisible)
+            : newIndex > (maximalIndex - itemsVisible) ? 0 : newIndex;
     }
     if (mode === 'finite') {
-        newIndex = oldIndex;
-        if (dir > 0 && !canGoRight) {
-            return oldIndex;
-        }
         newIndex = oldIndex + dir;
-        return newIndex < 0 ? 0 : newIndex;
+        return newIndex < 0 ? 0
+            : newIndex > (maximalIndex - itemsVisible) ? maximalIndex - itemsVisible
+                : newIndex;
     }
 };
 
