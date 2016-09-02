@@ -41,10 +41,10 @@ export const doReorderItems = (items: CarouselItemsList, order: SlidesOrder): Sl
     H.zipWith(doSetOrder, items, order);
 
 export const doSetPositioning = (howMany: number, items: CarouselItemsList, order: SlidesOrder): CarouselItemsList => {
-    items.forEach(x => H.removeClass('as24-carousel__item--static', x));
+    items.forEach(x => H.removeClass('as24-carousel__item--invisible', x));
     order.forEach((x, i) => {
         if (x > howMany - 1) {
-            H.addClass('as24-carousel__item--static', items[i]);
+            H.addClass('as24-carousel__item--invisible', items[i]);
         }
     });
     return items;

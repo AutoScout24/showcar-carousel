@@ -43,6 +43,17 @@ export const getNextIndex = (mode: CarouselMode, dir: MoveDirection, maximalInde
     }
 };
 
+export const getElementWidth = (element: Element, inclMargins: boolean): number => {
+    let computed = getComputedStyle(element);
+    let { width, marginLeft, marginRight, paddingLeft, paddingRight, boxSizing } = computed;
+
+    let totalMargin = inclMargins ? parseFloat(marginLeft) + parseFloat(marginRight) : 0;
+    let totalPadding = boxSizing === 'border-box' ? 0 : parseFloat(paddingLeft) + parseFloat(paddingRight);
+
+    let resultingWidth = parseFloat(width) + totalPadding + totalMargin;
+    return resultingWidth;
+};
+
 export const getVars = (element: CarouselElement, container: HTMLDivElement) => {
     const rootElemWidth: number = getElementWidth(element, false);
     const itemWidth: number = getElementWidth(<HTMLElement>container.children.item(0), true);
@@ -69,18 +80,6 @@ export const throttle = (fn: () => any, delay: number) => {
             }, delay);
         }
     };
-};
-
-export const getElementWidth = (element: Element, inclMargins: boolean): number => {
-    let computed = getComputedStyle(element);
-    let { width, marginLeft, marginRight, paddingLeft, paddingRight } = computed;
-    let totalMargin = parseFloat(marginLeft) + parseFloat(marginRight);
-    let totalPadding = parseFloat(paddingLeft) + parseFloat(paddingRight);
-    let resultingWidth = parseFloat(width) + totalPadding;
-    if (inclMargins) {
-        resultingWidth += totalMargin;
-    }
-    return resultingWidth;
 };
 
 export const getTouchCoords = (event: any): Coordinates => {

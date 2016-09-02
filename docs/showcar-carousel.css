@@ -85,8 +85,11 @@ as24-carousel {
       -ms-flex: 0 0 auto;
           flex: 0 0 auto;
   outline-style: none; }
-  .as24-carousel__item--static {
-    -webkit-transition: none;
-    transition: none; }
   .as24-carousel__item--invisible {
-    display: none; }
+    position: absolute;
+    z-index: -1; }
+
+as24-carousel[loop="infinite"] .as24-carousel__container {
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start; }

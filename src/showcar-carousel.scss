@@ -93,12 +93,15 @@ as24-carousel {
     flex: 0 0 auto;
     outline-style: none;
 
-    &--static {
-      transition: none;
-    }
-
     &--invisible {
-      display: none;
+      position: absolute;
+      z-index: -1;
     }
   }
+}
+
+as24-carousel[loop="infinite"] {
+    .as24-carousel__container {
+        justify-content: flex-start;
+    }
 }

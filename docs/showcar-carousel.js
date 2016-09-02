@@ -42,6 +42,19 @@ var getNextIndex = function getNextIndex(mode, dir, maximalIndex, oldIndex, item
         return newIndex < 0 ? 0 : newIndex > maximalIndex - itemsVisible ? maximalIndex - itemsVisible : newIndex;
     }
 };
+var getElementWidth = function getElementWidth(element, inclMargins) {
+    var computed = getComputedStyle(element);
+    var width = computed.width,
+        marginLeft = computed.marginLeft,
+        marginRight = computed.marginRight,
+        paddingLeft = computed.paddingLeft,
+        paddingRight = computed.paddingRight,
+        boxSizing = computed.boxSizing;
+    var totalMargin = inclMargins ? parseFloat(marginLeft) + parseFloat(marginRight) : 0;
+    var totalPadding = boxSizing === 'border-box' ? 0 : parseFloat(paddingLeft) + parseFloat(paddingRight);
+    var resultingWidth = parseFloat(width) + totalPadding + totalMargin;
+    return resultingWidth;
+};
 var getVars = function getVars(element, container) {
     var rootElemWidth = getElementWidth(element, false);
     var itemWidth = getElementWidth(container.children.item(0), true);
@@ -71,21 +84,6 @@ var throttle = function throttle(fn, delay) {
             }, delay);
         }
     };
-};
-var getElementWidth = function getElementWidth(element, inclMargins) {
-    var computed = getComputedStyle(element);
-    var width = computed.width,
-        marginLeft = computed.marginLeft,
-        marginRight = computed.marginRight,
-        paddingLeft = computed.paddingLeft,
-        paddingRight = computed.paddingRight;
-    var totalMargin = parseFloat(marginLeft) + parseFloat(marginRight);
-    var totalPadding = parseFloat(paddingLeft) + parseFloat(paddingRight);
-    var resultingWidth = parseFloat(width) + totalPadding;
-    if (inclMargins) {
-        resultingWidth += totalMargin;
-    }
-    return resultingWidth;
 };
 var getTouchCoords = function getTouchCoords(event) {
     var touch = event.touches && event.touches[0];
@@ -138,11 +136,11 @@ var doReorderItems = function doReorderItems(items, order) {
 };
 var doSetPositioning = function doSetPositioning(howMany, items, order) {
     items.forEach(function (x) {
-        return removeClass('as24-carousel__item--static', x);
+        return removeClass('as24-carousel__item--invisible', x);
     });
     order.forEach(function (x, i) {
         if (x > howMany - 1) {
-            addClass('as24-carousel__item--static', items[i]);
+            addClass('as24-carousel__item--invisible', items[i]);
         }
     });
     return items;
