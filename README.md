@@ -1,6 +1,6 @@
 # showcar-carousel
 
-This module provides an easy to use Carousel.
+This module provides a lightweight and easy to use Carousel for any content. There are two modes, an infinite and a finite mode.
 
 ***
 
@@ -50,6 +50,26 @@ See the following example below:
 *Note: pagination indicator is not a mandatory element*
 
 *Note: please, pay attention to `role` attributes*
+
+#### Modes
+
+You can choose between two modes:
+* Infinite - The carousel behaves like a real carousel. This means you can go through all the elements without stopping
+at the end of the list.
+* Finite (default) - In this mode you can not go further than the list of elements.
+
+To change the mode you can use the loop attribute on the as24-carousel element:
+
+```html
+<as24-carousel loop="finite"> ... </as24-carousel>
+```
+
+or 
+
+```html
+<as24-carousel loop="infinite"> ... </as24-carousel>
+```
+
 
 #### DOM Events
 
