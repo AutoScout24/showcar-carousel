@@ -103,7 +103,7 @@ The library uses Flexbox as box model. Also, the carousel item does not depend o
 }
 ```
 
-However, it is better to check [examples](docs)
+However, it is better to check [examples](docs/example)
 
 ### Migration from v3
 
