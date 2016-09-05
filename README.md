@@ -64,7 +64,7 @@ To change the mode you can use the loop attribute on the as24-carousel element:
 <as24-carousel loop="finite"> ... </as24-carousel>
 ```
 
-or 
+or
 
 ```html
 <as24-carousel loop="infinite"> ... </as24-carousel>
@@ -97,15 +97,13 @@ The library uses Flexbox as box model. Also, the carousel item does not depend o
 ```
 
 ```css
-.top-cars .as24-carousel-container {
-  height: 480px;
-}
-
-.top-cars .as24-carousel-item {
+.top-cars .as24-carousel__item {
   width: 310px;
   height: 280px;
 }
 ```
+
+However, it is better to check [examples](docs)
 
 ### Migration from v3
 
@@ -115,14 +113,14 @@ The library uses Flexbox as box model. Also, the carousel item does not depend o
     <div class="as24-carousel__container" role="container">
     <!-- items -->
     </div>
-    ``` 
+    ```
  * Use a new class for the items, `as24-carousel__item`
 
     ```html
     <div class="as24-carousel-item">...</div>
     ```
-    becomes 
-	
+    becomes
+
     ```html
     <div class="as24-carousel__item"></div>
     ```
@@ -133,7 +131,7 @@ The library uses Flexbox as box model. Also, the carousel item does not depend o
     <a href="#" class="as24-carousel__button" role="nav-button" data-direction="left"></a>
     <a href="#" class="as24-carousel__button" role="nav-button" data-direction="right"></a>
     ```
- 
+
  * If needed, add indicator (the one that shows x/y images)
 
     ```html
