@@ -2,16 +2,13 @@
   max-width: 640px;
 }
 
-.area .as24-carousel__container {
-  height: 220px;
-}
-
 .area .as24-carousel__item {
+  height: 220px;
   width: 310px;
   padding: 10px;
 }
 
 .controls input,
 .controls button {
-    font-size: 1rem;
+  font-size: 1rem;
 }

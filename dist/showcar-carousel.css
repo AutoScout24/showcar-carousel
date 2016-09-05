@@ -87,7 +87,8 @@ as24-carousel {
   outline-style: none; }
   .as24-carousel__item--invisible {
     position: absolute;
-    z-index: -1; }
+    z-index: -1;
+    visibility: hidden; }
 
 as24-carousel[loop="infinite"] .as24-carousel__container {
   -webkit-box-pack: start;
