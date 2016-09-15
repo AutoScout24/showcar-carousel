@@ -13,7 +13,7 @@ export const reorder = (index: CarouselIndex, items: SlidesOrder): SlidesOrder =
 // This function will be called either by the event listener or in updateInfinite fn.
 export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: boolean): void => {
     let { element, container, itemsOrder, offset, index } = state;
-    const { itemWidth } = getVars(element, container);
+    const { stepWidth } = getVars(element, container);
 
     let items = <CarouselItem[]>Array.from(container.children);
 
@@ -28,11 +28,11 @@ export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: bool
 };
 
 export const updateInfinite = (dir: MoveDirection, state: ICarousel): CarouselState => {
-    let {element, container, offset, index, pagination} = state;
-    const { itemWidth, itemsVisible } = getVars(element, container);
+    let { element, container, offset, index, pagination } = state;
+    const { stepWidth, itemsVisible } = getVars(element, container);
     let items = <CarouselItem[]>Array.from(container.children);
 
-    offset = dir * itemWidth;
+    offset = dir * stepWidth;
     let initialOrder = getInitialItemsOrder(container.children);
     let itemsOrder = reorder(index, initialOrder);
 

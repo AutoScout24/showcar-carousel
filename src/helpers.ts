@@ -56,11 +56,11 @@ export const getElementWidth = (element: Element, inclMargins: boolean): number 
 
 export const getVars = (element: CarouselElement, container: HTMLDivElement) => {
     const rootElemWidth: number = getElementWidth(element, false);
-    const itemWidth: number = getElementWidth(<HTMLElement>container.children.item(0), true);
+    const stepWidth: number = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(<HTMLElement>container.children.item(0), true);
     const totalWidth: number = Array.from(container.children).reduce((acc, item) => acc += getElementWidth(item, true), 0);
     const maxOffset: number = totalWidth - rootElemWidth;
-    const itemsVisible: number = Math.floor(rootElemWidth / itemWidth);
-    return { maxOffset, itemWidth, itemsVisible, rootElemWidth, totalWidth };
+    const itemsVisible: number = Math.floor(rootElemWidth / stepWidth);
+    return { maxOffset, stepWidth, itemsVisible, rootElemWidth, totalWidth };
 };
 
 export const zipWith = <T, U>(fn: (a: T, b: U) => U, arr1: T[], arr2: U[]): U[] => {

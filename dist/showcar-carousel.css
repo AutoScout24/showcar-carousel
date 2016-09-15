@@ -7,15 +7,26 @@ as24-carousel {
       -ms-user-select: none;
           user-select: none;
   position: relative;
-  overflow: hidden; }
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 0 0;
+          flex: 1 0 0; }
+  as24-carousel[loop=infinite] .as24-carousel__container {
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center; }
 
 .as24-carousel__container {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-flex: 1;
-      -ms-flex: 1 0 auto;
-          flex: 1 0 auto;
+      -ms-flex: 1 0 0%;
+          flex: 1 0 0%;
   -webkit-transition: -webkit-transform 0.3s;
   transition: -webkit-transform 0.3s;
   transition: transform 0.3s;
@@ -27,9 +38,9 @@ as24-carousel {
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
   will-change: transform;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center; }
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start; }
   .as24-carousel__container--static {
     -webkit-transition: none;
     transition: none; }
@@ -81,14 +92,22 @@ as24-carousel {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-flex: 0;
-      -ms-flex: 0 0 auto;
-          flex: 0 0 auto;
-  outline-style: none; }
+  -webkit-box-flex: 1;
+      -ms-flex: 1 0 100%;
+          flex: 1 0 100%;
+  outline-style: none;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center; }
   .as24-carousel__item--invisible {
     position: absolute;
     z-index: -1;
-    visibility: hidden; }
+    visibility: hidden;
+    -webkit-transform: translateX(-9999em);
+            transform: translateX(-9999em); }
 
 as24-carousel[loop="infinite"] .as24-carousel__container {
   -webkit-box-pack: start;

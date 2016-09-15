@@ -57,13 +57,13 @@ var getElementWidth = function getElementWidth(element, inclMargins) {
 };
 var getVars = function getVars(element, container) {
     var rootElemWidth = getElementWidth(element, false);
-    var itemWidth = getElementWidth(container.children.item(0), true);
+    var stepWidth = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(container.children.item(0), true);
     var totalWidth = Array.from(container.children).reduce(function (acc, item) {
         return acc += getElementWidth(item, true);
     }, 0);
     var maxOffset = totalWidth - rootElemWidth;
-    var itemsVisible = Math.floor(rootElemWidth / itemWidth);
-    return { maxOffset: maxOffset, itemWidth: itemWidth, itemsVisible: itemsVisible, rootElemWidth: rootElemWidth, totalWidth: totalWidth };
+    var itemsVisible = Math.floor(rootElemWidth / stepWidth);
+    return { maxOffset: maxOffset, stepWidth: stepWidth, itemsVisible: itemsVisible, rootElemWidth: rootElemWidth, totalWidth: totalWidth };
 };
 var zipWith = function zipWith(fn, arr1, arr2) {
     return arr2.map(function (val, idx) {
@@ -155,11 +155,11 @@ var updateFinite = function updateFinite(dir, state) {
         pagination = state.pagination;
     var _a = getVars(element, container),
         rootElemWidth = _a.rootElemWidth,
-        itemWidth = _a.itemWidth,
+        stepWidth = _a.stepWidth,
         maxOffset = _a.maxOffset,
         itemsVisible = _a.itemsVisible,
         totalWidth = _a.totalWidth;
-    offset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, itemWidth, maxOffset);
+    offset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, stepWidth, maxOffset);
     // side effects
     doUpdateNavigationButtonsState(pagination.left, pagination.right, offset <= 0, offset >= maxOffset);
     if (offset > 0 && offset < maxOffset) {
@@ -183,7 +183,7 @@ var afterInfiniteUpdated = function afterInfiniteUpdated(state, supposeToMoveToL
         itemsOrder = state.itemsOrder,
         offset = state.offset,
         index = state.index;
-    var itemWidth = getVars(element, container).itemWidth;
+    var stepWidth = getVars(element, container).stepWidth;
     var items = Array.from(container.children);
     if (supposeToMoveToLeft) {
         removeClass('as24-carousel__container--static', container);
@@ -200,10 +200,10 @@ var updateInfinite = function updateInfinite(dir, state) {
         index = state.index,
         pagination = state.pagination;
     var _a = getVars(element, container),
-        itemWidth = _a.itemWidth,
+        stepWidth = _a.stepWidth,
         itemsVisible = _a.itemsVisible;
     var items = Array.from(container.children);
-    offset = dir * itemWidth;
+    offset = dir * stepWidth;
     var initialOrder = getInitialItemsOrder(container.children);
     var itemsOrder = reorder(index, initialOrder);
     if (dir < 0) {
