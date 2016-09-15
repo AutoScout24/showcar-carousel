@@ -28,6 +28,10 @@ as24-carousel {
       &__container {
         justify-content: center;
       }
+
+      &__item {
+        flex: 1 0 100%;
+      }
     }
   }
 
@@ -101,7 +105,7 @@ as24-carousel {
   @at-root &__item {
     display: flex;
     flex-direction: column;
-    flex: 1 0 100%;
+    flex: 1;
     outline-style: none;
     align-items: center;
     justify-content: center;
