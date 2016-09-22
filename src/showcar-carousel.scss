@@ -6,8 +6,8 @@ $animationSpeed: .3s;
 // Currently the style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
 // Aspect ratio of the image ( 100% width / 75% height = 1.333 )
 $carousel-background-color: rgba(0, 0, 0, .95);
-$carousel-pagination-width: 50px;
-$carousel-pagination-height: 50px;
+$carousel-pagination-width: 40px;
+$carousel-pagination-height: 40px;
 $carousel-pagination-arrow-size: 30%;
 
 $pagination-indicator-color: #fff;
