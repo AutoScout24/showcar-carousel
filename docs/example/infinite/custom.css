@@ -15,7 +15,13 @@ body { width: 100%; margin: 0; padding: 0; }
   }
 }
 
-.carousel-item__image {
+.gallery-picture {
+  flex: 1;
+  /*position: relative;*/
+  height: 100%;
+}
+
+.gallery-picture__image {
   position: absolute;
   top: 50%;
   transform: translate3d(-50%, -50%, 0);
