@@ -68,6 +68,7 @@ as24-carousel {
   }
 
   @at-root &__button {
+    border: 2px solid transparent; //overrides the default button border
     position: absolute;
     top: 50%;
     width: $carousel-pagination-width;
