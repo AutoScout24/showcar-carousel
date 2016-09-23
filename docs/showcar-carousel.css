@@ -62,7 +62,6 @@ as24-carousel {
   text-align: center; }
 
 .as24-carousel__button {
-  border: 2px solid transparent;
   position: absolute;
   top: 50%;
   width: 40px;
@@ -71,10 +70,10 @@ as24-carousel {
   background-size: 30%;
   background-position: center center;
   outline-style: none;
-  -webkit-transition: background-color .3s, opacity .3s;
-  transition: background-color .3s, opacity .3s; }
+  -webkit-transition: background-color .1s, opacity .5s;
+  transition: background-color .1s, opacity .5s; }
   .as24-carousel__button:hover:not(.hide) {
-    background-color: rgba(0, 0, 0, 0.8); }
+    background-color: rgba(0, 0, 0, 0.75); }
   .as24-carousel__button:focus {
     outline: none; }
   .as24-carousel__button--hidden {
