@@ -1,4 +1,14 @@
 
+4.0.8 / 2016-09-23
+==================
+
+  * changing button border to 0
+  * removed commented code
+  * fixing infinite example
+  * cleanup and fix of examples
+  * adjusted gallery button opacity and transition time
+  * adjusted button size to 40x40px
+
 4.0.7 / 2016-09-15
 ==================
 
