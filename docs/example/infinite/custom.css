@@ -17,7 +17,6 @@ body { width: 100%; margin: 0; padding: 0; }
 
 .gallery-picture {
   flex: 1;
-  /*position: relative;*/
   height: 100%;
 }
 
