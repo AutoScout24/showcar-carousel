@@ -16,5 +16,5 @@ export const step = (dir: MoveDirection, state: ICarousel): CarouselState => {
 export const calcStepIndex = (dir: MoveDirection, state: ICarousel): number => {
     let {element, container, itemsOrder, mode, offset, index, pagination} = state;
     const { itemWidth, itemsVisible } = getVars(element, container);
-    return getNextIndex(mode, dir, container.children.length, index, itemsVisible);
+    return getNextIndex(mode, dir, container.children.length - 1, index, itemsVisible);
 };

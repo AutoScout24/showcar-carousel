@@ -243,7 +243,7 @@ var calcStepIndex = function calcStepIndex(dir, state) {
     var _a = getVars(element, container),
         itemWidth = _a.itemWidth,
         itemsVisible = _a.itemsVisible;
-    return getNextIndex(mode, dir, container.children.length, index, itemsVisible);
+    return getNextIndex(mode, dir, container.children.length - 1, index, itemsVisible);
 };
 
 /// <reference path="./definitions.ts" />
