@@ -59,7 +59,7 @@ export const getVars = (element: CarouselElement, container: HTMLDivElement) => 
     const stepWidth: number = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(<HTMLElement>container.children.item(0), true);
     const totalWidth: number = Array.from(container.children).reduce((acc, item) => acc += getElementWidth(item, true), 0);
     const maxOffset: number = totalWidth - rootElemWidth;
-    const itemsVisible: number = Math.floor(rootElemWidth / stepWidth);
+    const itemsVisible: number = Math.floor((rootElemWidth | 0) / (stepWidth | 0));
     return { maxOffset, stepWidth, itemsVisible, rootElemWidth, totalWidth };
 };
 

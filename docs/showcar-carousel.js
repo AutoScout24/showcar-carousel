@@ -1,9 +1,3 @@
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (factory());
-}(this, (function () { 'use strict';
-
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 /// <reference path="./definitions.ts" />
 var addClass = function addClass(className, element) {
@@ -62,7 +56,7 @@ var getVars = function getVars(element, container) {
         return acc += getElementWidth(item, true);
     }, 0);
     var maxOffset = totalWidth - rootElemWidth;
-    var itemsVisible = Math.floor(rootElemWidth / stepWidth);
+    var itemsVisible = Math.floor((rootElemWidth | 0) / (stepWidth | 0));
     return { maxOffset: maxOffset, stepWidth: stepWidth, itemsVisible: itemsVisible, rootElemWidth: rootElemWidth, totalWidth: totalWidth };
 };
 var zipWith = function zipWith(fn, arr1, arr2) {
@@ -243,7 +237,7 @@ var calcStepIndex = function calcStepIndex(dir, state) {
     var _a = getVars(element, container),
         itemWidth = _a.itemWidth,
         itemsVisible = _a.itemsVisible;
-    return getNextIndex(mode, dir, container.children.length - 1, index, itemsVisible);
+    return getNextIndex(mode, dir, container.children.length, index, itemsVisible);
 };
 
 /// <reference path="./definitions.ts" />
@@ -387,5 +381,3 @@ try {
         window.console.warn('Failed to register CustomElement "as24-carousel".', e);
     }
 }
-
-})));
