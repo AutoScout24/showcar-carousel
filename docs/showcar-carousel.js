@@ -1,3 +1,9 @@
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (factory());
+}(this, (function () { 'use strict';
+
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 /// <reference path="./definitions.ts" />
 var addClass = function addClass(className, element) {
@@ -381,3 +387,5 @@ try {
         window.console.warn('Failed to register CustomElement "as24-carousel".', e);
     }
 }
+
+})));
