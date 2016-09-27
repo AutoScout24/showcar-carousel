@@ -128,6 +128,7 @@ var doMove = function doMove(container, offset) {
     return true;
 };
 var doSetOrder = function doSetOrder(item, ord) {
+    item.style['WebkitOrder'] = ord.toString();
     item.style.order = ord.toString();
     return ord;
 };

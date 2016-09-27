@@ -33,6 +33,7 @@ export const doMove = (container: HTMLElement, offset: number): boolean => {
 };
 
 export const doSetOrder = (item: CarouselItem, ord: number): number => {
+    item.style['WebkitOrder'] = ord.toString();
     item.style.order = ord.toString();
     return ord;
 };
