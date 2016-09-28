@@ -2,12 +2,9 @@
 
 import { Carousel } from './carousel';
 
-function elementCreatedHandler() {
-    this.carousel = new Carousel(this);
-}
-
 function elementAttachedHandler() {
-    this.carousel.attached();
+  this.carousel = new Carousel(this);
+  this.carousel.attached();
 }
 
 function elementDetachedCallback() {
@@ -19,7 +16,6 @@ try {
     document['registerElement']('as24-carousel', {
         prototype: Object.assign(
             Object.create(HTMLElement.prototype, {
-                createdCallback: { value: elementCreatedHandler },
                 attachedCallback: { value: elementAttachedHandler },
                 detachedCallback: { value: elementDetachedCallback },
                 attributeChangedCallback: { value: function () { } }

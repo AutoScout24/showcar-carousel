@@ -354,10 +354,8 @@ var Carousel = function () {
 }();
 
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
-function elementCreatedHandler() {
-    this.carousel = new Carousel(this);
-}
 function elementAttachedHandler() {
+    this.carousel = new Carousel(this);
     this.carousel.attached();
 }
 function elementDetachedCallback() {
@@ -367,7 +365,6 @@ function elementDetachedCallback() {
 try {
     document['registerElement']('as24-carousel', {
         prototype: Object.assign(Object.create(HTMLElement.prototype, {
-            createdCallback: { value: elementCreatedHandler },
             attachedCallback: { value: elementAttachedHandler },
             detachedCallback: { value: elementDetachedCallback },
             attributeChangedCallback: { value: function value() {} }
