@@ -75,7 +75,7 @@ export class Carousel implements ICarousel {
         this.pagination.indicator = <HTMLDivElement>this.element.querySelector('[role="indicator"]');
 
         this.index = 0;
-        mutate(this, step(0, this));
+        mutate(this, step(0, this, false));
     }
 
     detached() {

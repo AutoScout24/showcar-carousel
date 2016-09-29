@@ -194,7 +194,7 @@ var afterInfiniteUpdated = function afterInfiniteUpdated(state, supposeToMoveToL
     }
     doMove(container, 0);
 };
-var updateInfinite = function updateInfinite(dir, state) {
+var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
     var element = state.element,
         container = state.container,
         offset = state.offset,
@@ -218,17 +218,22 @@ var updateInfinite = function updateInfinite(dir, state) {
     } else {
         doReorderItems(items, itemsOrder);
     }
-    doNotify(element, dir, index);
+    if (triggerNotifications) {
+        doNotify(element, dir, index);
+    }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     return { index: index, offset: offset, itemsOrder: itemsOrder };
 };
 
 /// <reference path="./definitions.ts" />
-var step = function step(dir, state) {
+var step = function step(dir, state, triggerNotifications) {
+    if (triggerNotifications === void 0) {
+        triggerNotifications = true;
+    }
     var mode = state.mode;
     switch (mode) {
         case 'infinite':
-            return updateInfinite(dir, state);
+            return updateInfinite(dir, state, triggerNotifications);
         case 'finite':
             return updateFinite(dir, state);
     }
@@ -303,7 +308,7 @@ var Carousel = function () {
         }, this.element.querySelectorAll('[role="nav-button"]'));
         this.pagination.indicator = this.element.querySelector('[role="indicator"]');
         this.index = 0;
-        mutate(this, step(0, this));
+        mutate(this, step(0, this, false));
     };
     Carousel.prototype.detached = function () {
         window.removeEventListener('resize', this.resizeListener, true);

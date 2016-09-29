@@ -27,7 +27,7 @@ export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: bool
     SE.doMove(container, 0);
 };
 
-export const updateInfinite = (dir: MoveDirection, state: ICarousel): CarouselState => {
+export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNotifications: boolean): CarouselState => {
     let { element, container, offset, index, pagination } = state;
     const { stepWidth, itemsVisible } = getVars(element, container);
     let items = <CarouselItem[]>Array.from(container.children);
@@ -48,7 +48,10 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel): CarouselSt
         SE.doReorderItems(items, itemsOrder);
     }
 
-    SE.doNotify(element, dir, index);
+    if (triggerNotifications) {
+        SE.doNotify(element, dir, index);
+    }
+
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
 
     return { index, offset, itemsOrder };

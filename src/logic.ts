@@ -5,10 +5,10 @@ import { updateInfinite } from './update-infinite';
 import { getNextOffset, getVars, getNextIndex } from './helpers';
 import * as SE from './side-effects';
 
-export const step = (dir: MoveDirection, state: ICarousel): CarouselState => {
+export const step = (dir: MoveDirection, state: ICarousel, triggerNotifications = true): CarouselState => {
     let { mode } = state;
     switch (mode) {
-        case 'infinite': return updateInfinite(dir, state);
+        case 'infinite': return updateInfinite(dir, state, triggerNotifications);
         case 'finite': return updateFinite(dir, state);
     }
 };
