@@ -114,8 +114,10 @@ export class Carousel implements ICarousel {
             return;
         }
         const touchEndCoords = getTouchCoords(event.changedTouches[0]);
-        this.index = calcStepIndex(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this);
-        mutate(this, step(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this));
+        if (Math.abs(touchEndCoords.x - this.touchStart.x) > 20) {
+          this.index = calcStepIndex(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this);
+          mutate(this, step(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this));
+        }
     }
 
     goTo(index: number) {
