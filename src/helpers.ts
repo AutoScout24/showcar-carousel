@@ -43,6 +43,16 @@ export const getNextIndex = (mode: CarouselMode, dir: MoveDirection, maximalInde
     }
 };
 
+export const navButtonIsHidden = (theButton: NavigationButton): Boolean => {
+    let theStyle = theButton !== null ? getComputedStyle(theButton) : null;
+    return theStyle !== null && theStyle.display !== 'none';
+};
+
+export const navAvailable = (buttons: NavigationButton[]): Boolean => {
+    // I could use `every` here. But browser support is...
+    return buttons.map(navButtonIsHidden).reduce((res, x) => res && x, true);
+};
+
 export const getElementWidth = (element: Element, inclMargins: boolean): number => {
     let computed = getComputedStyle(element);
     let { width, marginLeft, marginRight, paddingLeft, paddingRight, boxSizing } = computed;

@@ -1,4 +1,9 @@
 
+4.0.16 / 2016-10-12
+==================
+
+  * Whenever buttons are display:none swipe does not take any effect
+
 4.0.8 / 2016-09-23
 ==================
 

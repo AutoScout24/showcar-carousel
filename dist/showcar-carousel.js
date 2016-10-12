@@ -12,6 +12,7 @@ var addClass = function addClass(className, element) {
 var removeClass = function removeClass(className, element) {
     return element.classList.remove(className), element;
 };
+
 var toggleClass = function toggleClass(className, element, flag) {
     return flag ? (addClass(className, element), true) : (removeClass(className, element), false);
 };
@@ -41,6 +42,16 @@ var getNextIndex = function getNextIndex(mode, dir, maximalIndex, oldIndex, item
         newIndex = oldIndex + dir;
         return newIndex < 0 ? 0 : newIndex > maximalIndex - itemsVisible ? maximalIndex - itemsVisible : newIndex;
     }
+};
+var navButtonIsHidden = function navButtonIsHidden(theButton) {
+    var theStyle = theButton !== null ? getComputedStyle(theButton) : null;
+    return theStyle !== null && theStyle.display !== 'none';
+};
+var navAvailable = function navAvailable(buttons) {
+    // I could use `every` here. But browser support is...
+    return buttons.map(navButtonIsHidden).reduce(function (res, x) {
+        return res && x;
+    }, true);
 };
 var getElementWidth = function getElementWidth(element, inclMargins) {
     var computed = getComputedStyle(element);
@@ -96,7 +107,6 @@ var Coordinates = function () {
     }
     return Coordinates;
 }();
-;
 
 /// <reference path="./definitions.ts" />
 var doUpdateNavigationButtonsState = function doUpdateNavigationButtonsState(left, right, canGoLeft, canGoRight) {
@@ -317,6 +327,10 @@ var Carousel = function () {
         this.element.removeEventListener('touchend', this.touchEndListener, true);
     };
     Carousel.prototype.touchStartEventHandler = function (event) {
+        var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+        if (!navAvailable(navButtons)) {
+            return;
+        }
         this.touchStart = {};
         var target = event.target;
         if (!target.hasAttribute('data-direction')) {
@@ -337,6 +351,10 @@ var Carousel = function () {
         }
     };
     Carousel.prototype.touchEndEventHandler = function (event) {
+        var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+        if (!navAvailable(navButtons)) {
+            return;
+        }
         if (!isSwiping(this.touchStart)) {
             return;
         }

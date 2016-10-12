@@ -1,6 +1,6 @@
 /// <reference path="./definitions.ts" />
 
-import { throttle, forEach, mutate, isSwiping, getTouchCoords, Coordinates, getInitialItemsOrder } from './helpers';
+import { throttle, forEach, mutate, isSwiping, getTouchCoords, Coordinates, getInitialItemsOrder, navAvailable } from './helpers';
 import { step, calcStepIndex } from './logic';
 import { afterInfiniteUpdated } from './update-infinite';
 
@@ -86,6 +86,10 @@ export class Carousel implements ICarousel {
     }
 
     touchStartEventHandler(event: TouchEvent) {
+        const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+        if (!navAvailable(navButtons)) {
+            return;
+        }
         this.touchStart = {};
         let target = <HTMLElement>event.target;
         if (!target.hasAttribute('data-direction')) {
@@ -110,6 +114,10 @@ export class Carousel implements ICarousel {
     }
 
     touchEndEventHandler(event: TouchEvent) {
+        const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+        if (!navAvailable(navButtons)) {
+            return;
+        }
         if (!isSwiping(this.touchStart)) {
             return;
         }
