@@ -1,6 +1,11 @@
+interface PosCoordinates {
+    x: number;
+    y: number;
+}
+
 interface IPagination {
-    left: HTMLAnchorElement;
-    right: HTMLAnchorElement;
+    left: NavigationButton;
+    right: NavigationButton;
     indicator: HTMLDivElement;
 }
 
@@ -30,7 +35,9 @@ interface CarouselElement extends HTMLElement {
 interface CarouselState {
     index: CarouselIndex;
     offset: CarouselOffset;
+    busy: boolean;
     itemsOrder?: SlidesOrder;
+    touchStart?: PosCoordinates;
 };
 
 interface ICarousel extends CarouselState {
@@ -38,5 +45,4 @@ interface ICarousel extends CarouselState {
     container: HTMLDivElement;
     mode: CarouselMode;
     pagination: IPagination;
-    touchStart: Coordinates | any;
 }

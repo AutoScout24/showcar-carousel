@@ -41,7 +41,7 @@ as24-carousel {
 
   @at-root &__container {
     display: flex;
-    flex: 1 0 0%;
+    flex: 1 0 auto;
     transition: transform $animationSpeed;
     perspective: 1000px;
     transform: translate3d(0, 0, 0);
@@ -105,7 +105,7 @@ as24-carousel {
   @at-root &__item {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 1 0 auto;
     outline-style: none;
     align-items: center;
     justify-content: center;

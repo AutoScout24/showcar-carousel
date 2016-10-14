@@ -1,13 +1,15 @@
 /// <reference path="./definitions.ts" />
 
-import { throttle, forEach, mutate, isSwiping, getTouchCoords, Coordinates, getInitialItemsOrder, navAvailable } from './helpers';
-import { step, calcStepIndex } from './logic';
+import { throttle, forEach, mutate, isSwiping, getTouchCoords, PosCoordinates, getInitialItemsOrder, navAvailable, calcStepIndex } from './helpers';
+import { step, swipeContinuous, swipeStarts, swipeEnds } from './logic';
 import { afterInfiniteUpdated } from './update-infinite';
+import * as SE from './side-effects';
 
 export class Carousel implements ICarousel {
     element: CarouselElement;
     container: HTMLDivElement;
 
+    busy: boolean = false;
     index: number = 0;
     offset: number = 0;
     itemsOrder: SlidesOrder;
@@ -24,13 +26,17 @@ export class Carousel implements ICarousel {
         indicator: null
     };
 
-    touchStart: Coordinates | any;
+    touchStart: PosCoordinates;
+    currentTouch: PosCoordinates;
+    finalTouch: PosCoordinates;
 
     constructor(element: CarouselElement) {
-        this.touchStart = new Coordinates(0, 0);
+        this.touchStart = new PosCoordinates(0, 0);
         this.element = element;
         this.mode = this.element.getAttribute('loop') || 'finite';
         this.container = <HTMLDivElement>this.element.querySelector('[role="container"]');
+
+        this.container.addEventListener('transitionend', _ => this.busy = false);
 
         if (this.mode === 'infinite') {
             this.itemsOrder = getInitialItemsOrder(this.container.children);
@@ -47,7 +53,6 @@ export class Carousel implements ICarousel {
 
     attached() {
         // Create Listeners.
-
         this.resizeListener = throttle(step.bind(null, 0, this.mode, this), 100);
         this.touchStartListener = this.touchStartEventHandler.bind(this);
         this.touchMoveListener = this.touchMoveEventHandler.bind(this);
@@ -61,15 +66,16 @@ export class Carousel implements ICarousel {
 
         // Add container and pagination buttons.
         forEach((btn: NavigationButton) => {
-            let direction = btn.getAttribute('data-direction');
-            this.pagination[direction] = btn;
-            btn.addEventListener('mouseup', (evt: MouseEvent) => {
-                evt.stopPropagation();
-                evt.preventDefault();
-                this.index = calcStepIndex(direction === 'left' ? -1 : 1, this);
-                mutate(this, step(direction === 'left' ? -1 : 1, this));
+            const direction = btn.getAttribute('data-direction');
+            this.pagination[btn.getAttribute('data-direction')] = btn;
+            btn.addEventListener('click', e => {
+              if (this.busy) return;
+              if (!('ontouchstart' in window)) {
+                  this.busy = true;
+                  mutate(this, step(direction === 'left' ? -1 : 1, this));
+              }
+              e.preventDefault();
             });
-            btn.addEventListener('click', evt => evt.preventDefault());
         }, this.element.querySelectorAll('[role="nav-button"]'));
 
         this.pagination.indicator = <HTMLDivElement>this.element.querySelector('[role="indicator"]');
@@ -86,45 +92,44 @@ export class Carousel implements ICarousel {
     }
 
     touchStartEventHandler(event: TouchEvent) {
+        if (this.busy) return;
         const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
         if (!navAvailable(navButtons)) {
             return;
         }
-        this.touchStart = {};
-        let target = <HTMLElement>event.target;
-        if (!target.hasAttribute('data-direction')) {
-            this.touchStart = getTouchCoords(event);
-        }
+        mutate(this, swipeStarts(this));
     }
 
     touchMoveEventHandler(event: TouchEvent) {
-        if (!isSwiping(this.touchStart)) {
-            return;
-        }
-
-        const touchCoords = getTouchCoords(event);
-        const startDiffX = Math.abs(touchCoords.x - this.touchStart.x);
-        const startDiffY = Math.abs(touchCoords.y - this.touchStart.y);
-
-        if (startDiffX < startDiffY) {
-            this.touchStart = {};
-        } else {
-            event.preventDefault();
-        }
-    }
-
-    touchEndEventHandler(event: TouchEvent) {
+        if (this.busy) return;
         const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
         if (!navAvailable(navButtons)) {
             return;
         }
-        if (!isSwiping(this.touchStart)) {
+        mutate(this, swipeContinuous(getTouchCoords(event), this));
+    }
+
+    touchEndEventHandler(event: TouchEvent) {
+        if (this.busy) return;
+        const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+        if (!navAvailable(navButtons)) {
             return;
         }
-        const touchEndCoords = getTouchCoords(event.changedTouches[0]);
-        if (Math.abs(touchEndCoords.x - this.touchStart.x) > 20) {
-          this.index = calcStepIndex(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this);
-          mutate(this, step(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this));
+        const target = <NavigationButton>event.target;
+        const finalTouch = getTouchCoords(event.changedTouches[0]);
+        if (target.hasAttribute('data-direction')) {
+            event.preventDefault();
+            this.busy = true;
+            switch (target.getAttribute('data-direction')) {
+              case 'left'  : return mutate(this, step(-1, this));
+              case 'right' : return mutate(this, step(1, this));
+            }
+        } else {
+            if (this.touchStart.x === finalTouch.x) {
+                return;
+            }
+            this.busy = true;
+            mutate(this, swipeEnds(finalTouch, this));
         }
     }
 

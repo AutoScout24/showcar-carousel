@@ -2,10 +2,10 @@
 
 import * as H from './helpers';
 
-export const doUpdateNavigationButtonsState = (left: HTMLElement, right: HTMLElement, canGoLeft?: boolean, canGoRight?: boolean): boolean => {
+export const doUpdateNavigationButtonsState = (left: NavigationButton, right: NavigationButton, canGoLeft?: boolean, canGoRight?: boolean): boolean => {
     if (left && right) {
-        H.toggleClass('as24-carousel__button--hidden', left, canGoLeft);
-        H.toggleClass('as24-carousel__button--hidden', right, canGoRight);
+        H.toggleClass('as24-carousel__button--hidden', left, !canGoLeft);
+        H.toggleClass('as24-carousel__button--hidden', right, !canGoRight);
         return true;
     } else {
         return false;

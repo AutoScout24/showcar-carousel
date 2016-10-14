@@ -43,6 +43,12 @@ export const getNextIndex = (mode: CarouselMode, dir: MoveDirection, maximalInde
     }
 };
 
+export const calcStepIndex = (dir: MoveDirection, state: ICarousel): number => {
+    let {element, container, itemsOrder, mode, offset, index, pagination} = state;
+    const { itemsVisible } = getVars(element, container);
+    return getNextIndex(mode, dir, container.children.length, index, itemsVisible);
+};
+
 export const navButtonIsHidden = (theButton: NavigationButton): Boolean => {
     let theStyle = theButton !== null ? getComputedStyle(theButton) : null;
     return theStyle !== null && theStyle.display !== 'none';
@@ -67,8 +73,8 @@ export const getElementWidth = (element: Element, inclMargins: boolean): number 
 export const getVars = (element: CarouselElement, container: HTMLDivElement) => {
     const rootElemWidth: number = getElementWidth(element, false);
     const stepWidth: number = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(<HTMLElement>container.children.item(0), true);
-    const totalWidth: number = Array.from(container.children).reduce((acc, item) => acc += getElementWidth(item, true), 0);
-    const maxOffset: number = totalWidth - rootElemWidth;
+    const totalWidth: number = Math.floor(Array.from(container.children).reduce((acc, item) => acc += getElementWidth(item, true), 0));
+    const maxOffset: number = Math.floor(totalWidth - rootElemWidth);
     const itemsVisible: number = Math.floor((rootElemWidth | 0) / (stepWidth | 0));
     return { maxOffset, stepWidth, itemsVisible, rootElemWidth, totalWidth };
 };
@@ -77,7 +83,7 @@ export const zipWith = <T, U>(fn: (a: T, b: U) => U, arr1: T[], arr2: U[]): U[] 
     return arr2.map((val: U, idx) => fn(arr1[idx], val));
 };
 
-export const isSwiping = (touchStartCoords: Coordinates): boolean => Object.keys(touchStartCoords).length > 0;
+export const isSwiping = (touchStartCoords: PosCoordinates): boolean => Object.keys(touchStartCoords).length > 0;
 
 export const throttle = (fn: () => any, delay: number) => {
     let timer = null;
@@ -92,15 +98,15 @@ export const throttle = (fn: () => any, delay: number) => {
     };
 };
 
-export const getTouchCoords = (event: any): Coordinates => {
+export const getTouchCoords = (event: any): PosCoordinates => {
     let touch = event.touches && event.touches[0];
-    return new Coordinates(
+    return new PosCoordinates(
         event.clientX || (touch && touch.clientX),
         event.clientY || (touch && touch.clientY)
     );
 };
 
-export class Coordinates {
+export class PosCoordinates {
     x: number;
     y: number;
     constructor(x: number, y: number) {

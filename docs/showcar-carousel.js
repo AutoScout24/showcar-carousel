@@ -1,9 +1,3 @@
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (factory());
-}(this, (function () { 'use strict';
-
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 /// <reference path="./definitions.ts" />
 var addClass = function addClass(className, element) {
@@ -43,6 +37,17 @@ var getNextIndex = function getNextIndex(mode, dir, maximalIndex, oldIndex, item
         return newIndex < 0 ? 0 : newIndex > maximalIndex - itemsVisible ? maximalIndex - itemsVisible : newIndex;
     }
 };
+var calcStepIndex = function calcStepIndex(dir, state) {
+    var element = state.element,
+        container = state.container,
+        itemsOrder = state.itemsOrder,
+        mode = state.mode,
+        offset = state.offset,
+        index = state.index,
+        pagination = state.pagination;
+    var itemsVisible = getVars(element, container).itemsVisible;
+    return getNextIndex(mode, dir, container.children.length, index, itemsVisible);
+};
 var navButtonIsHidden = function navButtonIsHidden(theButton) {
     var theStyle = theButton !== null ? getComputedStyle(theButton) : null;
     return theStyle !== null && theStyle.display !== 'none';
@@ -69,10 +74,10 @@ var getElementWidth = function getElementWidth(element, inclMargins) {
 var getVars = function getVars(element, container) {
     var rootElemWidth = getElementWidth(element, false);
     var stepWidth = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(container.children.item(0), true);
-    var totalWidth = Array.from(container.children).reduce(function (acc, item) {
+    var totalWidth = Math.floor(Array.from(container.children).reduce(function (acc, item) {
         return acc += getElementWidth(item, true);
-    }, 0);
-    var maxOffset = totalWidth - rootElemWidth;
+    }, 0));
+    var maxOffset = Math.floor(totalWidth - rootElemWidth);
     var itemsVisible = Math.floor((rootElemWidth | 0) / (stepWidth | 0));
     return { maxOffset: maxOffset, stepWidth: stepWidth, itemsVisible: itemsVisible, rootElemWidth: rootElemWidth, totalWidth: totalWidth };
 };
@@ -81,9 +86,7 @@ var zipWith = function zipWith(fn, arr1, arr2) {
         return fn(arr1[idx], val);
     });
 };
-var isSwiping = function isSwiping(touchStartCoords) {
-    return Object.keys(touchStartCoords).length > 0;
-};
+
 var throttle = function throttle(fn, delay) {
     var timer = null;
     return function () {
@@ -98,21 +101,21 @@ var throttle = function throttle(fn, delay) {
 };
 var getTouchCoords = function getTouchCoords(event) {
     var touch = event.touches && event.touches[0];
-    return new Coordinates(event.clientX || touch && touch.clientX, event.clientY || touch && touch.clientY);
+    return new PosCoordinates(event.clientX || touch && touch.clientX, event.clientY || touch && touch.clientY);
 };
-var Coordinates = function () {
-    function Coordinates(x, y) {
+var PosCoordinates = function () {
+    function PosCoordinates(x, y) {
         this.x = x;
         this.y = y;
     }
-    return Coordinates;
+    return PosCoordinates;
 }();
 
 /// <reference path="./definitions.ts" />
 var doUpdateNavigationButtonsState = function doUpdateNavigationButtonsState(left, right, canGoLeft, canGoRight) {
     if (left && right) {
-        toggleClass('as24-carousel__button--hidden', left, canGoLeft);
-        toggleClass('as24-carousel__button--hidden', right, canGoRight);
+        toggleClass('as24-carousel__button--hidden', left, !canGoLeft);
+        toggleClass('as24-carousel__button--hidden', right, !canGoRight);
         return true;
     } else {
         return false;
@@ -158,6 +161,7 @@ var doSetPositioning = function doSetPositioning(howMany, items, order) {
 };
 
 /// <reference path="./definitions.ts" />
+/// <reference path="./helpers.ts" />
 var updateFinite = function updateFinite(dir, state) {
     var element = state.element,
         container = state.container,
@@ -170,15 +174,41 @@ var updateFinite = function updateFinite(dir, state) {
         maxOffset = _a.maxOffset,
         itemsVisible = _a.itemsVisible,
         totalWidth = _a.totalWidth;
+    removeClass('as24-carousel__container--static', container);
+    index = calcStepIndex(dir, state);
     offset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, stepWidth, maxOffset);
     // side effects
-    doUpdateNavigationButtonsState(pagination.left, pagination.right, offset <= 0, offset >= maxOffset);
+    doUpdateNavigationButtonsState(pagination.left, pagination.right, offset > 0, offset < maxOffset);
     if (offset > 0 && offset < maxOffset) {
         doNotify(element, dir, index);
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     doMove(container, offset);
+    return { touchStart: null, index: index, offset: offset };
+};
+var swipeStartsFinite = function swipeStartsFinite(state) {
+    var offset = state.offset,
+        index = state.index,
+        container = state.container;
+    addClass('as24-carousel__container--static', container);
+    var touchStart = getTouchCoords(event);
+    return { touchStart: touchStart, index: index, offset: offset };
+};
+var swipeContinuousFinite = function swipeContinuousFinite(currentPos, state) {
+    var offset = state.offset,
+        touchStart = state.touchStart,
+        index = state.index,
+        container = state.container;
+    var diffX = offset + -1 * (currentPos.x - touchStart.x);
+    doMove(container, diffX);
     return { index: index, offset: offset };
+};
+var swipeEndsFinite = function swipeEndsFinite(finalTouch, state) {
+    var offset = state.offset,
+        touchStart = state.touchStart,
+        container = state.container;
+    var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
+    return updateFinite(dir, state);
 };
 
 /// <reference path="./definitions.ts" />
@@ -214,7 +244,8 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         stepWidth = _a.stepWidth,
         itemsVisible = _a.itemsVisible;
     var items = Array.from(container.children);
-    offset = dir * stepWidth;
+    index = calcStepIndex(dir, state);
+    offset = dir === -1 ? offset === 0 ? dir * stepWidth : dir * offset : dir * stepWidth;
     var initialOrder = getInitialItemsOrder(container.children);
     var itemsOrder = reorder(index, initialOrder);
     if (dir < 0) {
@@ -232,7 +263,44 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         doNotify(element, dir, index);
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
+    return { index: index, offset: 0, itemsOrder: itemsOrder };
+};
+var swipeStartsInfinite = function swipeStartsInfinite(state) {
+    var offset = state.offset,
+        index = state.index,
+        container = state.container;
+    addClass('as24-carousel__container--static', container);
+    var touchStart = getTouchCoords(event);
+    return { touchStart: touchStart, index: index, offset: offset };
+};
+var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state) {
+    var touchStart = state.touchStart,
+        index = state.index,
+        container = state.container,
+        element = state.element;
+    var _a = getVars(element, container),
+        stepWidth = _a.stepWidth,
+        itemsVisible = _a.itemsVisible;
+    var dir = touchStart.x - currentPos.x > 0 ? 1 : -1;
+    var offset, diffX, newIndex, itemsOrder, items;
+    if (dir === -1) {
+        itemsOrder = reorder(calcStepIndex(dir, state), getInitialItemsOrder(container.children));
+        items = Array.from(container.children);
+        doSetPositioning(2, items, doReorderItems(items, itemsOrder));
+        offset = stepWidth + -1 * (currentPos.x - touchStart.x);
+    } else {
+        offset = -1 * (currentPos.x - touchStart.x);
+    }
+    doMove(container, offset);
     return { index: index, offset: offset, itemsOrder: itemsOrder };
+};
+var swipeEndsInfinite = function swipeEndsInfinite(finalTouch, state) {
+    var offset = state.offset,
+        touchStart = state.touchStart,
+        container = state.container;
+    removeClass('as24-carousel__container--static', container);
+    var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
+    return updateInfinite(dir, state, true);
 };
 
 /// <reference path="./definitions.ts" />
@@ -248,24 +316,39 @@ var step = function step(dir, state, triggerNotifications) {
             return updateFinite(dir, state);
     }
 };
-var calcStepIndex = function calcStepIndex(dir, state) {
-    var element = state.element,
-        container = state.container,
-        itemsOrder = state.itemsOrder,
-        mode = state.mode,
-        offset = state.offset,
-        index = state.index,
-        pagination = state.pagination;
-    var _a = getVars(element, container),
-        itemWidth = _a.itemWidth,
-        itemsVisible = _a.itemsVisible;
-    return getNextIndex(mode, dir, container.children.length, index, itemsVisible);
+var swipeStarts = function swipeStarts(state) {
+    var mode = state.mode;
+    switch (mode) {
+        case 'infinite':
+            return swipeStartsInfinite(state);
+        case 'finite':
+            return swipeStartsFinite(state);
+    }
+};
+var swipeContinuous = function swipeContinuous(currentPos, state) {
+    var mode = state.mode;
+    switch (mode) {
+        case 'infinite':
+            return swipeContinuousInfinite(currentPos, state);
+        case 'finite':
+            return swipeContinuousFinite(currentPos, state);
+    }
+};
+var swipeEnds = function swipeEnds(finalPos, state) {
+    var mode = state.mode;
+    switch (mode) {
+        case 'infinite':
+            return swipeEndsInfinite(finalPos, state);
+        case 'finite':
+            return swipeEndsFinite(finalPos, state);
+    }
 };
 
 /// <reference path="./definitions.ts" />
 var Carousel = function () {
     function Carousel(element) {
         var _this = this;
+        this.busy = false;
         this.index = 0;
         this.offset = 0;
         this.mode = 'finite';
@@ -274,10 +357,13 @@ var Carousel = function () {
             right: null,
             indicator: null
         };
-        this.touchStart = new Coordinates(0, 0);
+        this.touchStart = new PosCoordinates(0, 0);
         this.element = element;
         this.mode = this.element.getAttribute('loop') || 'finite';
         this.container = this.element.querySelector('[role="container"]');
+        this.container.addEventListener('transitionend', function (_) {
+            return _this.busy = false;
+        });
         if (this.mode === 'infinite') {
             this.itemsOrder = getInitialItemsOrder(this.container.children);
             // Note: This event will not be always triggered!
@@ -291,8 +377,8 @@ var Carousel = function () {
         }
     }
     Carousel.prototype.attached = function () {
-        // Create Listeners.
         var _this = this;
+        // Create Listeners.
         this.resizeListener = throttle(step.bind(null, 0, this.mode, this), 100);
         this.touchStartListener = this.touchStartEventHandler.bind(this);
         this.touchMoveListener = this.touchMoveEventHandler.bind(this);
@@ -305,15 +391,14 @@ var Carousel = function () {
         // Add container and pagination buttons.
         forEach(function (btn) {
             var direction = btn.getAttribute('data-direction');
-            _this.pagination[direction] = btn;
-            btn.addEventListener('mouseup', function (evt) {
-                evt.stopPropagation();
-                evt.preventDefault();
-                _this.index = calcStepIndex(direction === 'left' ? -1 : 1, _this);
-                mutate(_this, step(direction === 'left' ? -1 : 1, _this));
-            });
-            btn.addEventListener('click', function (evt) {
-                return evt.preventDefault();
+            _this.pagination[btn.getAttribute('data-direction')] = btn;
+            btn.addEventListener('click', function (e) {
+                if (_this.busy) return;
+                if (!('ontouchstart' in window)) {
+                    _this.busy = true;
+                    mutate(_this, step(direction === 'left' ? -1 : 1, _this));
+                }
+                e.preventDefault();
             });
         }, this.element.querySelectorAll('[role="nav-button"]'));
         this.pagination.indicator = this.element.querySelector('[role="indicator"]');
@@ -327,41 +412,44 @@ var Carousel = function () {
         this.element.removeEventListener('touchend', this.touchEndListener, true);
     };
     Carousel.prototype.touchStartEventHandler = function (event) {
+        if (this.busy) return;
         var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
         if (!navAvailable(navButtons)) {
             return;
         }
-        this.touchStart = {};
-        var target = event.target;
-        if (!target.hasAttribute('data-direction')) {
-            this.touchStart = getTouchCoords(event);
-        }
+        mutate(this, swipeStarts(this));
     };
     Carousel.prototype.touchMoveEventHandler = function (event) {
-        if (!isSwiping(this.touchStart)) {
-            return;
-        }
-        var touchCoords = getTouchCoords(event);
-        var startDiffX = Math.abs(touchCoords.x - this.touchStart.x);
-        var startDiffY = Math.abs(touchCoords.y - this.touchStart.y);
-        if (startDiffX < startDiffY) {
-            this.touchStart = {};
-        } else {
-            event.preventDefault();
-        }
-    };
-    Carousel.prototype.touchEndEventHandler = function (event) {
+        if (this.busy) return;
         var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
         if (!navAvailable(navButtons)) {
             return;
         }
-        if (!isSwiping(this.touchStart)) {
+        mutate(this, swipeContinuous(getTouchCoords(event), this));
+    };
+    Carousel.prototype.touchEndEventHandler = function (event) {
+        if (this.busy) return;
+        var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+        if (!navAvailable(navButtons)) {
             return;
         }
-        var touchEndCoords = getTouchCoords(event.changedTouches[0]);
-        if (Math.abs(touchEndCoords.x - this.touchStart.x) > 20) {
-            this.index = calcStepIndex(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this);
-            mutate(this, step(this.touchStart.x - touchEndCoords.x > 0 ? 1 : -1, this));
+        var target = event.target;
+        var finalTouch = getTouchCoords(event.changedTouches[0]);
+        if (target.hasAttribute('data-direction')) {
+            event.preventDefault();
+            this.busy = true;
+            switch (target.getAttribute('data-direction')) {
+                case 'left':
+                    return mutate(this, step(-1, this));
+                case 'right':
+                    return mutate(this, step(1, this));
+            }
+        } else {
+            if (this.touchStart.x === finalTouch.x) {
+                return;
+            }
+            this.busy = true;
+            mutate(this, swipeEnds(finalTouch, this));
         }
     };
     Carousel.prototype.goTo = function (index) {
@@ -410,5 +498,3 @@ try {
         window.console.warn('Failed to register CustomElement "as24-carousel".', e);
     }
 }
-
-})));
