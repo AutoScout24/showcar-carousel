@@ -11,7 +11,7 @@ export const reorder = (index: CarouselIndex, items: SlidesOrder): SlidesOrder =
 };
 
 // This function will be called either by the event listener or in updateInfinite fn.
-export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: boolean): void => {
+export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: boolean): CarouselState => {
     let { element, container, itemsOrder, offset, index } = state;
     const { stepWidth } = getVars(element, container);
 
@@ -25,12 +25,18 @@ export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: bool
     }
 
     SE.doMove(container, 0);
+
+    state.busy = false;
+    state.itemsOrder = getInitialItemsOrder(container.children);
+    return state;
 };
 
 export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNotifications: boolean): CarouselState => {
-    let { element, container, offset, index, pagination } = state;
+    let { element, container, touchStart, offset, index, pagination, busy } = state;
     const { stepWidth, itemsVisible } = getVars(element, container);
     let items = <CarouselItem[]>Array.from(container.children);
+
+    if (busy) return;
 
     index = calcStepIndex(dir, state);
     offset = dir === -1
@@ -57,18 +63,21 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
 
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
 
-    return { index, offset: 0, itemsOrder };
+    return { index, touchStart, offset: 0, itemsOrder, busy: true };
 };
 
-export const swipeStartsInfinite = (state: ICarousel): CarouselState => {
-    const { offset, index, container } = state;
+export const swipeStartsInfinite = (touch: PosCoordinates, state: ICarousel): CarouselState => {
+    const { offset, index, container, busy } = state;
+    if (busy) return;
+
     addClass('as24-carousel__container--static', container);
-    const touchStart = getTouchCoords(event);
-    return { touchStart, index, offset };
+    return { touchStart: touch, index, offset, busy };
 };
 
 export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
-    const { touchStart, index, container, element } = state;
+    const { touchStart, index, container, element, busy } = state;
+    if (busy) return;
+
     const { stepWidth, itemsVisible } = getVars(element, container);
     const dir = touchStart.x - currentPos.x > 0 ? 1 : -1;
 
@@ -85,11 +94,13 @@ export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICaro
 
     SE.doMove(container, offset);
 
-    return { index, offset, itemsOrder };
+    return { index, touchStart, offset, itemsOrder, busy };
 };
 
 export const swipeEndsInfinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { offset, touchStart, container } = state;
+    const { offset, touchStart, container, busy } = state;
+    if (busy) return;
+
     removeClass('as24-carousel__container--static', container);
     const dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
     return updateInfinite(dir, state, true);

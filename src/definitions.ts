@@ -37,7 +37,7 @@ interface CarouselState {
     offset: CarouselOffset;
     busy?: boolean;
     itemsOrder?: SlidesOrder;
-    touchStart?: PosCoordinates;
+    touchStart: PosCoordinates;
 };
 
 interface ICarousel extends CarouselState {

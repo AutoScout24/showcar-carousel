@@ -25,18 +25,17 @@ export const updateFinite = (dir: MoveDirection, state: ICarousel): CarouselStat
     return { touchStart: null, index, offset };
 };
 
-export const swipeStartsFinite = (state: ICarousel): CarouselState => {
+export const swipeStartsFinite = (touch: PosCoordinates, state: ICarousel): CarouselState => {
     const { offset, index, container } = state;
     addClass('as24-carousel__container--static', container);
-    const touchStart = getTouchCoords(event);
-    return { touchStart, index, offset };
+    return { touchStart: touch, index, offset };
 };
 
 export const swipeContinuousFinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
     const { offset, touchStart, index, container } = state;
     const diffX = offset + (-1 * (currentPos.x - touchStart.x));
     SE.doMove(container, diffX);
-    return { index, offset };
+    return { index, offset, touchStart };
 };
 
 export const swipeEndsFinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {

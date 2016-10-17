@@ -13,11 +13,11 @@ export const step = (dir: MoveDirection, state: ICarousel, triggerNotifications 
     }
 };
 
-export const swipeStarts = (state: ICarousel): CarouselState => {
+export const swipeStarts = (touch: PosCoordinates, state: ICarousel): CarouselState => {
     let { mode } = state;
     switch (mode) {
-        case 'infinite': return swipeStartsInfinite(state);
-        case 'finite': return swipeStartsFinite(state);
+        case 'infinite': return swipeStartsInfinite(touch, state);
+        case 'finite': return swipeStartsFinite(touch, state);
     }
 };
 

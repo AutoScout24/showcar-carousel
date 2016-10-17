@@ -1,6 +1,6 @@
 /// <reference path="./definitions.ts" />
 
-import { throttle, forEach, mutate, isSwiping, getTouchCoords, PosCoordinates, getInitialItemsOrder, navAvailable, calcStepIndex } from './helpers';
+import { containsClass, throttle, forEach, mutate, isSwiping, getTouchCoords, PosCoordinates, getInitialItemsOrder, navAvailable, calcStepIndex } from './helpers';
 import { step, swipeContinuous, swipeStarts, swipeEnds } from './logic';
 import { afterInfiniteUpdated } from './update-infinite';
 import * as SE from './side-effects';
@@ -39,14 +39,13 @@ export class Carousel implements ICarousel {
         this.container.addEventListener('transitionend', _ => this.busy = false);
 
         if (this.mode === 'infinite') {
-            this.itemsOrder = getInitialItemsOrder(this.container.children);
             // Note: This event will not be always triggered!
             // When we move to the [right], first of all, we remove `no-transition` class from the container.
             // Thus, transition happens and we have the event.
             // However, when we move to the [left], we add the `no-transition` class to the Container.
             // Thus, the transition will not be happening and the callback will not be called.
             this.container.addEventListener('transitionend', _ => {
-                afterInfiniteUpdated(this, false);
+                mutate(this, afterInfiniteUpdated(this, false));
             });
         }
     }
@@ -68,13 +67,12 @@ export class Carousel implements ICarousel {
         forEach((btn: NavigationButton) => {
             const direction = btn.getAttribute('data-direction');
             this.pagination[btn.getAttribute('data-direction')] = btn;
-            btn.addEventListener('click', e => {
-              if (this.busy) return;
-              if (!('ontouchstart' in window)) {
-                  this.busy = true;
-                  mutate(this, step(direction === 'left' ? -1 : 1, this));
-              }
-              e.preventDefault();
+
+            const eventName = 'touchend' in window ? 'touchend' : 'click';
+            btn.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+                mutate(this, step(direction === 'left' ? -1 : 1, this));
             });
         }, this.element.querySelectorAll('[role="nav-button"]'));
 
@@ -82,6 +80,7 @@ export class Carousel implements ICarousel {
 
         this.index = 0;
         mutate(this, step(0, this, false));
+        this.busy = false;
     }
 
     detached() {
@@ -92,16 +91,14 @@ export class Carousel implements ICarousel {
     }
 
     touchStartEventHandler(event: TouchEvent) {
-        if (this.busy) return;
         const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
         if (!navAvailable(navButtons)) {
             return;
         }
-        mutate(this, swipeStarts(this));
+        mutate(this, swipeStarts(getTouchCoords(event), this));
     }
 
     touchMoveEventHandler(event: TouchEvent) {
-        if (this.busy) return;
         const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
         if (!navAvailable(navButtons)) {
             return;
@@ -110,27 +107,12 @@ export class Carousel implements ICarousel {
     }
 
     touchEndEventHandler(event: TouchEvent) {
-        if (this.busy) return;
         const navButtons = <NavigationButton[]>Array.from(this.element.querySelectorAll('[role="nav-button"]'));
-        if (!navAvailable(navButtons)) {
+        const finalTouch = getTouchCoords(event.changedTouches[0]);
+        if (!navAvailable(navButtons) || (this.touchStart && this.touchStart.x === finalTouch.x)) {
             return;
         }
-        const target = <NavigationButton>event.target;
-        const finalTouch = getTouchCoords(event.changedTouches[0]);
-        if (target.hasAttribute('data-direction')) {
-            event.preventDefault();
-            this.busy = true;
-            switch (target.getAttribute('data-direction')) {
-              case 'left'  : return mutate(this, step(-1, this));
-              case 'right' : return mutate(this, step(1, this));
-            }
-        } else {
-            if (this.touchStart.x === finalTouch.x) {
-                return;
-            }
-            this.busy = true;
-            mutate(this, swipeEnds(finalTouch, this));
-        }
+        mutate(this, swipeEnds(finalTouch, this));
     }
 
     goTo(index: number) {

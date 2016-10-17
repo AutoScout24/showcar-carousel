@@ -1,4 +1,10 @@
 
+4.0.17 / 2016-10-17
+==================
+
+  * Diana/Ivan: fixed infinite mode
+  * Introduced proper swiping when the slide follows the finger
+
 4.0.16 / 2016-10-12
 ==================
 
