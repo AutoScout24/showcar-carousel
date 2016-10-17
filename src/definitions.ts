@@ -35,7 +35,7 @@ interface CarouselElement extends HTMLElement {
 interface CarouselState {
     index: CarouselIndex;
     offset: CarouselOffset;
-    busy: boolean;
+    busy?: boolean;
     itemsOrder?: SlidesOrder;
     touchStart?: PosCoordinates;
 };
