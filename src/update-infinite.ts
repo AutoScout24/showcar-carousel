@@ -38,7 +38,7 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
 
     if (busy) return;
 
-    index = calcStepIndex(dir, state);
+    index = dir !== 0 ? calcStepIndex(dir, state) : index;
     offset = dir === -1
         ? (offset === 0 ? dir * stepWidth : dir * offset)
         : dir * stepWidth;
@@ -54,7 +54,7 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
         removeClass('as24-carousel__container--static', container);
         SE.doMove(container, offset);
     } else {
-        SE.doReorderItems(items, itemsOrder);
+        SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
     }
 
     if (triggerNotifications) {

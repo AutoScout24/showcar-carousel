@@ -255,7 +255,7 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         itemsVisible = _a.itemsVisible;
     var items = Array.from(container.children);
     if (busy) return;
-    index = calcStepIndex(dir, state);
+    index = dir !== 0 ? calcStepIndex(dir, state) : index;
     offset = dir === -1 ? offset === 0 ? dir * stepWidth : dir * offset : dir * stepWidth;
     var initialOrder = getInitialItemsOrder(container.children);
     var itemsOrder = reorder(index, initialOrder);
@@ -268,7 +268,7 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         removeClass('as24-carousel__container--static', container);
         doMove(container, offset);
     } else {
-        doReorderItems(items, itemsOrder);
+        doSetPositioning(2, items, doReorderItems(items, itemsOrder));
     }
     if (triggerNotifications) {
         doNotify(element, dir, index);
@@ -450,7 +450,9 @@ var Carousel = function () {
     Carousel.prototype.goTo = function (index) {
         this.index = --index;
         this.index = calcStepIndex(0, this);
+        this.touchStart = new PosCoordinates(0, 0);
         mutate(this, step(0, this));
+        this.busy = false;
     };
     Carousel.prototype.getIndex = function () {
         return this.index;

@@ -118,7 +118,9 @@ export class Carousel implements ICarousel {
     goTo(index: number) {
         this.index = --index;
         this.index = calcStepIndex(0, this);
+        this.touchStart = new PosCoordinates(0, 0);
         mutate(this, step(0, this));
+        this.busy = false;
     }
 
     getIndex(): number {

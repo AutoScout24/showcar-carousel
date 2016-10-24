@@ -21,7 +21,7 @@ as24-carousel {
   position: relative;
   overflow: hidden;
   flex-direction: column;
-  flex: 1 0 0;
+  flex: 1 0 auto;
 
   &[loop=infinite] {
     .as24-carousel {
@@ -34,7 +34,6 @@ as24-carousel {
       }
     }
   }
-
 }
 
 .as24-carousel {
