@@ -129,5 +129,6 @@ export class Carousel implements ICarousel {
 
     redraw(): void {
         mutate(this, step(0, this));
+        this.busy = false;
     }
 }

@@ -459,6 +459,7 @@ var Carousel = function () {
     };
     Carousel.prototype.redraw = function () {
         mutate(this, step(0, this));
+        this.busy = false;
     };
     return Carousel;
 }();
