@@ -47,6 +47,7 @@ as24-carousel {
     backface-visibility: hidden;
     will-change: transform;
     justify-content: flex-start;
+    height: 100%;
 
     &--static {
       transition: none;
