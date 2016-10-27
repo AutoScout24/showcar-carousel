@@ -33,13 +33,23 @@ export const swipeStartsFinite = (touch: PosCoordinates, state: ICarousel): Caro
 
 export const swipeContinuousFinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
     const { offset, touchStart, index, container } = state;
+    const distanceX  = Math.abs(currentPos.x - touchStart.x);
+    const distanceY  = Math.abs(currentPos.y - touchStart.y);
+    if (distanceX < distanceY) {
+      return { index, offset, touchStart };
+    }
     const diffX = offset + (-1 * (currentPos.x - touchStart.x));
     SE.doMove(container, diffX);
     return { index, offset, touchStart };
 };
 
 export const swipeEndsFinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { offset, touchStart, container } = state;
+    const { index, offset, touchStart, container } = state;
     const dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
+    const distanceX  = Math.abs(finalTouch.x - touchStart.x);
+    const distanceY  = Math.abs(finalTouch.y - touchStart.y);
+    if (distanceX < distanceY || distanceX < 25) {
+      return { index, offset, touchStart };
+    }
     return updateFinite(dir, state);
 };

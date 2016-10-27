@@ -76,12 +76,16 @@ export const swipeStartsInfinite = (touch: PosCoordinates, state: ICarousel): Ca
 
 export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
     const { touchStart, index, container, element, busy } = state;
-    if (busy) return;
+
+    let offset = 0, itemsOrder, items;
+    const distanceX  = Math.abs(currentPos.x - touchStart.x);
+    const distanceY  = Math.abs(currentPos.y - touchStart.y);
+    if (busy || distanceX < distanceY) {
+      return { index, offset, touchStart, busy: true };
+    }
 
     const { stepWidth, itemsVisible } = getVars(element, container);
     const dir = touchStart.x - currentPos.x > 0 ? 1 : -1;
-
-    let offset, diffX, newIndex, itemsOrder, items;
 
     if (dir === -1) {
         itemsOrder = reorder(calcStepIndex(dir, state), getInitialItemsOrder(container.children));
@@ -98,8 +102,12 @@ export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICaro
 };
 
 export const swipeEndsInfinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { offset, touchStart, container, busy } = state;
-    if (busy) return;
+    const { index, offset, touchStart, container, busy } = state;
+    const distanceX  = Math.abs(finalTouch.x - touchStart.x);
+    const distanceY  = Math.abs(finalTouch.y - touchStart.y);
+    if (busy || distanceX < distanceY) {
+      return { index, offset, touchStart, busy: false };
+    }
 
     removeClass('as24-carousel__container--static', container);
     const dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;

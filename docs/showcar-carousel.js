@@ -204,15 +204,26 @@ var swipeContinuousFinite = function swipeContinuousFinite(currentPos, state) {
         touchStart = state.touchStart,
         index = state.index,
         container = state.container;
+    var distanceX = Math.abs(currentPos.x - touchStart.x);
+    var distanceY = Math.abs(currentPos.y - touchStart.y);
+    if (distanceX < distanceY) {
+        return { index: index, offset: offset, touchStart: touchStart };
+    }
     var diffX = offset + -1 * (currentPos.x - touchStart.x);
     doMove(container, diffX);
     return { index: index, offset: offset, touchStart: touchStart };
 };
 var swipeEndsFinite = function swipeEndsFinite(finalTouch, state) {
-    var offset = state.offset,
+    var index = state.index,
+        offset = state.offset,
         touchStart = state.touchStart,
         container = state.container;
     var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
+    var distanceX = Math.abs(finalTouch.x - touchStart.x);
+    var distanceY = Math.abs(finalTouch.y - touchStart.y);
+    if (distanceX < distanceY || distanceX < 25) {
+        return { index: index, offset: offset, touchStart: touchStart };
+    }
     return updateFinite(dir, state);
 };
 
@@ -291,12 +302,18 @@ var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state
         container = state.container,
         element = state.element,
         busy = state.busy;
-    if (busy) return;
+    var offset = 0,
+        itemsOrder,
+        items;
+    var distanceX = Math.abs(currentPos.x - touchStart.x);
+    var distanceY = Math.abs(currentPos.y - touchStart.y);
+    if (busy || distanceX < distanceY) {
+        return { index: index, offset: offset, touchStart: touchStart, busy: true };
+    }
     var _a = getVars(element, container),
         stepWidth = _a.stepWidth,
         itemsVisible = _a.itemsVisible;
     var dir = touchStart.x - currentPos.x > 0 ? 1 : -1;
-    var offset, diffX, newIndex, itemsOrder, items;
     if (dir === -1) {
         itemsOrder = reorder(calcStepIndex(dir, state), getInitialItemsOrder(container.children));
         items = Array.from(container.children);
@@ -309,11 +326,16 @@ var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state
     return { index: index, touchStart: touchStart, offset: offset, itemsOrder: itemsOrder, busy: busy };
 };
 var swipeEndsInfinite = function swipeEndsInfinite(finalTouch, state) {
-    var offset = state.offset,
+    var index = state.index,
+        offset = state.offset,
         touchStart = state.touchStart,
         container = state.container,
         busy = state.busy;
-    if (busy) return;
+    var distanceX = Math.abs(finalTouch.x - touchStart.x);
+    var distanceY = Math.abs(finalTouch.y - touchStart.y);
+    if (busy || distanceX < distanceY) {
+        return { index: index, offset: offset, touchStart: touchStart, busy: false };
+    }
     removeClass('as24-carousel__container--static', container);
     var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
     return updateInfinite(dir, state, true);
