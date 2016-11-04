@@ -182,15 +182,15 @@ var updateFinite = function updateFinite(dir, state) {
         totalWidth = _a.totalWidth;
     removeClass('as24-carousel__container--static', container);
     index = calcStepIndex(dir, state);
-    offset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, stepWidth, maxOffset);
+    var newOffset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, stepWidth, maxOffset);
     // side effects
-    doUpdateNavigationButtonsState(pagination.left, pagination.right, offset > 0, offset < maxOffset);
-    if (offset > 0 && offset < maxOffset) {
+    doUpdateNavigationButtonsState(pagination.left, pagination.right, newOffset > 0, newOffset < maxOffset);
+    if (Math.abs(offset - newOffset) > 0) {
         doNotify(element, dir, index);
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
-    doMove(container, offset);
-    return { touchStart: null, index: index, offset: offset };
+    doMove(container, newOffset);
+    return { touchStart: null, index: index, offset: newOffset };
 };
 var swipeStartsFinite = function swipeStartsFinite(touch, state) {
     var offset = state.offset,

@@ -12,17 +12,17 @@ export const updateFinite = (dir: MoveDirection, state: ICarousel): CarouselStat
     removeClass('as24-carousel__container--static', container);
 
     index = calcStepIndex(dir, state);
-    offset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, stepWidth, maxOffset);
+    let newOffset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, stepWidth, maxOffset);
 
     // side effects
-    SE.doUpdateNavigationButtonsState(pagination.left, pagination.right, offset > 0, offset < maxOffset);
-    if (offset > 0 && offset < maxOffset) {
+    SE.doUpdateNavigationButtonsState(pagination.left, pagination.right, newOffset > 0, newOffset < maxOffset);
+    if (Math.abs(offset - newOffset) > 0) {
         SE.doNotify(element, dir, index);
     }
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
-    SE.doMove(container, offset);
+    SE.doMove(container, newOffset);
 
-    return { touchStart: null, index, offset };
+    return { touchStart: null, index, offset: newOffset };
 };
 
 export const swipeStartsFinite = (touch: PosCoordinates, state: ICarousel): CarouselState => {
