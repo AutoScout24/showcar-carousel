@@ -1,3 +1,7 @@
+[![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/package/showcar-carousel)
+![](http://img.badgesize.io/AutoScout24/showcar-carousel/master/dist/showcar-carousel.min.js?label=js_size_gzip&compression=gzip)
+![](http://img.badgesize.io/AutoScout24/showcar-carousel/master/dist/showcar-carousel.min.css?label=css_size_gzip&compression=gzip)
+
 # showcar-carousel
 
 This module provides a lightweight and easy to use Carousel for any content. There are two modes, an infinite and a finite mode.
