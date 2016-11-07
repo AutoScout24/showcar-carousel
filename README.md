@@ -1,4 +1,4 @@
-[![npm version](https://img.shields.io/npm/v/badge-size.svg?style=flat)](https://www.npmjs.com/package/showcar-carousel)
+[![npm version](https://img.shields.io/npm/v/showcar-carousel.svg)](https://www.npmjs.com/package/showcar-carousel)
 ![](http://img.badgesize.io/AutoScout24/showcar-carousel/master/dist/showcar-carousel.min.js?label=js_size_gzip&compression=gzip)
 ![](http://img.badgesize.io/AutoScout24/showcar-carousel/master/dist/showcar-carousel.min.css?label=css_size_gzip&compression=gzip)
 
