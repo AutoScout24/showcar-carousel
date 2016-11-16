@@ -20,7 +20,7 @@ try {
                 detachedCallback: { value: elementDetachedCallback },
                 attributeChangedCallback: { value: function () { } }
             }), {
-                goTo: function (index) { this.carousel.goTo(index); },
+                goTo: function (index, options) { this.carousel.goTo(index, options || { notify: true }); },
                 getIndex: function () { return this.carousel.index; },
                 redraw: function () { this.carousel.redraw(); }
             }

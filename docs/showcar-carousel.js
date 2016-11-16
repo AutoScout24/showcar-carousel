@@ -504,8 +504,8 @@ try {
             detachedCallback: { value: elementDetachedCallback },
             attributeChangedCallback: { value: function value() {} }
         }), {
-            goTo: function goTo(index) {
-                this.carousel.goTo(index);
+            goTo: function goTo(index, options) {
+                this.carousel.goTo(index, options || { notify: true });
             },
             getIndex: function getIndex() {
                 return this.carousel.index;
