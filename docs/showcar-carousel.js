@@ -226,7 +226,7 @@ var swipeEndsFinite = function swipeEndsFinite(finalTouch, state) {
     if (distanceX < distanceY || distanceX < 25) {
         return { index: index, offset: offset, touchStart: touchStart };
     }
-    return updateFinite(dir, state);
+    return updateFinite(dir, state, true);
 };
 
 /// <reference path="./definitions.ts" />
@@ -475,7 +475,7 @@ var Carousel = function () {
         this.index = --index;
         this.index = calcStepIndex(0, this);
         this.touchStart = new PosCoordinates(0, 0);
-        mutate(this, step(0, this, options.silent));
+        mutate(this, step(0, this, options.notify));
         this.busy = false;
     };
     Carousel.prototype.getIndex = function () {

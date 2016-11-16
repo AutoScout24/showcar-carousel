@@ -53,5 +53,5 @@ export const swipeEndsFinite = (finalTouch: PosCoordinates, state: ICarousel): C
     if (distanceX < distanceY || distanceX < 25) {
       return { index, offset, touchStart };
     }
-    return updateFinite(dir, state);
+    return updateFinite(dir, state, true);
 };

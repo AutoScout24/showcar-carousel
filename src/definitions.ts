@@ -10,7 +10,7 @@ interface IPagination {
 }
 
 interface GoToOptions {
-  silent: boolean;
+  notify: boolean;
 }
 
 type MoveDirection = number;
