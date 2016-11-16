@@ -9,6 +9,10 @@ interface IPagination {
     indicator: HTMLDivElement;
 }
 
+interface GoToOptions {
+  silent: boolean;
+}
+
 type MoveDirection = number;
 type CarouselIndex = number;
 type CarouselOffset = number;

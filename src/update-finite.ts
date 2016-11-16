@@ -5,7 +5,7 @@ import { getNextIndex, getVars, getNextOffset, addClass, removeClass, getTouchCo
 
 import * as SE from './side-effects';
 
-export const updateFinite = (dir: MoveDirection, state: ICarousel): CarouselState => {
+export const updateFinite = (dir: MoveDirection, state: ICarousel, triggerNotifications: boolean): CarouselState => {
     let { element, container, offset, index, pagination } = state;
     const { rootElemWidth, stepWidth, maxOffset, itemsVisible, totalWidth } = getVars(element, container);
 
@@ -17,7 +17,9 @@ export const updateFinite = (dir: MoveDirection, state: ICarousel): CarouselStat
     // side effects
     SE.doUpdateNavigationButtonsState(pagination.left, pagination.right, newOffset > 0, newOffset < maxOffset);
     if (Math.abs(offset - newOffset) > 0) {
-        SE.doNotify(element, dir, index);
+        if (triggerNotifications) {
+            SE.doNotify(element, dir, index);
+        }
     }
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     SE.doMove(container, newOffset);

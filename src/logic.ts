@@ -9,7 +9,7 @@ export const step = (dir: MoveDirection, state: ICarousel, triggerNotifications 
     let { mode } = state;
     switch (mode) {
         case 'infinite': return updateInfinite(dir, state, triggerNotifications);
-        case 'finite': return updateFinite(dir, state);
+        case 'finite': return updateFinite(dir, state, triggerNotifications);
     }
 };
 

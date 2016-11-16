@@ -115,11 +115,11 @@ export class Carousel implements ICarousel {
         mutate(this, swipeEnds(finalTouch, this));
     }
 
-    goTo(index: number) {
+    goTo(index: number, options: GoToOptions) {
         this.index = --index;
         this.index = calcStepIndex(0, this);
         this.touchStart = new PosCoordinates(0, 0);
-        mutate(this, step(0, this));
+        mutate(this, step(0, this, options.silent));
         this.busy = false;
     }
 

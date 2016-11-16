@@ -168,7 +168,7 @@ var doSetPositioning = function doSetPositioning(howMany, items, order) {
 
 /// <reference path="./definitions.ts" />
 /// <reference path="./helpers.ts" />
-var updateFinite = function updateFinite(dir, state) {
+var updateFinite = function updateFinite(dir, state, triggerNotifications) {
     var element = state.element,
         container = state.container,
         offset = state.offset,
@@ -186,7 +186,9 @@ var updateFinite = function updateFinite(dir, state) {
     // side effects
     doUpdateNavigationButtonsState(pagination.left, pagination.right, newOffset > 0, newOffset < maxOffset);
     if (Math.abs(offset - newOffset) > 0) {
-        doNotify(element, dir, index);
+        if (triggerNotifications) {
+            doNotify(element, dir, index);
+        }
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     doMove(container, newOffset);
@@ -351,7 +353,7 @@ var step = function step(dir, state, triggerNotifications) {
         case 'infinite':
             return updateInfinite(dir, state, triggerNotifications);
         case 'finite':
-            return updateFinite(dir, state);
+            return updateFinite(dir, state, triggerNotifications);
     }
 };
 var swipeStarts = function swipeStarts(touch, state) {
@@ -469,11 +471,11 @@ var Carousel = function () {
         }
         mutate(this, swipeEnds(finalTouch, this));
     };
-    Carousel.prototype.goTo = function (index) {
+    Carousel.prototype.goTo = function (index, options) {
         this.index = --index;
         this.index = calcStepIndex(0, this);
         this.touchStart = new PosCoordinates(0, 0);
-        mutate(this, step(0, this));
+        mutate(this, step(0, this, options.silent));
         this.busy = false;
     };
     Carousel.prototype.getIndex = function () {
