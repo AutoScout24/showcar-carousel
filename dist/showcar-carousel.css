@@ -44,8 +44,7 @@ as24-carousel {
   will-change: transform;
   -webkit-box-pack: start;
       -ms-flex-pack: start;
-          justify-content: flex-start;
-  height: 100%; }
+          justify-content: flex-start; }
   .as24-carousel__container--static {
     -webkit-transition: none;
     transition: none; }

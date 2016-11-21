@@ -4,8 +4,6 @@
   -webkit-flex: 1 0 auto;
       -ms-flex: 1 0 auto;
           flex: 1 0 auto;
-  min-width: 0%;
-  min-height: 0%;
 }
 
 .gallery-picture {
