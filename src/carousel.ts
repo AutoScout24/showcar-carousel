@@ -127,8 +127,8 @@ export class Carousel implements ICarousel {
         return this.index;
     }
 
-    redraw(): void {
-        mutate(this, step(0, this));
+    redraw(triggerNotifications = true): void {
+        mutate(this, step(0, this, triggerNotifications));
         this.busy = false;
     }
 }

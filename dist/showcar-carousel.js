@@ -481,8 +481,11 @@ var Carousel = function () {
     Carousel.prototype.getIndex = function () {
         return this.index;
     };
-    Carousel.prototype.redraw = function () {
-        mutate(this, step(0, this));
+    Carousel.prototype.redraw = function (triggerNotifications) {
+        if (triggerNotifications === void 0) {
+            triggerNotifications = true;
+        }
+        mutate(this, step(0, this, triggerNotifications));
         this.busy = false;
     };
     return Carousel;
