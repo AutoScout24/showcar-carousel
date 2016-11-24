@@ -513,8 +513,8 @@ try {
             getIndex: function getIndex() {
                 return this.carousel.index;
             },
-            redraw: function redraw() {
-                this.carousel.redraw();
+            redraw: function redraw(triggerNotifications) {
+                this.carousel.redraw(triggerNotifications);
             }
         })
     });
