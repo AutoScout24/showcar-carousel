@@ -488,6 +488,11 @@ var Carousel = function () {
         mutate(this, step(0, this, triggerNotifications));
         this.busy = false;
     };
+    Carousel.prototype.removeItem = function (index) {
+        this.container.children[index].remove();
+        this.busy = false;
+        this.goTo(1, { notify: false });
+    };
     return Carousel;
 }();
 
@@ -515,6 +520,9 @@ try {
             },
             redraw: function redraw(triggerNotifications) {
                 this.carousel.redraw(triggerNotifications);
+            },
+            removeItem: function removeItem(index) {
+                this.carousel.removeItem(index);
             }
         })
     });

@@ -131,4 +131,10 @@ export class Carousel implements ICarousel {
         mutate(this, step(0, this, triggerNotifications));
         this.busy = false;
     }
+
+    removeItem(index: number): void {
+        this.container.children[index].remove();
+        this.busy = false;
+        this.goTo(1, { notify: false });
+    }
 }

@@ -22,7 +22,8 @@ try {
             }), {
                 goTo: function (index, options) { this.carousel.goTo(index, options || { notify: true }); },
                 getIndex: function () { return this.carousel.index; },
-                redraw: function (triggerNotifications) { this.carousel.redraw(triggerNotifications); }
+                redraw: function (triggerNotifications) { this.carousel.redraw(triggerNotifications); },
+                removeItem: function(index) { this.carousel.removeItem(index); }
             }
         )
     });
