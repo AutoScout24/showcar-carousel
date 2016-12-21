@@ -168,6 +168,14 @@ For changing the current image index manually call the `goTo()` method on the ca
 document.getElementById('carousel-example').goTo(2);
 ```
 
+#### Remove the slide:
+The index starts from `0`. So, `2` is the third slide. 
+
+```
+document.getElementById('carousel-example').removeItem(2);
+```
+
+
 ## Installation
 
 #### How to install:
