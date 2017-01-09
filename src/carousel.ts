@@ -9,6 +9,7 @@ export class Carousel implements ICarousel {
     element: CarouselElement;
     container: HTMLDivElement;
 
+    swipeDir = undefined;
     isSwiping = undefined;
     busy: boolean = false;
     index: number = 0;

@@ -192,41 +192,40 @@ var updateFinite = function updateFinite(dir, state, triggerNotifications) {
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     doMove(container, newOffset);
-    return { touchStart: null, index: index, offset: newOffset };
+    return { touchStart: null, index: index, offset: newOffset, isSwiping: false, swipeDir: undefined };
 };
 var swipeStartsFinite = function swipeStartsFinite(touch, state) {
     var offset = state.offset,
         index = state.index,
         container = state.container;
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index: index, offset: offset };
+    return { touchStart: touch, index: index, offset: offset, isSwiping: undefined, swipeDir: undefined };
 };
 var swipeContinuousFinite = function swipeContinuousFinite(currentPos, state) {
     var offset = state.offset,
         touchStart = state.touchStart,
         index = state.index,
-        container = state.container;
-    var distanceX = Math.abs(currentPos.x - touchStart.x);
-    var distanceY = Math.abs(currentPos.y - touchStart.y);
-    if (distanceX < distanceY) {
-        return { index: index, offset: offset, touchStart: touchStart };
+        container = state.container,
+        isSwiping$$1 = state.isSwiping,
+        swipeDir = state.swipeDir;
+    var dx = Math.abs(currentPos.x - touchStart.x);
+    var dy = Math.abs(currentPos.y - touchStart.y);
+    if (isSwiping$$1) {
+        var diffX = offset + -1 * (currentPos.x - touchStart.x);
+        doMove(container, diffX);
     }
-    var diffX = offset + -1 * (currentPos.x - touchStart.x);
-    doMove(container, diffX);
-    return { index: index, offset: offset, touchStart: touchStart };
+    return { index: index, offset: offset, touchStart: touchStart, swipeDir: swipeDir, isSwiping: isSwiping$$1 === undefined ? dx / dy > .6 : isSwiping$$1 };
 };
 var swipeEndsFinite = function swipeEndsFinite(finalTouch, state) {
     var index = state.index,
         offset = state.offset,
         touchStart = state.touchStart,
-        container = state.container;
+        container = state.container,
+        isSwiping$$1 = state.isSwiping;
     var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
-    var distanceX = Math.abs(finalTouch.x - touchStart.x);
-    var distanceY = Math.abs(finalTouch.y - touchStart.y);
-    if (distanceX < distanceY || distanceX < 25) {
-        return { index: index, offset: offset, touchStart: touchStart };
+    if (isSwiping$$1) {
+        return updateFinite(dir, state, true);
     }
-    return updateFinite(dir, state, true);
 };
 
 /// <reference path="./definitions.ts" />
@@ -390,6 +389,7 @@ var swipeEnds = function swipeEnds(finalPos, state) {
 var Carousel = function () {
     function Carousel(element) {
         var _this = this;
+        this.swipeDir = undefined;
         this.isSwiping = undefined;
         this.busy = false;
         this.index = 0;

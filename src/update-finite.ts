@@ -24,34 +24,32 @@ export const updateFinite = (dir: MoveDirection, state: ICarousel, triggerNotifi
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     SE.doMove(container, newOffset);
 
-    return { touchStart: null, index, offset: newOffset };
+    return { touchStart: null, index, offset: newOffset, isSwiping: false, swipeDir: undefined };
 };
 
 export const swipeStartsFinite = (touch: PosCoordinates, state: ICarousel): CarouselState => {
     const { offset, index, container } = state;
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index, offset };
+    return { touchStart: touch, index, offset, isSwiping: undefined, swipeDir: undefined };
 };
 
 export const swipeContinuousFinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
-    const { offset, touchStart, index, container } = state;
-    const distanceX  = Math.abs(currentPos.x - touchStart.x);
-    const distanceY  = Math.abs(currentPos.y - touchStart.y);
-    if (distanceX < distanceY) {
-      return { index, offset, touchStart };
+    const { offset, touchStart, index, container, isSwiping, swipeDir } = state;
+    const dx  = Math.abs(currentPos.x - touchStart.x);
+    const dy  = Math.abs(currentPos.y - touchStart.y);
+    if (isSwiping) {
+        const diffX = offset + (-1 * (currentPos.x - touchStart.x));
+        SE.doMove(container, diffX);
     }
-    const diffX = offset + (-1 * (currentPos.x - touchStart.x));
-    SE.doMove(container, diffX);
-    return { index, offset, touchStart };
+    return { index, offset, touchStart, swipeDir, isSwiping: isSwiping === undefined
+        ? dx / dy > .6
+        : isSwiping };
 };
 
 export const swipeEndsFinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { index, offset, touchStart, container } = state;
+    const { index, offset, touchStart, container, isSwiping } = state;
     const dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
-    const distanceX  = Math.abs(finalTouch.x - touchStart.x);
-    const distanceY  = Math.abs(finalTouch.y - touchStart.y);
-    if (distanceX < distanceY || distanceX < 25) {
-      return { index, offset, touchStart };
+    if (isSwiping) {
+        return updateFinite(dir, state, true);
     }
-    return updateFinite(dir, state, true);
 };
