@@ -9,6 +9,7 @@ export class Carousel implements ICarousel {
     element: CarouselElement;
     container: HTMLDivElement;
 
+    isSwiping = undefined;
     busy: boolean = false;
     index: number = 0;
     offset: number = 0;
@@ -104,6 +105,9 @@ export class Carousel implements ICarousel {
             return;
         }
         mutate(this, swipeContinuous(getTouchCoords(event), this));
+        if (this.isSwiping) {
+            event.preventDefault();
+        }
     }
 
     touchEndEventHandler(event: TouchEvent) {

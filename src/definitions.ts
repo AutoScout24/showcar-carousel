@@ -17,15 +17,15 @@ type MoveDirection = number;
 type CarouselIndex = number;
 type CarouselOffset = number;
 
-type DirectionAttr = "data-direction";
-type DirectionValue = "left" | "right";
+type DirectionAttr = 'data-direction';
+type DirectionValue = 'left' | 'right';
 
 interface NavigationButton extends HTMLAnchorElement {
     getAttribute(name: DirectionAttr): DirectionValue;
 }
 
-type CarouselModeAttr = "loop";
-type CarouselMode = "finite" | "infinite";
+type CarouselModeAttr = 'loop';
+type CarouselMode = 'finite' | 'infinite';
 
 type SlidesOrder = number[];
 interface CarouselItem extends HTMLDivElement { }
@@ -41,7 +41,9 @@ interface CarouselState {
     offset: CarouselOffset;
     busy?: boolean;
     itemsOrder?: SlidesOrder;
-    touchStart: PosCoordinates;
+    touchStart: PosCoordinates | null;
+    isSwiping: undefined | boolean;
+    swipeDir: undefined | number;
 };
 
 interface ICarousel extends CarouselState {

@@ -63,53 +63,54 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
 
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
 
-    return { index, touchStart, offset: 0, itemsOrder, busy: true };
+    return { index, touchStart, offset: 0, itemsOrder, busy: true, isSwiping: false, swipeDir: undefined };
 };
 
 export const swipeStartsInfinite = (touch: PosCoordinates, state: ICarousel): CarouselState => {
     const { offset, index, container, busy } = state;
+
     if (busy) return;
 
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index, offset, busy };
+    return { touchStart: touch, index, offset, busy, isSwiping: undefined, swipeDir: undefined };
 };
 
 export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
-    const { touchStart, index, container, element, busy } = state;
+    let { touchStart, index, container, element, busy, isSwiping, swipeDir } = state;
+
+    if (busy) return;
 
     let offset = 0, itemsOrder, items;
     const distanceX  = Math.abs(currentPos.x - touchStart.x);
     const distanceY  = Math.abs(currentPos.y - touchStart.y);
-    if (busy || distanceX < distanceY) {
-      return { index, offset, touchStart, busy: true };
-    }
 
     const { stepWidth, itemsVisible } = getVars(element, container);
-    const dir = touchStart.x - currentPos.x > 0 ? 1 : -1;
-
-    if (dir === -1) {
-        itemsOrder = reorder(calcStepIndex(dir, state), getInitialItemsOrder(container.children));
-        items = <CarouselItem[]>Array.from(container.children);
-        SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
-        offset = stepWidth + (-1 * (currentPos.x - touchStart.x));
-    } else {
-        offset = -1 * (currentPos.x - touchStart.x);
+    if (swipeDir === undefined) {
+        swipeDir = touchStart.x - currentPos.x > 0 ? 1 : -1;
     }
 
-    SE.doMove(container, offset);
+    if (isSwiping) {
+        if (swipeDir === -1) {
+            itemsOrder = reorder(calcStepIndex(swipeDir, state), getInitialItemsOrder(container.children));
+            items = <CarouselItem[]>Array.from(container.children);
+            SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
+            offset = stepWidth + (-1 * (currentPos.x - touchStart.x));
+        } else {
+            offset = -1 * (currentPos.x - touchStart.x);
+        }
+        SE.doMove(container, offset);
+    }
 
-    return { index, touchStart, offset, itemsOrder, busy };
+    return { index, touchStart, offset, itemsOrder, busy, swipeDir, isSwiping: isSwiping === undefined
+        ? distanceX / distanceY > .6
+        : isSwiping };
 };
 
 export const swipeEndsInfinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { index, offset, touchStart, container, busy } = state;
-    const distanceX  = Math.abs(finalTouch.x - touchStart.x);
-    const distanceY  = Math.abs(finalTouch.y - touchStart.y);
-    if (busy || distanceX < distanceY) {
-      return { index, offset, touchStart, busy: false };
+    const { index, offset, touchStart, container, busy, isSwiping } = state;
+    if (isSwiping) {
+        removeClass('as24-carousel__container--static', container);
+        const dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
+        return updateInfinite(dir, state, true);
     }
-
-    removeClass('as24-carousel__container--static', container);
-    const dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
-    return updateInfinite(dir, state, true);
 };

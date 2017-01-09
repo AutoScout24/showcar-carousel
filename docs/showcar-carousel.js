@@ -287,7 +287,7 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         doNotify(element, dir, index);
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
-    return { index: index, touchStart: touchStart, offset: 0, itemsOrder: itemsOrder, busy: true };
+    return { index: index, touchStart: touchStart, offset: 0, itemsOrder: itemsOrder, busy: true, isSwiping: false, swipeDir: undefined };
 };
 var swipeStartsInfinite = function swipeStartsInfinite(touch, state) {
     var offset = state.offset,
@@ -296,51 +296,53 @@ var swipeStartsInfinite = function swipeStartsInfinite(touch, state) {
         busy = state.busy;
     if (busy) return;
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index: index, offset: offset, busy: busy };
+    return { touchStart: touch, index: index, offset: offset, busy: busy, isSwiping: undefined, swipeDir: undefined };
 };
 var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state) {
     var touchStart = state.touchStart,
         index = state.index,
         container = state.container,
         element = state.element,
-        busy = state.busy;
+        busy = state.busy,
+        isSwiping$$1 = state.isSwiping,
+        swipeDir = state.swipeDir;
+    if (busy) return;
     var offset = 0,
         itemsOrder,
         items;
     var distanceX = Math.abs(currentPos.x - touchStart.x);
     var distanceY = Math.abs(currentPos.y - touchStart.y);
-    if (busy || distanceX < distanceY) {
-        return { index: index, offset: offset, touchStart: touchStart, busy: true };
-    }
     var _a = getVars(element, container),
         stepWidth = _a.stepWidth,
         itemsVisible = _a.itemsVisible;
-    var dir = touchStart.x - currentPos.x > 0 ? 1 : -1;
-    if (dir === -1) {
-        itemsOrder = reorder(calcStepIndex(dir, state), getInitialItemsOrder(container.children));
-        items = Array.from(container.children);
-        doSetPositioning(2, items, doReorderItems(items, itemsOrder));
-        offset = stepWidth + -1 * (currentPos.x - touchStart.x);
-    } else {
-        offset = -1 * (currentPos.x - touchStart.x);
+    if (swipeDir === undefined) {
+        swipeDir = touchStart.x - currentPos.x > 0 ? 1 : -1;
     }
-    doMove(container, offset);
-    return { index: index, touchStart: touchStart, offset: offset, itemsOrder: itemsOrder, busy: busy };
+    if (isSwiping$$1) {
+        if (swipeDir === -1) {
+            itemsOrder = reorder(calcStepIndex(swipeDir, state), getInitialItemsOrder(container.children));
+            items = Array.from(container.children);
+            doSetPositioning(2, items, doReorderItems(items, itemsOrder));
+            offset = stepWidth + -1 * (currentPos.x - touchStart.x);
+        } else {
+            offset = -1 * (currentPos.x - touchStart.x);
+        }
+        doMove(container, offset);
+    }
+    return { index: index, touchStart: touchStart, offset: offset, itemsOrder: itemsOrder, busy: busy, swipeDir: swipeDir, isSwiping: isSwiping$$1 === undefined ? distanceX / distanceY > .6 : isSwiping$$1 };
 };
 var swipeEndsInfinite = function swipeEndsInfinite(finalTouch, state) {
     var index = state.index,
         offset = state.offset,
         touchStart = state.touchStart,
         container = state.container,
-        busy = state.busy;
-    var distanceX = Math.abs(finalTouch.x - touchStart.x);
-    var distanceY = Math.abs(finalTouch.y - touchStart.y);
-    if (busy || distanceX < distanceY) {
-        return { index: index, offset: offset, touchStart: touchStart, busy: false };
+        busy = state.busy,
+        isSwiping$$1 = state.isSwiping;
+    if (isSwiping$$1) {
+        removeClass('as24-carousel__container--static', container);
+        var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
+        return updateInfinite(dir, state, true);
     }
-    removeClass('as24-carousel__container--static', container);
-    var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
-    return updateInfinite(dir, state, true);
 };
 
 /// <reference path="./definitions.ts" />
@@ -388,6 +390,7 @@ var swipeEnds = function swipeEnds(finalPos, state) {
 var Carousel = function () {
     function Carousel(element) {
         var _this = this;
+        this.isSwiping = undefined;
         this.busy = false;
         this.index = 0;
         this.offset = 0;
@@ -462,6 +465,9 @@ var Carousel = function () {
             return;
         }
         mutate(this, swipeContinuous(getTouchCoords(event), this));
+        if (this.isSwiping) {
+            event.preventDefault();
+        }
     };
     Carousel.prototype.touchEndEventHandler = function (event) {
         var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
