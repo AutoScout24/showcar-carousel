@@ -31,8 +31,8 @@ export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: bool
     return state;
 };
 
-export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNotifications: boolean): CarouselState => {
-    let { element, container, touchStart, offset, index, pagination, busy } = state;
+export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNotifications: boolean): ICarousel => {
+    let { element, container, touchStart, offset, index, pagination, busy, mode } = state;
     const { stepWidth, itemsVisible } = getVars(element, container);
     let items = <CarouselItem[]>Array.from(container.children);
 
@@ -44,6 +44,7 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
         : dir * stepWidth;
     const initialOrder = getInitialItemsOrder(container.children);
     const itemsOrder = reorder(index, initialOrder);
+    let isBusy = busy;
 
     if (dir < 0) {
         addClass('as24-carousel__container--static', container);
@@ -54,7 +55,10 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
         removeClass('as24-carousel__container--static', container);
         SE.doMove(container, offset);
     } else {
+        addClass('as24-carousel__container--static', container);
+        SE.doMove(container, offset);
         SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
+        isBusy = false;
     }
 
     if (triggerNotifications) {
@@ -63,7 +67,7 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
 
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
 
-    return { index, touchStart, offset: 0, itemsOrder, busy: true, isSwiping: false, swipeDir: undefined };
+    return { index, touchStart, offset: 0, itemsOrder, busy: isBusy, isSwiping: false, swipeDir: undefined, element, container, mode, pagination };
 };
 
 export const swipeStartsInfinite = (touch: PosCoordinates, state: ICarousel): CarouselState => {
@@ -72,7 +76,7 @@ export const swipeStartsInfinite = (touch: PosCoordinates, state: ICarousel): Ca
     if (busy) return;
 
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index, offset, busy, isSwiping: undefined, swipeDir: undefined };
+    return { touchStart: touch, index, offset: 0, busy, isSwiping: undefined, swipeDir: undefined };
 };
 
 export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
@@ -94,10 +98,15 @@ export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICaro
             itemsOrder = reorder(calcStepIndex(swipeDir, state), getInitialItemsOrder(container.children));
             items = <CarouselItem[]>Array.from(container.children);
             SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
-            offset = stepWidth + (-1 * (currentPos.x - touchStart.x));
+            offset = touchStart.x - currentPos.x > 0
+              ? stepWidth
+              : stepWidth + (-1 * (currentPos.x - touchStart.x));
         } else {
-            offset = -1 * (currentPos.x - touchStart.x);
+            offset = touchStart.x - currentPos.x < 0
+              ? 0
+              : -1 * (currentPos.x - touchStart.x);
         }
+        console.log(offset);
         SE.doMove(container, offset);
     }
 
@@ -107,10 +116,14 @@ export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICaro
 };
 
 export const swipeEndsInfinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { index, offset, touchStart, container, busy, isSwiping } = state;
+    const { index, offset, touchStart, container, busy, isSwiping, swipeDir } = state;
     if (isSwiping) {
         removeClass('as24-carousel__container--static', container);
-        const dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
-        return updateInfinite(dir, state, true);
+        const swipedToFarToLeft = (swipeDir === -1 && touchStart.x - finalTouch.x > 0);
+        const swipedToFarToRight = (swipeDir === 1 && touchStart.x - finalTouch.x < 0);
+        if (swipedToFarToLeft || swipedToFarToRight) {
+          return updateInfinite(0, state, false);
+        }
+        return updateInfinite(swipeDir, state, true);
     }
 };

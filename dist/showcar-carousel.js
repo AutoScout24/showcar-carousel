@@ -261,7 +261,8 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         offset = state.offset,
         index = state.index,
         pagination = state.pagination,
-        busy = state.busy;
+        busy = state.busy,
+        mode = state.mode;
     var _a = getVars(element, container),
         stepWidth = _a.stepWidth,
         itemsVisible = _a.itemsVisible;
@@ -271,6 +272,7 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
     offset = dir === -1 ? offset === 0 ? dir * stepWidth : dir * offset : dir * stepWidth;
     var initialOrder = getInitialItemsOrder(container.children);
     var itemsOrder = reorder(index, initialOrder);
+    var isBusy = busy;
     if (dir < 0) {
         addClass('as24-carousel__container--static', container);
         doSetPositioning(2, items, doReorderItems(items, itemsOrder));
@@ -280,13 +282,16 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         removeClass('as24-carousel__container--static', container);
         doMove(container, offset);
     } else {
+        addClass('as24-carousel__container--static', container);
+        doMove(container, offset);
         doSetPositioning(2, items, doReorderItems(items, itemsOrder));
+        isBusy = false;
     }
     if (triggerNotifications) {
         doNotify(element, dir, index);
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
-    return { index: index, touchStart: touchStart, offset: 0, itemsOrder: itemsOrder, busy: true, isSwiping: false, swipeDir: undefined };
+    return { index: index, touchStart: touchStart, offset: 0, itemsOrder: itemsOrder, busy: isBusy, isSwiping: false, swipeDir: undefined, element: element, container: container, mode: mode, pagination: pagination };
 };
 var swipeStartsInfinite = function swipeStartsInfinite(touch, state) {
     var offset = state.offset,
@@ -295,7 +300,7 @@ var swipeStartsInfinite = function swipeStartsInfinite(touch, state) {
         busy = state.busy;
     if (busy) return;
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index: index, offset: offset, busy: busy, isSwiping: undefined, swipeDir: undefined };
+    return { touchStart: touch, index: index, offset: 0, busy: busy, isSwiping: undefined, swipeDir: undefined };
 };
 var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state) {
     var touchStart = state.touchStart,
@@ -322,10 +327,11 @@ var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state
             itemsOrder = reorder(calcStepIndex(swipeDir, state), getInitialItemsOrder(container.children));
             items = Array.from(container.children);
             doSetPositioning(2, items, doReorderItems(items, itemsOrder));
-            offset = stepWidth + -1 * (currentPos.x - touchStart.x);
+            offset = touchStart.x - currentPos.x > 0 ? stepWidth : stepWidth + -1 * (currentPos.x - touchStart.x);
         } else {
-            offset = -1 * (currentPos.x - touchStart.x);
+            offset = touchStart.x - currentPos.x < 0 ? 0 : -1 * (currentPos.x - touchStart.x);
         }
+        console.log(offset);
         doMove(container, offset);
     }
     return { index: index, touchStart: touchStart, offset: offset, itemsOrder: itemsOrder, busy: busy, swipeDir: swipeDir, isSwiping: isSwiping$$1 === undefined ? distanceX / distanceY > .6 : isSwiping$$1 };
@@ -336,11 +342,16 @@ var swipeEndsInfinite = function swipeEndsInfinite(finalTouch, state) {
         touchStart = state.touchStart,
         container = state.container,
         busy = state.busy,
-        isSwiping$$1 = state.isSwiping;
+        isSwiping$$1 = state.isSwiping,
+        swipeDir = state.swipeDir;
     if (isSwiping$$1) {
         removeClass('as24-carousel__container--static', container);
-        var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
-        return updateInfinite(dir, state, true);
+        var swipedToFarToLeft = swipeDir === -1 && touchStart.x - finalTouch.x > 0;
+        var swipedToFarToRight = swipeDir === 1 && touchStart.x - finalTouch.x < 0;
+        if (swipedToFarToLeft || swipedToFarToRight) {
+            return updateInfinite(0, state, false);
+        }
+        return updateInfinite(swipeDir, state, true);
     }
 };
 
