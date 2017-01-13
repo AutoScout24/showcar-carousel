@@ -106,7 +106,6 @@ export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICaro
               ? 0
               : -1 * (currentPos.x - touchStart.x);
         }
-        console.log(offset);
         SE.doMove(container, offset);
     }
 

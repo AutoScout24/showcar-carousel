@@ -331,7 +331,6 @@ var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state
         } else {
             offset = touchStart.x - currentPos.x < 0 ? 0 : -1 * (currentPos.x - touchStart.x);
         }
-        console.log(offset);
         doMove(container, offset);
     }
     return { index: index, touchStart: touchStart, offset: offset, itemsOrder: itemsOrder, busy: busy, swipeDir: swipeDir, isSwiping: isSwiping$$1 === undefined ? distanceX / distanceY > .6 : isSwiping$$1 };
