@@ -1,7 +1,7 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (factory());
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(factory());
 }(this, (function () { 'use strict';
 
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
@@ -414,18 +414,22 @@ var Carousel = function () {
         this.element = element;
         this.mode = this.element.getAttribute('loop') || 'finite';
         this.container = this.element.querySelector('[role="container"]');
-        this.container.addEventListener('transitionend', function (_) {
-            return _this.busy = false;
-        });
+        if (this.container) {
+            this.container.addEventListener('transitionend', function (_) {
+                return _this.busy = false;
+            });
+        }
         if (this.mode === 'infinite') {
             // Note: This event will not be always triggered!
             // When we move to the [right], first of all, we remove `no-transition` class from the container.
             // Thus, transition happens and we have the event.
             // However, when we move to the [left], we add the `no-transition` class to the Container.
             // Thus, the transition will not be happening and the callback will not be called.
-            this.container.addEventListener('transitionend', function (_) {
-                mutate(_this, afterInfiniteUpdated(_this, false));
-            });
+            if (this.container) {
+                this.container.addEventListener('transitionend', function (_) {
+                    mutate(_this, afterInfiniteUpdated(_this, false));
+                });
+            }
         }
     }
     Carousel.prototype.attached = function () {
