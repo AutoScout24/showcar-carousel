@@ -37,18 +37,20 @@ export class Carousel implements ICarousel {
         this.element = element;
         this.mode = this.element.getAttribute('loop') || 'finite';
         this.container = <HTMLDivElement>this.element.querySelector('[role="container"]');
-
-        this.container.addEventListener('transitionend', _ => this.busy = false);
-
+        if(this.container){ //hot fix
+          this.container.addEventListener('transitionend', _ => this.busy = false);
+        }
         if (this.mode === 'infinite') {
             // Note: This event will not be always triggered!
             // When we move to the [right], first of all, we remove `no-transition` class from the container.
             // Thus, transition happens and we have the event.
             // However, when we move to the [left], we add the `no-transition` class to the Container.
             // Thus, the transition will not be happening and the callback will not be called.
+          if(this.container){//hot fix
             this.container.addEventListener('transitionend', _ => {
                 mutate(this, afterInfiniteUpdated(this, false));
             });
+          }
         }
     }
 
