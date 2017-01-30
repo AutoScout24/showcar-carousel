@@ -27,8 +27,8 @@ export const doUpdateIndicator = (indicator: HTMLElement, currentPosition: numbe
     indicator ? (indicator.innerHTML = `${currentPosition}/${max}`, true) : false;
 
 export const doMove = (container: HTMLElement, offset: number): boolean => {
-    container.style.transform = 'translate3d(' + (-1 * offset) + 'px, 0, 0)';
-    container.style.webkitTransform = 'translate3d(' + (-1 * offset) + 'px, 0, 0)';
+    container.style.transform = 'translateX(' + (-1 * offset) + 'px)';
+    container.style.webkitTransform = 'translateX(' + (-1 * offset) + 'px)';
     return true;
 };
 

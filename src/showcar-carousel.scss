@@ -1,7 +1,5 @@
 $carousel-gap: 20px;
-
 $animationSpeed: .3s;
-
 // Lazy image aspect ratio load hack for fixing the flickering bug on webkit
 // Currently the style is set to support 4:3 images if the carousel uses an different format please overwrite "padding-bottom"
 // Aspect ratio of the image ( 100% width / 75% height = 1.333 )
@@ -9,111 +7,96 @@ $carousel-background-color: rgba(0, 0, 0, .95);
 $carousel-pagination-width: 40px;
 $carousel-pagination-height: 40px;
 $carousel-pagination-arrow-size: 30%;
-
 $pagination-indicator-color: #fff;
 $pagination-indicator-font-size: 0.75rem;
 $pagination-indicator-padding: 7px;
 $pagination-indicator-background-color: $carousel-background-color;
-
 as24-carousel {
-  display: flex;
-  user-select: none;
-  position: relative;
-  overflow: hidden;
-  flex-direction: column;
-  flex: 1 0 auto;
-
-  &[loop=infinite] {
-    .as24-carousel {
-      &__container {
-        justify-content: center;
-      }
-
-      &__item {
-        flex: 1 0 100%;
-      }
+    display: flex;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    flex-direction: column;
+    flex: 1 0 auto;
+    &[loop=infinite] {
+        .as24-carousel {
+            &__container {
+                justify-content: center;
+            }
+            &__item {
+                flex: 1 0 100%;
+            }
+        }
     }
-  }
 }
 
 .as24-carousel {
-
-  @at-root &__container {
-    display: flex;
-    flex: 1 0 auto;
-    transition: transform $animationSpeed;
-    backface-visibility: hidden;
-    will-change: transform;
-    justify-content: flex-start;
-
-    &--static {
-      transition: none;
+    @at-root &__container {
+        display: flex;
+        flex: 1 0 auto;
+        transition: transform $animationSpeed;
+        backface-visibility: hidden;
+        will-change: transform;
+        justify-content: flex-start;
+        &--static {
+            transition: none;
+        }
     }
-  }
-
-  @at-root &__indicator {
-    position: absolute;
-    color: $pagination-indicator-color;
-    padding: $pagination-indicator-padding 0;
-    background-color: $pagination-indicator-background-color;
-    font-size: $pagination-indicator-font-size;
-    bottom: 0;
-    left: 0;
-    min-width: 40px;
-    max-width: 50px;
-    text-align: center;
-  }
-
-  @at-root &__button {
-    border: 0 solid transparent; //overrides the default button border
-    position: absolute;
-    top: 50%;
-    width: $carousel-pagination-width;
-    height: $carousel-pagination-height;
-    background: $carousel-background-color url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI4IDQ4Ij48c3R5bGU+LnN0MHtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNmZmZ9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcuNCAyNC4xTDMuMSA0OCAwIDQ1LjFsMjEuNC0yMUwwIDMuMSAzLjEgMHoiLz48L3N2Zz4=) no-repeat 18px center;
-    background-size: $carousel-pagination-arrow-size;
-    background-position: center center;
-    outline-style: none;
-    transition: background-color .1s, opacity .5s;
-
-    &:hover:not(.hide) {
-      background-color: rgba(0, 0, 0, .75);
+    @at-root &__indicator {
+        position: absolute;
+        color: $pagination-indicator-color;
+        padding: $pagination-indicator-padding 0;
+        background-color: $pagination-indicator-background-color;
+        font-size: $pagination-indicator-font-size;
+        bottom: 0;
+        left: 0;
+        min-width: 40px;
+        max-width: 50px;
+        text-align: center;
     }
-
-    &:focus {
-      outline: none;
+    @at-root &__button {
+        border: 0 solid transparent; //overrides the default button border
+        position: absolute;
+        top: 50%;
+        width: $carousel-pagination-width;
+        height: $carousel-pagination-height;
+        background: $carousel-background-color url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI4IDQ4Ij48c3R5bGU+LnN0MHtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNmZmZ9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcuNCAyNC4xTDMuMSA0OCAwIDQ1LjFsMjEuNC0yMUwwIDMuMSAzLjEgMHoiLz48L3N2Zz4=) no-repeat 18px center;
+        background-size: $carousel-pagination-arrow-size;
+        background-position: center center;
+        outline-style: none;
+        transition: background-color .1s, opacity .5s;
+        &:hover:not(.hide) {
+            background-color: rgba(0, 0, 0, .75);
+        }
+        &:focus {
+            outline: none;
+        }
+        &--hidden {
+            opacity: 0;
+        }
+        &[data-direction="left"] {
+            left: $carousel-gap/2;
+            transform: scaleX(-1) translateY(-50%);
+        }
+        &[data-direction="right"] {
+            right: $carousel-gap/2;
+            transform: translateY(-50%);
+        }
     }
-
-    &--hidden {
-      opacity: 0;
+    @at-root &__item {
+        display: flex;
+        flex-direction: column;
+        flex: 1 0 auto;
+        outline-style: none;
+        align-items: center;
+        justify-content: center;
+        &--invisible {
+            position: absolute;
+            z-index: -1;
+            visibility: hidden;
+            transform: translateX(-9999em);
+        }
     }
-
-    &[data-direction="left"] {
-      left: $carousel-gap/2;
-      transform: scaleX(-1) translateY(-50%);
-    }
-
-    &[data-direction="right"] {
-      right: $carousel-gap/2;
-      transform: translateY(-50%);
-    }
-  }
-
-  @at-root &__item {
-    display: flex;
-    flex-direction: column;
-    flex: 1 0 auto;
-    outline-style: none;
-    align-items: center;
-    justify-content: center;
-
-    &--invisible {
-      position: absolute;
-      z-index: -1;
-      visibility: hidden;
-      transform: translateX(-9999em);
-    }
-  }
 }
 
 as24-carousel[loop="infinite"] {
