@@ -142,8 +142,8 @@ var doUpdateIndicator = function doUpdateIndicator(indicator, currentPosition, m
     return indicator ? (indicator.innerHTML = currentPosition + "/" + max, true) : false;
 };
 var doMove = function doMove(container, offset) {
-    container.style.transform = 'translate3d(' + -1 * offset + 'px, 0, 0)';
-    container.style.webkitTransform = 'translate3d(' + -1 * offset + 'px, 0, 0)';
+    container.style.transform = 'translateX(' + -1 * offset + 'px)';
+    container.style.webkitTransform = 'translateX(' + -1 * offset + 'px)';
     return true;
 };
 var doSetOrder = function doSetOrder(item, ord) {
