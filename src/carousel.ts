@@ -5,6 +5,8 @@ import { step, swipeContinuous, swipeStarts, swipeEnds } from './logic';
 import { afterInfiniteUpdated } from './update-infinite';
 import * as SE from './side-effects';
 
+const querySelector =  HTMLElement.prototype.querySelector;
+
 export class Carousel implements ICarousel {
     element: CarouselElement;
     container: HTMLDivElement;
@@ -33,28 +35,25 @@ export class Carousel implements ICarousel {
     finalTouch: PosCoordinates;
 
     constructor(element: CarouselElement) {
-        this.touchStart = new PosCoordinates(0, 0);
-        this.element = element;
-        this.mode = this.element.getAttribute('loop') || 'finite';
-        this.container = <HTMLDivElement>this.element.querySelector('[role="container"]');
-        if (this.container) { // hot fix
-          this.container.addEventListener('transitionend', _ => this.busy = false);
-        }
-        if (this.mode === 'infinite') {
-            // Note: This event will not be always triggered!
-            // When we move to the [right], first of all, we remove `no-transition` class from the container.
-            // Thus, transition happens and we have the event.
-            // However, when we move to the [left], we add the `no-transition` class to the Container.
-            // Thus, the transition will not be happening and the callback will not be called.
-          if (this.container) {// hot fix
-            this.container.addEventListener('transitionend', _ => {
-                mutate(this, afterInfiniteUpdated(this, false));
-            });
-          }
-        }
+      this.element = element;
     }
 
     attached() {
+      this.touchStart = new PosCoordinates(0, 0);
+      this.mode = this.element.getAttribute('loop') || 'finite';
+      this.container = <HTMLDivElement>(querySelector.call(this.element, '[role="container"]'));
+        this.container.addEventListener('transitionend', _ => this.busy = false);
+      if (this.mode === 'infinite') {
+        // Note: This event will not be always triggered!
+        // When we move to the [right], first of all, we remove `no-transition` class from the container.
+        // Thus, transition happens and we have the event.
+        // However, when we move to the [left], we add the `no-transition` class to the Container.
+        // Thus, the transition will not be happening and the callback will not be called.
+          this.container.addEventListener('transitionend', _ => {
+            mutate(this, afterInfiniteUpdated(this, false));
+          });
+      }
+
         // Create Listeners.
         this.resizeListener = throttle(step.bind(null, 0, this.mode, this), 100);
         this.touchStartListener = this.touchStartEventHandler.bind(this);

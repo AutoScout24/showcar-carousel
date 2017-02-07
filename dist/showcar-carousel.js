@@ -78,11 +78,17 @@ var getElementWidth = function getElementWidth(element, inclMargins) {
     return resultingWidth;
 };
 var getVars = function getVars(element, container) {
+    // console.log(container);
     var rootElemWidth = getElementWidth(element, false);
     var stepWidth = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(container.children.item(0), true);
+    // const totalWidth: number;
+    // if (!container) {
     var totalWidth = Math.floor(Array.from(container.children).reduce(function (acc, item) {
         return acc += getElementWidth(item, true);
     }, 0));
+    // }else{
+    //   const totalWidth: number = stepWidth;
+    // }
     var maxOffset = Math.floor(totalWidth - rootElemWidth);
     var itemsVisible = Math.floor((rootElemWidth | 0) / (stepWidth | 0));
     return { maxOffset: maxOffset, stepWidth: stepWidth, itemsVisible: itemsVisible, rootElemWidth: rootElemWidth, totalWidth: totalWidth };
@@ -396,9 +402,9 @@ var swipeEnds = function swipeEnds(finalPos, state) {
 };
 
 /// <reference path="./definitions.ts" />
+var querySelector = HTMLElement.prototype.querySelector;
 var Carousel = function () {
     function Carousel(element) {
-        var _this = this;
         this.swipeDir = undefined;
         this.isSwiping = undefined;
         this.busy = false;
@@ -410,30 +416,26 @@ var Carousel = function () {
             right: null,
             indicator: null
         };
-        this.touchStart = new PosCoordinates(0, 0);
         this.element = element;
+    }
+    Carousel.prototype.attached = function () {
+        var _this = this;
+        this.touchStart = new PosCoordinates(0, 0);
         this.mode = this.element.getAttribute('loop') || 'finite';
-        this.container = this.element.querySelector('[role="container"]');
-        if (this.container) {
-            this.container.addEventListener('transitionend', function (_) {
-                return _this.busy = false;
-            });
-        }
+        this.container = querySelector.call(this.element, '[role="container"]');
+        this.container.addEventListener('transitionend', function (_) {
+            return _this.busy = false;
+        });
         if (this.mode === 'infinite') {
             // Note: This event will not be always triggered!
             // When we move to the [right], first of all, we remove `no-transition` class from the container.
             // Thus, transition happens and we have the event.
             // However, when we move to the [left], we add the `no-transition` class to the Container.
             // Thus, the transition will not be happening and the callback will not be called.
-            if (this.container) {
-                this.container.addEventListener('transitionend', function (_) {
-                    mutate(_this, afterInfiniteUpdated(_this, false));
-                });
-            }
+            this.container.addEventListener('transitionend', function (_) {
+                mutate(_this, afterInfiniteUpdated(_this, false));
+            });
         }
-    }
-    Carousel.prototype.attached = function () {
-        var _this = this;
         // Create Listeners.
         this.resizeListener = throttle(step.bind(null, 0, this.mode, this), 100);
         this.touchStartListener = this.touchStartEventHandler.bind(this);

@@ -48,7 +48,7 @@ interface CarouselState {
 
 interface ICarousel extends CarouselState {
     element: CarouselElement;
-    container: HTMLDivElement | null; // hotfix from Inaki Anduaga
+    container: HTMLDivElement;
     mode: CarouselMode;
     pagination: IPagination;
 }
