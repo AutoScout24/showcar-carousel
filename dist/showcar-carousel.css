@@ -103,6 +103,7 @@ as24-carousel {
       -ms-flex-pack: center;
           justify-content: center; }
   .as24-carousel__item--invisible {
+    display: none;
     position: absolute;
     z-index: -1;
     visibility: hidden;
