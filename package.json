@@ -1,6 +1,6 @@
 {
   "name": "showcar-carousel",
-  "version": "4.3.2",
+  "version": "4.3.3",
   "description": "A simple carousel web component without dependencies.",
   "main": "dist/showcar-carousel.min.js",
   "scripts": {
