@@ -1,3 +1,9 @@
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(factory());
+}(this, (function () { 'use strict';
+
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 /// <reference path="./definitions.ts" />
 var addClass = function addClass(className, element) {
@@ -72,17 +78,11 @@ var getElementWidth = function getElementWidth(element, inclMargins) {
     return resultingWidth;
 };
 var getVars = function getVars(element, container) {
-    // console.log(container);
     var rootElemWidth = getElementWidth(element, false);
     var stepWidth = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(container.children.item(0), true);
-    // const totalWidth: number;
-    // if (!container) {
     var totalWidth = Math.floor(Array.from(container.children).reduce(function (acc, item) {
         return acc += getElementWidth(item, true);
     }, 0));
-    // }else{
-    //   const totalWidth: number = stepWidth;
-    // }
     var maxOffset = Math.floor(totalWidth - rootElemWidth);
     var itemsVisible = Math.floor((rootElemWidth | 0) / (stepWidth | 0));
     return { maxOffset: maxOffset, stepWidth: stepWidth, itemsVisible: itemsVisible, rootElemWidth: rootElemWidth, totalWidth: totalWidth };
@@ -165,7 +165,6 @@ var doSetPositioning = function doSetPositioning(howMany, items, order) {
     });
     return items;
 };
-//# sourceMappingURL=side-effects.js.map
 
 /// <reference path="./definitions.ts" />
 /// <reference path="./helpers.ts" />
@@ -174,7 +173,8 @@ var updateFinite = function updateFinite(dir, state, triggerNotifications) {
         container = state.container,
         offset = state.offset,
         index = state.index,
-        pagination = state.pagination;
+        pagination = state.pagination,
+        itemsOrder = state.itemsOrder;
     var _a = getVars(element, container),
         rootElemWidth = _a.rootElemWidth,
         stepWidth = _a.stepWidth,
@@ -185,7 +185,11 @@ var updateFinite = function updateFinite(dir, state, triggerNotifications) {
     index = calcStepIndex(dir, state);
     var newOffset = rootElemWidth > totalWidth ? 0 : getNextOffset(index, stepWidth, maxOffset);
     // side effects
-    doUpdateNavigationButtonsState(pagination.left, pagination.right, newOffset > 0, newOffset < maxOffset);
+    if (maxOffset < 0) {
+        doUpdateNavigationButtonsState(pagination.left, pagination.right, false, true);
+    } else {
+        doUpdateNavigationButtonsState(pagination.left, pagination.right, newOffset > 0, newOffset < maxOffset);
+    }
     if (Math.abs(offset - newOffset) > 0) {
         if (triggerNotifications) {
             doNotify(element, dir, index);
@@ -193,20 +197,22 @@ var updateFinite = function updateFinite(dir, state, triggerNotifications) {
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
     doMove(container, newOffset);
-    return { touchStart: null, index: index, offset: newOffset, isSwiping: false, swipeDir: undefined };
+    return { touchStart: null, index: index, offset: newOffset, itemsOrder: itemsOrder, isSwiping: false, swipeDir: undefined };
 };
 var swipeStartsFinite = function swipeStartsFinite(touch, state) {
     var offset = state.offset,
         index = state.index,
-        container = state.container;
+        container = state.container,
+        itemsOrder = state.itemsOrder;
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index: index, offset: offset, isSwiping: undefined, swipeDir: undefined };
+    return { touchStart: touch, index: index, offset: offset, itemsOrder: itemsOrder, isSwiping: undefined, swipeDir: undefined };
 };
 var swipeContinuousFinite = function swipeContinuousFinite(currentPos, state) {
     var offset = state.offset,
         touchStart = state.touchStart,
         index = state.index,
         container = state.container,
+        itemsOrder = state.itemsOrder,
         isSwiping$$1 = state.isSwiping,
         swipeDir = state.swipeDir;
     var dx = Math.abs(currentPos.x - touchStart.x);
@@ -215,7 +221,7 @@ var swipeContinuousFinite = function swipeContinuousFinite(currentPos, state) {
         var diffX = offset + -1 * (currentPos.x - touchStart.x);
         doMove(container, diffX);
     }
-    return { index: index, offset: offset, touchStart: touchStart, swipeDir: swipeDir, isSwiping: isSwiping$$1 === undefined ? dx / dy > .6 : isSwiping$$1 };
+    return { index: index, offset: offset, touchStart: touchStart, swipeDir: swipeDir, itemsOrder: itemsOrder, isSwiping: isSwiping$$1 === undefined ? dx / dy > .6 : isSwiping$$1 };
 };
 var swipeEndsFinite = function swipeEndsFinite(finalTouch, state) {
     var index = state.index,
@@ -223,12 +229,15 @@ var swipeEndsFinite = function swipeEndsFinite(finalTouch, state) {
         touchStart = state.touchStart,
         container = state.container,
         isSwiping$$1 = state.isSwiping;
+    if (!touchStart) {
+        // meaning user tapped a button
+        return;
+    }
     var dir = touchStart.x - finalTouch.x > 0 ? 1 : -1;
     if (isSwiping$$1) {
         return updateFinite(dir, state, true);
     }
 };
-//# sourceMappingURL=update-finite.js.map
 
 /// <reference path="./definitions.ts" />
 var reorder = function reorder(index, items) {
@@ -351,7 +360,6 @@ var swipeEndsInfinite = function swipeEndsInfinite(finalTouch, state) {
         return updateInfinite(swipeDir, state, true);
     }
 };
-//# sourceMappingURL=update-infinite.js.map
 
 /// <reference path="./definitions.ts" />
 var step = function step(dir, state, triggerNotifications) {
@@ -393,7 +401,6 @@ var swipeEnds = function swipeEnds(finalPos, state) {
             return swipeEndsFinite(finalPos, state);
     }
 };
-//# sourceMappingURL=logic.js.map
 
 /// <reference path="./definitions.ts" />
 var querySelector = HTMLElement.prototype.querySelector;
@@ -563,4 +570,5 @@ try {
         window.console.warn('Failed to register CustomElement "as24-carousel".', e);
     }
 }
-//# sourceMappingURL=showcar-carousel.js.map
+
+})));

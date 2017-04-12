@@ -71,15 +71,9 @@ export const getElementWidth = (element: Element, inclMargins: boolean): number 
 };
 
 export const getVars = (element: CarouselElement, container: HTMLDivElement) => {
-    // console.log(container);
     const rootElemWidth: number = getElementWidth(element, false);
     const stepWidth: number = element.getAttribute('loop') === 'infinite' ? element.getBoundingClientRect().width : getElementWidth(<HTMLElement>container.children.item(0), true);
-  // const totalWidth: number;
-  // if (!container) {
     const totalWidth: number = Math.floor(Array.from(container.children).reduce((acc, item) => acc += getElementWidth(item, true), 0));
-  // }else{
-  //   const totalWidth: number = stepWidth;
-  // }
     const maxOffset: number = Math.floor(totalWidth - rootElemWidth);
     const itemsVisible: number = Math.floor((rootElemWidth | 0) / (stepWidth | 0));
     return { maxOffset, stepWidth, itemsVisible, rootElemWidth, totalWidth };
