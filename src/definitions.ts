@@ -40,7 +40,7 @@ interface CarouselState {
     index: CarouselIndex;
     offset: CarouselOffset;
     busy?: boolean;
-    itemsOrder?: SlidesOrder;
+    itemsOrder: SlidesOrder;
     touchStart: PosCoordinates | null;
     isSwiping: undefined | boolean;
     swipeDir: undefined | number;

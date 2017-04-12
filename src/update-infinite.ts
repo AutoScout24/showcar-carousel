@@ -21,22 +21,22 @@ export const afterInfiniteUpdated = (state: ICarousel, supposeToMoveToLeft: bool
         removeClass('as24-carousel__container--static', container);
     } else {
         addClass('as24-carousel__container--static', container);
-        SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
+        if (itemsOrder !== undefined) {
+            SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
+        }
     }
 
     SE.doMove(container, 0);
 
-    state.busy = false;
     state.itemsOrder = getInitialItemsOrder(container.children);
+    state.busy = false;
     return state;
 };
 
 export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNotifications: boolean): ICarousel => {
-    let { element, container, touchStart, offset, index, pagination, busy, mode } = state;
+    let { element, container, touchStart, offset, index, pagination, mode } = state;
     const { stepWidth, itemsVisible } = getVars(element, container);
     let items = <CarouselItem[]>Array.from(container.children);
-
-    if (busy) return;
 
     index = dir !== 0 ? calcStepIndex(dir, state) : index;
     offset = dir === -1
@@ -44,7 +44,7 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
         : dir * stepWidth;
     const initialOrder = getInitialItemsOrder(container.children);
     const itemsOrder = reorder(index, initialOrder);
-    let isBusy = busy;
+    let busy = true;
 
     if (dir < 0) {
         addClass('as24-carousel__container--static', container);
@@ -58,7 +58,7 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
         addClass('as24-carousel__container--static', container);
         SE.doMove(container, offset);
         SE.doSetPositioning(2, items, SE.doReorderItems(items, itemsOrder));
-        isBusy = false;
+        busy = false;
     }
 
     if (triggerNotifications) {
@@ -67,22 +67,17 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
 
     SE.doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
 
-    return { index, touchStart, offset: 0, itemsOrder, busy: isBusy, isSwiping: false, swipeDir: undefined, element, container, mode, pagination };
+    return { index, touchStart, offset: 0, itemsOrder, busy, isSwiping: false, swipeDir: undefined, element, container, mode, pagination };
 };
 
 export const swipeStartsInfinite = (touch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { offset, index, container, busy } = state;
-
-    if (busy) return;
-
+    const { offset, index, container, itemsOrder } = state;
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index, offset: 0, busy, isSwiping: undefined, swipeDir: undefined };
+    return { touchStart: touch, index, offset: 0, itemsOrder, isSwiping: undefined, swipeDir: undefined };
 };
 
 export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICarousel): CarouselState => {
-    let { touchStart, index, container, element, busy, isSwiping, swipeDir } = state;
-
-    if (busy) return;
+    let { touchStart, index, container, element, isSwiping, swipeDir } = state;
 
     let offset = 0, itemsOrder, items;
     const distanceX  = Math.abs(currentPos.x - touchStart.x);
@@ -109,13 +104,13 @@ export const swipeContinuousInfinite = (currentPos: PosCoordinates, state: ICaro
         SE.doMove(container, offset);
     }
 
-    return { index, touchStart, offset, itemsOrder, busy, swipeDir, isSwiping: isSwiping === undefined
+    return { index, touchStart, offset, itemsOrder, swipeDir, isSwiping: isSwiping === undefined
         ? distanceX / distanceY > .6
         : isSwiping };
 };
 
 export const swipeEndsInfinite = (finalTouch: PosCoordinates, state: ICarousel): CarouselState => {
-    const { index, offset, touchStart, container, busy, isSwiping, swipeDir } = state;
+    const { index, offset, touchStart, container, isSwiping, swipeDir } = state;
     if (isSwiping) {
         removeClass('as24-carousel__container--static', container);
         const swipedToFarToLeft = (swipeDir === -1 && touchStart.x - finalTouch.x > 0);

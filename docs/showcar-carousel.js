@@ -1,9 +1,3 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(factory());
-}(this, (function () { 'use strict';
-
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 /// <reference path="./definitions.ts" />
 var addClass = function addClass(className, element) {
@@ -171,6 +165,7 @@ var doSetPositioning = function doSetPositioning(howMany, items, order) {
     });
     return items;
 };
+//# sourceMappingURL=side-effects.js.map
 
 /// <reference path="./definitions.ts" />
 /// <reference path="./helpers.ts" />
@@ -233,6 +228,7 @@ var swipeEndsFinite = function swipeEndsFinite(finalTouch, state) {
         return updateFinite(dir, state, true);
     }
 };
+//# sourceMappingURL=update-finite.js.map
 
 /// <reference path="./definitions.ts" />
 var reorder = function reorder(index, items) {
@@ -253,11 +249,13 @@ var afterInfiniteUpdated = function afterInfiniteUpdated(state, supposeToMoveToL
         removeClass('as24-carousel__container--static', container);
     } else {
         addClass('as24-carousel__container--static', container);
-        doSetPositioning(2, items, doReorderItems(items, itemsOrder));
+        if (itemsOrder !== undefined) {
+            doSetPositioning(2, items, doReorderItems(items, itemsOrder));
+        }
     }
     doMove(container, 0);
-    state.busy = false;
     state.itemsOrder = getInitialItemsOrder(container.children);
+    state.busy = false;
     return state;
 };
 var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
@@ -267,18 +265,16 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         offset = state.offset,
         index = state.index,
         pagination = state.pagination,
-        busy = state.busy,
         mode = state.mode;
     var _a = getVars(element, container),
         stepWidth = _a.stepWidth,
         itemsVisible = _a.itemsVisible;
     var items = Array.from(container.children);
-    if (busy) return;
     index = dir !== 0 ? calcStepIndex(dir, state) : index;
     offset = dir === -1 ? offset === 0 ? dir * stepWidth : dir * offset : dir * stepWidth;
     var initialOrder = getInitialItemsOrder(container.children);
     var itemsOrder = reorder(index, initialOrder);
-    var isBusy = busy;
+    var busy = true;
     if (dir < 0) {
         addClass('as24-carousel__container--static', container);
         doSetPositioning(2, items, doReorderItems(items, itemsOrder));
@@ -291,32 +287,29 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         addClass('as24-carousel__container--static', container);
         doMove(container, offset);
         doSetPositioning(2, items, doReorderItems(items, itemsOrder));
-        isBusy = false;
+        busy = false;
     }
     if (triggerNotifications) {
         doNotify(element, dir, index);
     }
     doUpdateIndicator(pagination.indicator, index + 1, container.children.length);
-    return { index: index, touchStart: touchStart, offset: 0, itemsOrder: itemsOrder, busy: isBusy, isSwiping: false, swipeDir: undefined, element: element, container: container, mode: mode, pagination: pagination };
+    return { index: index, touchStart: touchStart, offset: 0, itemsOrder: itemsOrder, busy: busy, isSwiping: false, swipeDir: undefined, element: element, container: container, mode: mode, pagination: pagination };
 };
 var swipeStartsInfinite = function swipeStartsInfinite(touch, state) {
     var offset = state.offset,
         index = state.index,
         container = state.container,
-        busy = state.busy;
-    if (busy) return;
+        itemsOrder = state.itemsOrder;
     addClass('as24-carousel__container--static', container);
-    return { touchStart: touch, index: index, offset: 0, busy: busy, isSwiping: undefined, swipeDir: undefined };
+    return { touchStart: touch, index: index, offset: 0, itemsOrder: itemsOrder, isSwiping: undefined, swipeDir: undefined };
 };
 var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state) {
     var touchStart = state.touchStart,
         index = state.index,
         container = state.container,
         element = state.element,
-        busy = state.busy,
         isSwiping$$1 = state.isSwiping,
         swipeDir = state.swipeDir;
-    if (busy) return;
     var offset = 0,
         itemsOrder,
         items;
@@ -339,14 +332,13 @@ var swipeContinuousInfinite = function swipeContinuousInfinite(currentPos, state
         }
         doMove(container, offset);
     }
-    return { index: index, touchStart: touchStart, offset: offset, itemsOrder: itemsOrder, busy: busy, swipeDir: swipeDir, isSwiping: isSwiping$$1 === undefined ? distanceX / distanceY > .6 : isSwiping$$1 };
+    return { index: index, touchStart: touchStart, offset: offset, itemsOrder: itemsOrder, swipeDir: swipeDir, isSwiping: isSwiping$$1 === undefined ? distanceX / distanceY > .6 : isSwiping$$1 };
 };
 var swipeEndsInfinite = function swipeEndsInfinite(finalTouch, state) {
     var index = state.index,
         offset = state.offset,
         touchStart = state.touchStart,
         container = state.container,
-        busy = state.busy,
         isSwiping$$1 = state.isSwiping,
         swipeDir = state.swipeDir;
     if (isSwiping$$1) {
@@ -359,6 +351,7 @@ var swipeEndsInfinite = function swipeEndsInfinite(finalTouch, state) {
         return updateInfinite(swipeDir, state, true);
     }
 };
+//# sourceMappingURL=update-infinite.js.map
 
 /// <reference path="./definitions.ts" />
 var step = function step(dir, state, triggerNotifications) {
@@ -400,6 +393,7 @@ var swipeEnds = function swipeEnds(finalPos, state) {
             return swipeEndsFinite(finalPos, state);
     }
 };
+//# sourceMappingURL=logic.js.map
 
 /// <reference path="./definitions.ts" />
 var querySelector = HTMLElement.prototype.querySelector;
@@ -434,6 +428,7 @@ var Carousel = function () {
             // Thus, the transition will not be happening and the callback will not be called.
             this.container.addEventListener('transitionend', function (_) {
                 mutate(_this, afterInfiniteUpdated(_this, false));
+                // this.busy = false;
             });
         }
         // Create Listeners.
@@ -442,21 +437,21 @@ var Carousel = function () {
         this.touchMoveListener = this.touchMoveEventHandler.bind(this);
         this.touchEndListener = this.touchEndEventHandler.bind(this);
         // Add Listeners.
-        window.addEventListener('resize', this.resizeListener, true);
-        this.element.addEventListener('touchstart', this.touchStartListener, true);
-        this.element.addEventListener('touchmove', this.touchMoveListener, true);
-        this.element.addEventListener('touchend', this.touchEndListener, true);
-        // Add container and pagination buttons.
-        forEach(function (btn) {
-            var direction = btn.getAttribute('data-direction');
-            _this.pagination[btn.getAttribute('data-direction')] = btn;
-            var eventName = 'touchend' in window ? 'touchend' : 'click';
-            btn.addEventListener(eventName, function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                mutate(_this, step(direction === 'left' ? -1 : 1, _this));
-            });
-        }, this.element.querySelectorAll('[role="nav-button"]'));
+        window.addEventListener('resize', this.resizeListener);
+        this.element.addEventListener('touchstart', this.touchStartListener);
+        this.element.addEventListener('touchmove', this.touchMoveListener);
+        this.element.addEventListener('touchend', this.touchEndListener);
+        if (!('touchend' in window)) {
+            forEach(function (btn) {
+                var direction = btn.getAttribute('data-direction');
+                _this.pagination[btn.getAttribute('data-direction')] = btn;
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    mutate(_this, step(direction === 'left' ? -1 : 1, _this));
+                });
+            }, this.element.querySelectorAll('[role="nav-button"]'));
+        }
         this.pagination.indicator = this.element.querySelector('[role="indicator"]');
         this.index = 0;
         mutate(this, step(0, this, false));
@@ -469,20 +464,35 @@ var Carousel = function () {
         this.element.removeEventListener('touchend', this.touchEndListener, true);
     };
     Carousel.prototype.touchStartEventHandler = function (event) {
-        var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
-        if (!navAvailable(navButtons)) {
-            return;
+        var target = event.target;
+        if (target.classList.contains('as24-carousel__button')) {
+            event.preventDefault();
+            event.stopPropagation();
         }
-        mutate(this, swipeStarts(getTouchCoords(event), this));
+        if (this.busy) return;
+        if (target.classList.contains('as24-carousel__button')) {
+            var btnDirection = target.dataset.direction;
+            mutate(this, step(btnDirection === 'left' ? -1 : 1, this));
+        } else {
+            var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+            if (!navAvailable(navButtons)) {
+                return;
+            }
+            mutate(this, swipeStarts(getTouchCoords(event), this));
+        }
     };
     Carousel.prototype.touchMoveEventHandler = function (event) {
+        var target = event.target;
         var navButtons = Array.from(this.element.querySelectorAll('[role="nav-button"]'));
+        if (this.busy) return;
+        if (this.isSwiping) {
+            event.preventDefault();
+        }
         if (!navAvailable(navButtons)) {
             return;
         }
-        mutate(this, swipeContinuous(getTouchCoords(event), this));
-        if (this.isSwiping) {
-            event.preventDefault();
+        if (!target.classList.contains('as24-carousel__button')) {
+            mutate(this, swipeContinuous(getTouchCoords(event), this));
         }
     };
     Carousel.prototype.touchEndEventHandler = function (event) {
@@ -553,5 +563,4 @@ try {
         window.console.warn('Failed to register CustomElement "as24-carousel".', e);
     }
 }
-
-})));
+//# sourceMappingURL=showcar-carousel.js.map
