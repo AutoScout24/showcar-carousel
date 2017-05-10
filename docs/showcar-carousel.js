@@ -445,8 +445,8 @@ var Carousel = function () {
         this.touchEndListener = this.touchEndEventHandler.bind(this);
         // Add Listeners.
         window.addEventListener('resize', this.resizeListener);
-        this.element.addEventListener('touchstart', this.touchStartListener, { passive: true });
-        this.element.addEventListener('touchmove', this.touchMoveListener, { passive: true });
+        this.element.addEventListener('touchstart', this.touchStartListener);
+        this.element.addEventListener('touchmove', this.touchMoveListener);
         this.element.addEventListener('touchend', this.touchEndListener);
         if (!('touchend' in window)) {
             forEach(function (btn) {
@@ -466,8 +466,8 @@ var Carousel = function () {
     };
     Carousel.prototype.detached = function () {
         window.removeEventListener('resize', this.resizeListener, true);
-        this.element.removeEventListener('touchstart', this.touchStartListener, { passive: true });
-        this.element.removeEventListener('touchmove', this.touchMoveListener, { passive: true });
+        this.element.removeEventListener('touchstart', this.touchStartListener, true);
+        this.element.removeEventListener('touchmove', this.touchMoveListener, true);
         this.element.removeEventListener('touchend', this.touchEndListener, true);
     };
     Carousel.prototype.touchStartEventHandler = function (event) {

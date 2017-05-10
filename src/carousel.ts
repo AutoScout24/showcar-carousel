@@ -63,8 +63,8 @@ export class Carousel implements ICarousel {
 
         // Add Listeners.
         window.addEventListener('resize', this.resizeListener);
-        this.element.addEventListener('touchstart', this.touchStartListener, { passive: true });
-        this.element.addEventListener('touchmove', this.touchMoveListener, { passive: true });
+        this.element.addEventListener('touchstart', this.touchStartListener);
+        this.element.addEventListener('touchmove', this.touchMoveListener);
         this.element.addEventListener('touchend', this.touchEndListener);
 
         if (!('touchend' in window)) {
@@ -88,8 +88,8 @@ export class Carousel implements ICarousel {
 
     detached() {
         window.removeEventListener('resize', this.resizeListener, true);
-        this.element.removeEventListener('touchstart', this.touchStartListener, { passive: true });
-        this.element.removeEventListener('touchmove', this.touchMoveListener, { passive: true });
+        this.element.removeEventListener('touchstart', this.touchStartListener, true);
+        this.element.removeEventListener('touchmove', this.touchMoveListener, true);
         this.element.removeEventListener('touchend', this.touchEndListener, true);
     }
 
