@@ -18,6 +18,8 @@ export class Carousel implements ICarousel {
     offset: number = 0;
     itemsOrder: SlidesOrder;
     mode: CarouselMode = 'finite';
+    autoRotateInterval: number = 0;
+    private autoRotateIntervalId: number;
 
     resizeListener: EventListener;
     touchStartListener: EventListener;
@@ -41,6 +43,7 @@ export class Carousel implements ICarousel {
     attached() {
       this.touchStart = new PosCoordinates(0, 0);
       this.mode = this.element.getAttribute('loop') || 'finite';
+      this.autoRotateInterval = this.element.getAttribute('auto-rotate-interval') || 0;
       this.container = <HTMLDivElement>(querySelector.call(this.element, '[role="container"]'));
         this.container.addEventListener('transitionend', _ => this.busy = false);
         if (this.mode === 'infinite') {
@@ -84,6 +87,8 @@ export class Carousel implements ICarousel {
         this.index = 0;
         mutate(this, step(0, this, false));
         this.busy = false;
+
+        if (this.autoRotateInterval > 0) this.setupAutoRotate();
     }
 
     detached() {
@@ -157,5 +162,28 @@ export class Carousel implements ICarousel {
         this.container.children[index].remove();
         this.busy = false;
         this.goTo(1, { notify: false });
+    }
+
+    private setupAutoRotate(): void {
+      this.autoRotateIntervalId = setInterval(() => {
+        mutate(this, step(1, this));
+      }, this.autoRotateInterval);
+      this.addOneTimeEventListener(this.element, 'touchstart', this.stopAutoRotate.bind(this));
+      this.addOneTimeEventListener(this.element, 'click', this.stopAutoRotate.bind(this));
+    }
+
+    private stopAutoRotate(): void {
+      clearInterval(this.autoRotateIntervalId);
+      this.autoRotateIntervalId = 0;
+      this.element.removeEventListener('click', this.stopAutoRotate);
+      this.element.removeEventListener('touchstart', this.stopAutoRotate);
+    }
+
+    private addOneTimeEventListener(element: Element, eventName: string, listener: Function): void {
+      const executeListenerAndRemove = () => {
+        listener();
+        element.removeEventListener(eventName, executeListenerAndRemove, true);
+      }
+      element.addEventListener(eventName, executeListenerAndRemove, true);
     }
 }
