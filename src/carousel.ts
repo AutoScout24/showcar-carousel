@@ -173,10 +173,9 @@ export class Carousel implements ICarousel {
     }
 
     private stopAutoRotate(): void {
+      if (!this.autoRotateIntervalId) return;
       clearInterval(this.autoRotateIntervalId);
       this.autoRotateIntervalId = 0;
-      this.element.removeEventListener('click', this.stopAutoRotate);
-      this.element.removeEventListener('touchstart', this.stopAutoRotate);
     }
 
     private addOneTimeEventListener(element: Element, eventName: string, listener: Function): void {

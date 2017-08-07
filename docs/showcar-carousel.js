@@ -544,10 +544,9 @@ var Carousel = function () {
         this.addOneTimeEventListener(this.element, 'click', this.stopAutoRotate.bind(this));
     };
     Carousel.prototype.stopAutoRotate = function () {
+        if (!this.autoRotateIntervalId) return;
         clearInterval(this.autoRotateIntervalId);
         this.autoRotateIntervalId = 0;
-        this.element.removeEventListener('click', this.stopAutoRotate);
-        this.element.removeEventListener('touchstart', this.stopAutoRotate);
     };
     Carousel.prototype.addOneTimeEventListener = function (element, eventName, listener) {
         var executeListenerAndRemove = function executeListenerAndRemove() {
