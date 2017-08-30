@@ -74,6 +74,17 @@ or
 <as24-carousel loop="infinite"> ... </as24-carousel>
 ```
 
+#### Auto rotate
+
+You can activate an auto rotate feature which advances the carousel by one image repeatedly. The time interval of the rotation is configurable.
+
+To activate the auto rotate feature set the `auto-rotate-interval` attribute to a value other than zero:
+
+```html
+<as24-carousel loop="infinite" auto-rotate-interval="2000"> ... </as24-carousel>
+```
+
+**Note:** Using this option mostly makes sense in combination with the "infinite" mode. In "finite" mode the auto rotate will stop when reaching the end of the carousel.
 
 #### DOM Events
 
@@ -169,7 +180,7 @@ document.getElementById('carousel-example').goTo(2);
 ```
 
 #### Remove the slide:
-The index starts from `0`. So, `2` is the third slide. 
+The index starts from `0`. So, `2` is the third slide.
 
 ```
 document.getElementById('carousel-example').removeItem(2);

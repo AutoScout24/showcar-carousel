@@ -412,6 +412,7 @@ var Carousel = function () {
         this.index = 0;
         this.offset = 0;
         this.mode = 'finite';
+        this.autoRotateInterval = 0;
         this.pagination = {
             left: null,
             right: null,
@@ -423,6 +424,7 @@ var Carousel = function () {
         var _this = this;
         this.touchStart = new PosCoordinates(0, 0);
         this.mode = this.element.getAttribute('loop') || 'finite';
+        this.autoRotateInterval = this.element.getAttribute('auto-rotate-interval') || 0;
         this.container = querySelector.call(this.element, '[role="container"]');
         this.container.addEventListener('transitionend', function (_) {
             return _this.busy = false;
@@ -463,6 +465,7 @@ var Carousel = function () {
         this.index = 0;
         mutate(this, step(0, this, false));
         this.busy = false;
+        if (this.autoRotateInterval > 0) this.setupAutoRotate();
     };
     Carousel.prototype.detached = function () {
         window.removeEventListener('resize', this.resizeListener, true);
@@ -531,6 +534,26 @@ var Carousel = function () {
         this.container.children[index].remove();
         this.busy = false;
         this.goTo(1, { notify: false });
+    };
+    Carousel.prototype.setupAutoRotate = function () {
+        var _this = this;
+        this.autoRotateIntervalId = setInterval(function () {
+            mutate(_this, step(1, _this));
+        }, this.autoRotateInterval);
+        this.addOneTimeEventListener(this.element, 'touchstart', this.stopAutoRotate.bind(this));
+        this.addOneTimeEventListener(this.element, 'click', this.stopAutoRotate.bind(this));
+    };
+    Carousel.prototype.stopAutoRotate = function () {
+        if (!this.autoRotateIntervalId) return;
+        clearInterval(this.autoRotateIntervalId);
+        this.autoRotateIntervalId = 0;
+    };
+    Carousel.prototype.addOneTimeEventListener = function (element, eventName, listener) {
+        var executeListenerAndRemove = function executeListenerAndRemove() {
+            listener();
+            element.removeEventListener(eventName, executeListenerAndRemove, true);
+        };
+        element.addEventListener(eventName, executeListenerAndRemove, true);
     };
     return Carousel;
 }();

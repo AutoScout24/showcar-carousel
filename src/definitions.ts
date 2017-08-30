@@ -27,6 +27,9 @@ interface NavigationButton extends HTMLAnchorElement {
 type CarouselModeAttr = 'loop';
 type CarouselMode = 'finite' | 'infinite';
 
+type CarouselAutoRotateIntervalAttr = 'auto-rotate-interval';
+type CarouselAutoRotateInterval = number;
+
 type SlidesOrder = number[];
 interface CarouselItem extends HTMLDivElement { }
 type CarouselItemsList = CarouselItem[];
@@ -34,6 +37,7 @@ type CarouselItemsList = CarouselItem[];
 
 interface CarouselElement extends HTMLElement {
     getAttribute(name: CarouselModeAttr): CarouselMode;
+    getAttribute(name: CarouselAutoRotateIntervalAttr): CarouselAutoRotateInterval;
 }
 
 interface CarouselState {
