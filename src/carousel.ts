@@ -182,7 +182,7 @@ export class Carousel implements ICarousel {
       const executeListenerAndRemove = () => {
         listener();
         element.removeEventListener(eventName, executeListenerAndRemove, true);
-      }
+      };
       element.addEventListener(eventName, executeListenerAndRemove, true);
     }
 }

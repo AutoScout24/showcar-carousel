@@ -36,7 +36,6 @@ as24-carousel {
   transition: transform 0.3s, -webkit-transform 0.3s;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
-  will-change: transform;
   -webkit-box-pack: start;
       -ms-flex-pack: start;
           justify-content: flex-start; }
