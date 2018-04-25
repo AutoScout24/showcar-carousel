@@ -36,7 +36,6 @@ as24-carousel {
         flex: 1 0 auto;
         transition: transform $animationSpeed;
         backface-visibility: hidden;
-        will-change: transform;
         justify-content: flex-start;
         &--static {
             transition: none;
