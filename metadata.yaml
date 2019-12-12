@@ -1,0 +1,22 @@
+type: library
+id: showcar-carousel
+name: showcar-carousel
+description: NPM package for carousel element
+vertical: as24
+owners:
+  - '#AS24-acquisition-cxp-ds@scout24.com'
+  - as24-cxp-acquisition@scout24.com
+availability: false
+integrity: false
+confidentiality: public
+exposure: 
+  - non-applicable
+lifecycle: maintenance
+product: showcar-ui
+links:
+  - type: repository
+    title: Git Repository
+    address: https://github.com/Scout24/showcar-carousel/
+  - type: documentation
+    title: Readme
+    address: https://github.com/Scout24/showcar-carousel/blob/master/README.md
