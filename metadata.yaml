@@ -4,8 +4,7 @@ name: showcar-carousel
 description: NPM package for carousel element
 vertical: as24
 owners:
-  - '#AS24-acquisition-cxp-ds@scout24.com'
-  - as24-cxp-acquisition@scout24.com
+- '#AS24-UG-Activation-ds@autoscout24.com'
 availability: false
 integrity: false
 confidentiality: public
