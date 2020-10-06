@@ -53,7 +53,7 @@ export const updateInfinite = (dir: MoveDirection, state: ICarousel, triggerNoti
         afterInfiniteUpdated(state, true);
     } else if (dir > 0) {
         removeClass('as24-carousel__container--static', container);
-        SE.doMove(container, offset);
+        window.requestAnimationFrame(() => { SE.doMove(container, offset) });
     } else {
         addClass('as24-carousel__container--static', container);
         SE.doMove(container, offset);

@@ -1,9 +1,3 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(factory());
-}(this, (function () { 'use strict';
-
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 /// <reference path="./definitions.ts" />
 var addClass = function addClass(className, element) {
@@ -291,7 +285,9 @@ var updateInfinite = function updateInfinite(dir, state, triggerNotifications) {
         afterInfiniteUpdated(state, true);
     } else if (dir > 0) {
         removeClass('as24-carousel__container--static', container);
-        doMove(container, offset);
+        window.requestAnimationFrame(function () {
+            doMove(container, offset);
+        });
     } else {
         addClass('as24-carousel__container--static', container);
         doMove(container, offset);
@@ -593,5 +589,3 @@ try {
         window.console.warn('Failed to register CustomElement "as24-carousel".', e);
     }
 }
-
-})));
