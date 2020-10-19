@@ -424,6 +424,9 @@ var Carousel = function () {
         var _this = this;
         this.touchStart = new PosCoordinates(0, 0);
         this.mode = this.element.getAttribute('loop') || 'finite';
+        if (navigator.userAgent.indexOf('Safari') >= 0 && navigator.userAgent.indexOf('OS 14_') >= 0) {
+            this.mode = 'finite';
+        }
         this.autoRotateInterval = this.element.getAttribute('auto-rotate-interval') || 0;
         this.container = querySelector.call(this.element, '[role="container"]');
         this.container.addEventListener('transitionend', function (_) {
